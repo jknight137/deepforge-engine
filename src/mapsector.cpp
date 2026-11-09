@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -6,7 +7,7 @@
 #include "exceptions.h"
 #include "mapblock.h"
 
-MapSector::MapSector(Map *parent, v2s16 pos, IGameDef *gamedef):
+MapSector::MapSector(Map *parent, v2s32 pos, IGameDef *gamedef):
 		m_parent(parent),
 		m_pos(pos),
 		m_gamedef(gamedef)
@@ -33,7 +34,7 @@ void MapSector::deleteBlocks(size_t *used_count)
 	m_blocks.clear();
 }
 
-MapBlock *MapSector::getBlockBuffered(s16 y)
+MapBlock *MapSector::getBlockBuffered(s32 y)
 {
 	MapBlock *block;
 
@@ -52,24 +53,24 @@ MapBlock *MapSector::getBlockBuffered(s16 y)
 	return block;
 }
 
-MapBlock *MapSector::getBlockNoCreateNoEx(s16 y)
+MapBlock *MapSector::getBlockNoCreateNoEx(s32 y)
 {
 	return getBlockBuffered(y);
 }
 
-std::unique_ptr<MapBlock> MapSector::createBlankBlockNoInsert(s16 y)
+std::unique_ptr<MapBlock> MapSector::createBlankBlockNoInsert(s32 y)
 {
 	assert(getBlockBuffered(y) == nullptr); // Pre-condition
 
-	if (blockpos_over_max_limit(v3s16(0, y, 0)))
+	if (blockpos_over_max_limit(v3s32(0, y, 0)))
 		throw InvalidPositionException("createBlankBlockNoInsert(): pos over max mapgen limit");
 
-	v3s16 blockpos_map(m_pos.X, y, m_pos.Y);
+	v3s32 blockpos_map(m_pos.X, y, m_pos.Y);
 
 	return std::make_unique<MapBlock>(blockpos_map, m_gamedef);
 }
 
-MapBlock *MapSector::createBlankBlock(s16 y)
+MapBlock *MapSector::createBlankBlock(s32 y)
 {
 	std::unique_ptr<MapBlock> block_u = createBlankBlockNoInsert(y);
 	MapBlock *block = block_u.get();
@@ -81,14 +82,14 @@ MapBlock *MapSector::createBlankBlock(s16 y)
 
 void MapSector::insertBlock(std::unique_ptr<MapBlock> block)
 {
-	s16 block_y = block->getPos().Y;
+	s32 block_y = block->getPos().Y;
 
 	MapBlock *block2 = getBlockBuffered(block_y);
 	if (block2) {
 		throw AlreadyExistsException("Block already exists");
 	}
 
-	v2s16 p2d(block->getPos().X, block->getPos().Z);
+	v2s32 p2d(block->getPos().X, block->getPos().Z);
 	assert(p2d == m_pos);
 
 	// Insert into container
@@ -103,7 +104,7 @@ void MapSector::deleteBlock(MapBlock *block)
 
 std::unique_ptr<MapBlock> MapSector::detachBlock(MapBlock *block)
 {
-	s16 block_y = block->getPos().Y;
+	s32 block_y = block->getPos().Y;
 
 	// Clear from cache
 	m_block_cache = nullptr;

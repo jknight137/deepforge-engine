@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -33,35 +34,35 @@
 #define FRAMED_NEIGHBOR_COUNT 18
 
 // Maps light index to corner direction
-static constexpr v3s16 light_dirs[8] = {
-	v3s16(-1, -1, -1),
-	v3s16(-1, -1,  1),
-	v3s16(-1,  1, -1),
-	v3s16(-1,  1,  1),
-	v3s16( 1, -1, -1),
-	v3s16( 1, -1,  1),
-	v3s16( 1,  1, -1),
-	v3s16( 1,  1,  1),
+static constexpr v3s32 light_dirs[8] = {
+	v3s32(-1, -1, -1),
+	v3s32(-1, -1,  1),
+	v3s32(-1,  1, -1),
+	v3s32(-1,  1,  1),
+	v3s32( 1, -1, -1),
+	v3s32( 1, -1,  1),
+	v3s32( 1,  1, -1),
+	v3s32( 1,  1,  1),
 };
 
 // Direction of solid node tiles
-static constexpr v3s16 tile_dirs[6] = {
-	v3s16( 0,  1,  0),
-	v3s16( 0, -1,  0),
-	v3s16( 1,  0,  0),
-	v3s16(-1,  0,  0),
-	v3s16( 0,  0,  1),
-	v3s16( 0,  0, -1)
+static constexpr v3s32 tile_dirs[6] = {
+	v3s32( 0,  1,  0),
+	v3s32( 0, -1,  0),
+	v3s32( 1,  0,  0),
+	v3s32(-1,  0,  0),
+	v3s32( 0,  0,  1),
+	v3s32( 0,  0, -1)
 };
 
 // we have this order for some reason...
-static constexpr v3s16 nodebox_connection_dirs[6] = {
-	v3s16( 0,  1,  0), // top
-	v3s16( 0, -1,  0), // bottom
-	v3s16( 0,  0, -1), // front
-	v3s16(-1,  0,  0), // left
-	v3s16( 0,  0,  1), // back
-	v3s16( 1,  0,  0), // right
+static constexpr v3s32 nodebox_connection_dirs[6] = {
+	v3s32( 0,  1,  0), // top
+	v3s32( 0, -1,  0), // bottom
+	v3s32( 0,  0, -1), // front
+	v3s32(-1,  0,  0), // left
+	v3s32( 0,  0,  1), // back
+	v3s32( 1,  0,  0), // right
 };
 
 // Maps cuboid face and vertex indices to the corresponding light index
@@ -110,7 +111,7 @@ void MapblockMeshGenerator::getTile(int index, TileSpec *tile_ret)
 }
 
 // Returns a tile, ready for use, rotated according to the node facedir.
-void MapblockMeshGenerator::getTile(v3s16 direction, TileSpec *tile_ret)
+void MapblockMeshGenerator::getTile(v3s32 direction, TileSpec *tile_ret)
 {
 	getNodeTile(cur_node.n, cur_node.p, direction, data, *tile_ret);
 }
@@ -135,13 +136,13 @@ void MapblockMeshGenerator::getSpecialTile(int index, TileSpec *tile_ret, bool a
 		top_layer->material_flags |= MATERIAL_FLAG_CRACK;
 }
 
-void MapblockMeshGenerator::drawQuad(const TileSpec &tile, v3f *coords, const v3s16 &normal,
+void MapblockMeshGenerator::drawQuad(const TileSpec &tile, v3f *coords, const v3s32 &normal,
 	float vertical_tiling)
 {
 	const v2f tcoords[4] = {v2f(0.0, 0.0), v2f(1.0, 0.0),
 		v2f(1.0, vertical_tiling), v2f(0.0, vertical_tiling)};
 	video::S3DVertex vertices[4];
-	bool shade_face = !cur_node.f->light_source && (normal != v3s16(0, 0, 0));
+	bool shade_face = !cur_node.f->light_source && (normal != v3s32(0, 0, 0));
 	v3f normal2 = v3f::from(normal);
 	for (int j = 0; j < 4; j++) {
 		vertices[j].Pos = coords[j] + cur_node.origin;
@@ -158,7 +159,7 @@ void MapblockMeshGenerator::drawQuad(const TileSpec &tile, v3f *coords, const v3
 }
 
 static std::array<video::S3DVertex, 24> setupCuboidVertices(const aabb3f &box,
-		const f32 *txc, const TileSpec *tiles, int tilecount, v3s16 alignment)
+		const f32 *txc, const TileSpec *tiles, int tilecount, v3s32 alignment)
 {
 	v3f min = box.MinEdge;
 	v3f max = box.MaxEdge;
@@ -335,25 +336,25 @@ static LightPair getFaceLight(MapNode n, MapNode n2, const NodeDefManager *ndef)
 	Calculate smooth lighting at the XYZ- corner of p.
 	Both light banks
 */
-static LightPair getSmoothLightCorner(const v3s16 &p,
-		const v3s16 &corner, MeshMakeData *data)
+static LightPair getSmoothLightCorner(const v3s32 &p,
+		const v3s32 &corner, MeshMakeData *data)
 {
 	const NodeDefManager *ndef = data->m_nodedef;
 
 	assert(data->m_smooth_lighting);
 
-	const std::array<v3s16,8> dirs {
+	const std::array<v3s32,8> dirs {
 		// Always shine light
-		v3s16(0,0,0),
-		v3s16(corner.X,0,0),
-		v3s16(0,corner.Y,0),
-		v3s16(0,0,corner.Z),
+		v3s32(0,0,0),
+		v3s32(corner.X,0,0),
+		v3s32(0,corner.Y,0),
+		v3s32(0,0,corner.Z),
 
 		// Can be obstructed
-		v3s16(corner.X,corner.Y,0),
-		v3s16(corner.X,0,corner.Z),
-		v3s16(0,corner.Y,corner.Z),
-		v3s16(corner.X,corner.Y,corner.Z)
+		v3s32(corner.X,corner.Y,0),
+		v3s32(corner.X,0,corner.Z),
+		v3s32(0,corner.Y,corner.Z),
+		v3s32(corner.X,corner.Y,corner.Z)
 	};
 
 	u16 ambient_occlusion = 0;
@@ -610,7 +611,7 @@ void MapblockMeshGenerator::drawSolidNode()
 	TileSpec tiles[6];
 	u16 lights[6];
 	content_t n1 = cur_node.n.getContent();
-	v3s16 p1 = blockpos_nodes + cur_node.p;
+	v3s32 p1 = blockpos_nodes + cur_node.p;
 
 	auto add_face = [&] (int face, const MapNode &neighbor, bool backface_culling) {
 		faces |= 1 << face;
@@ -630,14 +631,14 @@ void MapblockMeshGenerator::drawSolidNode()
 	// face is visible from below e.g. looking up from underwater.
 	// Submerged solids surrounded by liquid or other solid nodes on all sides are excluded.
 	auto add_waving_liquid_top_face =
-				[&] (const v3s16 &p2, const MapNode &neighbor, content_t n2) -> bool {
+				[&] (const v3s32 &p2, const MapNode &neighbor, content_t n2) -> bool {
 		const ContentFeatures &f2 = nodedef->get(n2);
 		if (cur_node.f->sameLiquidRender(f2))
 			return false;
-		static constexpr v3s16 h_dirs[4] = {
-			v3s16(1,0,0), v3s16(-1,0,0), v3s16(0,0,1), v3s16(0,0,-1)
+		static constexpr v3s32 h_dirs[4] = {
+			v3s32(1,0,0), v3s32(-1,0,0), v3s32(0,0,1), v3s32(0,0,-1)
 		};
-		for (const v3s16 &d : h_dirs) {
+		for (const v3s32 &d : h_dirs) {
 			const ContentFeatures &f_side =
 					nodedef->get(data->m_vmanip.getNodeRefUnsafeCheckFlags(p2 + d));
 
@@ -657,7 +658,7 @@ void MapblockMeshGenerator::drawSolidNode()
 	};
 
 	for (int face = 0; face < 6; face++) {
-		v3s16 p2 = p1 + tile_dirs[face];
+		v3s32 p2 = p1 + tile_dirs[face];
 		MapNode neighbor = data->m_vmanip.getNodeRefUnsafeCheckFlags(p2);
 		content_t n2 = neighbor.getContent();
 		if (n2 == n1)
@@ -697,16 +698,16 @@ void MapblockMeshGenerator::drawSolidNode()
 				continue;
 			if constexpr (LIQUID) {
 				for (int k = 0; k < 4; k++) {
-					const v3s16 corner = light_dirs[light_indices[face][k]];
+					const v3s32 corner = light_dirs[light_indices[face][k]];
 					lights[face][k] = getSmoothLightCorner(p1, corner, data);
 				}
 			} else {
 				// Solid nodes (usually) obstruct light, so take the light from
 				// the (non-solid) neighbor node.
-				const v3s16 &face_dir = tile_dirs[face];
-				v3s16 p2 = p1 + face_dir;
+				const v3s32 &face_dir = tile_dirs[face];
+				v3s32 p2 = p1 + face_dir;
 				for (int k = 0; k < 4; k++) {
-					const v3s16 corner = light_dirs[light_indices[face][k]] - 2 * face_dir;
+					const v3s32 corner = light_dirs[light_indices[face][k]] - 2 * face_dir;
 					lights[face][k] = getSmoothLightCorner(p2, corner, data);
 				}
 			}
@@ -779,9 +780,9 @@ void MapblockMeshGenerator::prepareLiquidNodeDrawing()
 	getSpecialTile(1, &cur_liquid.tile);
 
 	MapNode ntop    = data->m_vmanip.getNodeRefUnsafeCheckFlags(
-			blockpos_nodes + cur_node.p + v3s16(0,  1, 0));
+			blockpos_nodes + cur_node.p + v3s32(0,  1, 0));
 	MapNode nbottom = data->m_vmanip.getNodeRefUnsafeCheckFlags(
-			blockpos_nodes + cur_node.p + v3s16(0, -1, 0));
+			blockpos_nodes + cur_node.p + v3s32(0, -1, 0));
 	cur_liquid.c_flowing = cur_node.f->liquid_alternative_flowing_id;
 	cur_liquid.c_source = cur_node.f->liquid_alternative_source_id;
 	cur_liquid.top_is_same_liquid = (ntop.getContent() == cur_liquid.c_flowing)
@@ -820,7 +821,7 @@ void MapblockMeshGenerator::getLiquidNeighborhood()
 	for (int w = -1; w <= 1; w++)
 	for (int u = -1; u <= 1; u++) {
 		LiquidData::NeighborData &neighbor = cur_liquid.neighbors[w + 1][u + 1];
-		v3s16 p2 = cur_node.p + v3s16(u, 0, w);
+		v3s32 p2 = cur_node.p + v3s32(u, 0, w);
 		MapNode n2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(blockpos_nodes + p2);
 		neighbor.content = n2.getContent();
 		neighbor.level = -0.5f;
@@ -895,17 +896,17 @@ f32 MapblockMeshGenerator::getCornerLevel(int i, int k) const
 
 namespace {
 	struct LiquidFaceDesc {
-		v3s16 dir; // XZ
-		v3s16 p[2]; // XZ only; 1 means +, 0 means -
+		v3s32 dir; // XZ
+		v3s32 p[2]; // XZ only; 1 means +, 0 means -
 	};
 	struct UV {
 		int u, v;
 	};
 	static const LiquidFaceDesc liquid_base_faces[4] = {
-		{v3s16( 1, 0,  0), {v3s16(1, 0, 1), v3s16(1, 0, 0)}},
-		{v3s16(-1, 0,  0), {v3s16(0, 0, 0), v3s16(0, 0, 1)}},
-		{v3s16( 0, 0,  1), {v3s16(0, 0, 1), v3s16(1, 0, 1)}},
-		{v3s16( 0, 0, -1), {v3s16(1, 0, 0), v3s16(0, 0, 0)}},
+		{v3s32( 1, 0,  0), {v3s32(1, 0, 1), v3s32(1, 0, 0)}},
+		{v3s32(-1, 0,  0), {v3s32(0, 0, 0), v3s32(0, 0, 1)}},
+		{v3s32( 0, 0,  1), {v3s32(0, 0, 1), v3s32(1, 0, 1)}},
+		{v3s32( 0, 0, -1), {v3s32(1, 0, 0), v3s32(0, 0, 0)}},
 	};
 	static const UV liquid_base_vertices[4] = {
 		{0, 1},
@@ -938,7 +939,7 @@ void MapblockMeshGenerator::drawLiquidSides()
 		video::S3DVertex vertices[4];
 		for (int j = 0; j < 4; j++) {
 			const UV &vertex = liquid_base_vertices[j];
-			const v3s16 &base = face.p[vertex.u];
+			const v3s32 &base = face.p[vertex.u];
 			float v = vertex.v;
 
 			v3f pos;
@@ -1087,8 +1088,8 @@ void MapblockMeshGenerator::drawGlasslikeNode()
 
 	for (int face = 0; face < 6; face++) {
 		// Check this neighbor
-		v3s16 dir = g_6dirs[face];
-		v3s16 neighbor_pos = blockpos_nodes + cur_node.p + dir;
+		v3s32 dir = g_6dirs[face];
+		v3s32 neighbor_pos = blockpos_nodes + cur_node.p + dir;
 		MapNode neighbor = data->m_vmanip.getNodeRefUnsafeCheckFlags(neighbor_pos);
 		// Don't make face if neighbor is of same type
 		if (neighbor.getContent() == cur_node.n.getContent())
@@ -1182,7 +1183,7 @@ void MapblockMeshGenerator::drawGlasslikeFramedNode()
 		for (int i = 0; i < FRAMED_NEIGHBOR_COUNT; i++) {
 			if (!check_nb[i])
 				continue;
-			v3s16 n2p = blockpos_nodes + cur_node.p + g_26dirs[i];
+			v3s32 n2p = blockpos_nodes + cur_node.p + g_26dirs[i];
 			MapNode n2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(n2p);
 			content_t n2c = n2.getContent();
 			if (n2c == current)
@@ -1240,7 +1241,7 @@ void MapblockMeshGenerator::drawGlasslikeFramedNode()
 					vertex.rotateXZBy(-90); break;
 			}
 		}
-		v3s16 dir = g_6dirs[face];
+		v3s32 dir = g_6dirs[face];
 		drawQuad(glass_tiles[face], vertices, dir);
 	}
 
@@ -1421,7 +1422,7 @@ void MapblockMeshGenerator::drawPlantlikeQuad(const TileSpec &tile,
 		}
 	}
 
-	drawQuad(tile, vertices, v3s16(0, 0, 0), cur_plant.plant_height);
+	drawQuad(tile, vertices, v3s32(0, 0, 0), cur_plant.plant_height);
 }
 
 void MapblockMeshGenerator::drawPlantlike(const TileSpec &tile, bool is_rooted)
@@ -1566,7 +1567,7 @@ void MapblockMeshGenerator::drawFirelikeNode()
 	bool neighbor[6] = {0, 0, 0, 0, 0, 0};
 	content_t current = cur_node.n.getContent();
 	for (int i = 0; i < 6; i++) {
-		v3s16 n2p = blockpos_nodes + cur_node.p + g_6dirs[i];
+		v3s32 n2p = blockpos_nodes + cur_node.p + g_6dirs[i];
 		MapNode n2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(n2p);
 		content_t n2c = n2.getContent();
 		if (n2c != CONTENT_IGNORE && n2c != CONTENT_AIR && n2c != current) {
@@ -1630,7 +1631,7 @@ void MapblockMeshGenerator::drawFencelikeNode()
 	drawAutoLightedCuboid(post, tile_rot, postuv);
 
 	// Now a section of fence, +X, if there's a post there
-	v3s16 p2 = cur_node.p;
+	v3s32 p2 = cur_node.p;
 	p2.X++;
 	MapNode n2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(blockpos_nodes + p2);
 	const ContentFeatures *f2 = &nodedef->get(n2);
@@ -1674,7 +1675,7 @@ void MapblockMeshGenerator::drawFencelikeNode()
 	}
 }
 
-bool MapblockMeshGenerator::isSameRail(v3s16 dir)
+bool MapblockMeshGenerator::isSameRail(v3s32 dir)
 {
 	MapNode node2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(
 			blockpos_nodes + cur_node.p + dir);
@@ -1686,11 +1687,11 @@ bool MapblockMeshGenerator::isSameRail(v3s16 dir)
 }
 
 namespace {
-	static const v3s16 rail_direction[4] = {
-		v3s16( 0, 0,  1),
-		v3s16( 0, 0, -1),
-		v3s16(-1, 0,  0),
-		v3s16( 1, 0,  0),
+	static const v3s32 rail_direction[4] = {
+		v3s32( 0, 0,  1),
+		v3s32( 0, 0, -1),
+		v3s32(-1, 0,  0),
+		v3s32( 1, 0,  0),
 	};
 	static const int rail_slope_angle[4] = {0, 180, 90, -90};
 
@@ -1735,14 +1736,14 @@ void MapblockMeshGenerator::drawRaillikeNode()
 	int tile_index;
 	bool sloped = false;
 	for (int dir = 0; dir < 4; dir++) {
-		bool rail_above = isSameRail(rail_direction[dir] + v3s16(0, 1, 0));
+		bool rail_above = isSameRail(rail_direction[dir] + v3s32(0, 1, 0));
 		if (rail_above) {
 			sloped = true;
 			angle = rail_slope_angle[dir];
 		}
 		if (rail_above ||
 				isSameRail(rail_direction[dir]) ||
-				isSameRail(rail_direction[dir] + v3s16(0, -1, 0)))
+				isSameRail(rail_direction[dir] + v3s32(0, -1, 0)))
 			code |= 1 << dir;
 	}
 
@@ -1805,7 +1806,7 @@ void MapblockMeshGenerator::drawNodeboxNode()
 	u8 sametype_neighbors = 0;
 	for (int dir = 0; dir != 6; dir++) {
 		u8 flag = 1 << dir;
-		v3s16 p2 = blockpos_nodes + cur_node.p + tile_dirs[dir];
+		v3s32 p2 = blockpos_nodes + cur_node.p + tile_dirs[dir];
 		MapNode n2 = data->m_vmanip.getNodeRefUnsafeCheckFlags(p2);
 
 		// mark neighbors that are the same node type
@@ -2040,7 +2041,7 @@ void MapblockMeshGenerator::generate()
 	// Currently all drawtypes use at most nodes one away except for NDT_PLANTLIKE_ROOTED
 	// which reads nodes at y+2 for getSmoothLightFrame
 	assert(data->m_vmanip.m_area.contains(blockpos_nodes - 3));
-	assert(data->m_vmanip.m_area.contains(blockpos_nodes + v3s16(data->m_side_length + 2)));
+	assert(data->m_vmanip.m_area.contains(blockpos_nodes + v3s32(data->m_side_length + 2)));
 
 	for (cur_node.p.Z = 0; cur_node.p.Z < data->m_side_length; cur_node.p.Z++)
 	for (cur_node.p.Y = 0; cur_node.p.Y < data->m_side_length; cur_node.p.Y++)

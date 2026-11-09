@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepforge-platform-runtime"
+version = "0.4.0"
+description = "Persistent worlds, scripting, scheduling and external agent control"
+requires-python = ">=3.11"
+dependencies = []
+license = "MIT"
+
+[project.scripts]
+deepforge-platform = "dadcraft_platform.service:main"
+
+[tool.setuptools.packages.find]
+include = ["dadcraft_platform*"]

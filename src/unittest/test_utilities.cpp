@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -707,7 +708,7 @@ C apply_all(const C &co, F functor)
 
 void TestUtilities::testIsBlockInSight()
 {
-	const std::vector<v3s16> testdata1 = {
+	const std::vector<v3s32> testdata1 = {
 		{0, 1 * (int)BS, 0}, // camera_pos
 		{1, 0, 0},           // camera_dir
 
@@ -718,7 +719,7 @@ void TestUtilities::testIsBlockInSight()
 		{0, 0, 0},
 		{6, 0, 0}
 	};
-	auto test1 = [] (const std::vector<v3s16> &data) {
+	auto test1 = [] (const std::vector<v3s32> &data) {
 		float range = BS * MAP_BLOCKSIZE * 4;
 		float fov = 72 * core::DEGTORAD;
 		v3f cam_pos = v3f::from(data[0]), cam_dir = v3f::from(data[1]);
@@ -735,7 +736,7 @@ void TestUtilities::testIsBlockInSight()
 	};
 	// XZ rotations
 	for (int j = 0; j < 4; j++) {
-		auto tmpdata = apply_all(testdata1, [&] (v3s16 v) -> v3s16 {
+		auto tmpdata = apply_all(testdata1, [&] (v3s32 v) -> v3s32 {
 			v.rotateXZBy(j*90);
 			return v;
 		});
@@ -743,7 +744,7 @@ void TestUtilities::testIsBlockInSight()
 	}
 	// just two for XY
 	for (int j = 0; j < 2; j++) {
-		auto tmpdata = apply_all(testdata1, [&] (v3s16 v) -> v3s16 {
+		auto tmpdata = apply_all(testdata1, [&] (v3s32 v) -> v3s32 {
 			v.rotateXYBy(90+j*180);
 			return v;
 		});

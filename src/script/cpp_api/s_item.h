@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -45,7 +46,7 @@ protected:
 	friend class LuaItemStack;
 	friend class ModApiItem;
 
-	bool getItemCallback(const char *name, const char *callbackname, const v3s16 *p = nullptr);
+	bool getItemCallback(const char *name, const char *callbackname, const v3s32 *p = nullptr);
 	/*!
 	 * Pushes a `pointed_thing` table to the stack.
 	 * \param hitpoint If true, the exact pointing location is also pushed

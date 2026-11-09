@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2016 juhdanad, Daniel Juhasz <juhdanad@gmail.com>
@@ -32,7 +33,7 @@ public:
 	//! Iterator to store the progress of the raycast.
 	voxalgo::VoxelLineIterator m_iterator;
 	//! Previous tested node during the raycast.
-	v3s16 m_previous_node;
+	v3s32 m_previous_node;
 
 	/*!
 	 * This priority queue stores the found pointed things
@@ -45,7 +46,7 @@ public:
 	const std::optional<Pointabilities> m_pointabilities;
 
 	//! The code needs to search these nodes around the center node.
-	core::aabbox3d<s16> m_search_range { 0, 0, 0, 0, 0, 0 };
+	core::aabbox3d<s32> m_search_range { 0, 0, 0, 0, 0, 0 };
 
 	//! If true, the Environment will initialize this state.
 	bool m_initialization_needed = true;

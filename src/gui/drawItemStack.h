@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2024 cx384
@@ -37,5 +38,5 @@ void drawItemStack(
 		const core::rect<s32> *clip,
 		Client *client,
 		ItemRotationKind rotation_kind,
-		const v3s16 &angle,
-		const v3s16 &rotation_speed);
+		const v3s32 &angle,
+		const v3s32 &rotation_speed);

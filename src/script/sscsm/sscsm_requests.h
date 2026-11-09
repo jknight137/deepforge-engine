@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // SPDX-FileCopyrightText: 2024 Luanti authors
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -94,7 +95,7 @@ struct SSCSMRequestGetNode final : public ISSCSMRequest
 		bool is_pos_ok;
 	};
 
-	v3s16 pos;
+	v3s32 pos;
 
 	SerializedSSCSMAnswer exec(Client *client) override
 	{

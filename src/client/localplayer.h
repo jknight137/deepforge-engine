@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -65,8 +66,8 @@ public:
 
 	void applyControl(float dtime, Environment *env);
 
-	v3s16 getStandingNodePos();
-	v3s16 getFootstepNodePos();
+	v3s32 getStandingNodePos();
+	v3s32 getFootstepNodePos();
 
 	// Used to check if anything changed and prevent sending packets if not
 	v3f last_position;
@@ -112,7 +113,7 @@ public:
 	u16 getBreath() const { return m_breath; }
 	void setBreath(u16 breath) { m_breath = breath; }
 
-	v3s16 getLightPosition() const;
+	v3s32 getLightPosition() const;
 
 	void setYaw(f32 yaw) { m_yaw = yaw; }
 	f32 getYaw() const { return m_yaw; }
@@ -171,9 +172,9 @@ private:
 		v3f position_before_move, v3f speed_before_move);
 
 	v3f m_position;
-	v3s16 m_standing_node;
+	v3s32 m_standing_node;
 
-	v3s16 m_sneak_node = v3s16(32767, 32767, 32767);
+	v3s32 m_sneak_node = v3s32(32767, 32767, 32767);
 	// Stores the top bounding box of m_sneak_node
 	aabb3f m_sneak_node_bb_top = aabb3f(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	// Whether the player is allowed to sneak
@@ -189,7 +190,7 @@ private:
 	bool m_need_to_get_new_sneak_node = true;
 	// Node below player, used to determine whether it has been removed,
 	// and its old type
-	v3s16 m_old_node_below = v3s16(32767, 32767, 32767);
+	v3s32 m_old_node_below = v3s32(32767, 32767, 32767);
 	std::string m_old_node_below_type = "air";
 	// ***** End of variables for temporary option *****
 

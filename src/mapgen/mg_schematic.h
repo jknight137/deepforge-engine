@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -86,23 +87,23 @@ public:
 		const NodeDefManager *ndef, StringMap *replace_names = NULL);
 	bool saveSchematicToFile(const std::string &filename,
 		const NodeDefManager *ndef);
-	bool getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2);
+	bool getSchematicFromMap(Map *map, v3s32 p1, v3s32 p2);
 
 	bool deserializeFromMts(std::istream *is);
 	bool serializeToMts(std::ostream *os) const;
 	bool serializeToLua(std::ostream *os, bool use_comments, u32 indent_spaces) const;
 
-	void blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_place);
-	bool placeOnVManip(MMVManip *vm, v3s16 p, u32 flags, Rotation rot, bool force_place);
-	void placeOnMap(ServerMap *map, v3s16 p, u32 flags, Rotation rot, bool force_place);
+	void blitToVManip(MMVManip *vm, v3s32 p, Rotation rot, bool force_place);
+	bool placeOnVManip(MMVManip *vm, v3s32 p, u32 flags, Rotation rot, bool force_place);
+	void placeOnMap(ServerMap *map, v3s32 p, u32 flags, Rotation rot, bool force_place);
 
-	void applyProbabilities(v3s16 p0,
-		std::vector<std::pair<v3s16, u8> > *plist,
-		std::vector<std::pair<s16, u8> > *splist);
+	void applyProbabilities(v3s32 p0,
+		std::vector<std::pair<v3s32, u8> > *plist,
+		std::vector<std::pair<s32, u8> > *splist);
 
 	std::vector<content_t> c_nodes;
 	u32 flags = 0;
-	v3s16 size;
+	v3s32 size;
 	MapNode *schemdata = nullptr;
 	u8 *slice_probs = nullptr;
 

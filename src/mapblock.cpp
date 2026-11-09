@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -98,7 +99,7 @@ static const char *modified_reason_strings[] = {
 	MapBlock
 */
 
-MapBlock::MapBlock(v3s16 pos, IGameDef *gamedef):
+MapBlock::MapBlock(v3s32 pos, IGameDef *gamedef):
 		m_pos(pos),
 		m_pos_relative(pos * MAP_BLOCKSIZE),
 		m_gamedef(gamedef),
@@ -171,12 +172,12 @@ bool MapBlock::saveStaticObject(u16 id, const StaticObject &obj, u32 reason)
 	return true;
 }
 
-void MapBlock::step(float dtime, const std::function<bool(v3s16, MapNode, NodeTimer)> &on_timer_cb)
+void MapBlock::step(float dtime, const std::function<bool(v3s32, MapNode, NodeTimer)> &on_timer_cb)
 {
 	// Run callbacks for elapsed node_timers
 	std::vector<NodeTimer> elapsed_timers = m_node_timers.step(dtime);
 	MapNode n;
-	v3s16 p;
+	v3s32 p;
 	for (const auto &it : elapsed_timers) {
 		n = getNodeNoEx(it.position);
 		p = it.position + getPosRelative();
@@ -213,22 +214,22 @@ std::string MapBlock::getModifiedReasonString()
 
 void MapBlock::copyTo(VoxelManipulator &dst)
 {
-	v3s16 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
-	VoxelArea data_area(v3s16(0,0,0), data_size - v3s16(1,1,1));
+	v3s32 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
+	VoxelArea data_area(v3s32(0,0,0), data_size - v3s32(1,1,1));
 
 	// Copy from data to VoxelManipulator
-	dst.copyFrom(data, m_is_mono_block, data_area, v3s16(0,0,0),
+	dst.copyFrom(data, m_is_mono_block, data_area, v3s32(0,0,0),
 			getPosRelative(), data_size);
 }
 
 void MapBlock::copyFrom(const VoxelManipulator &src)
 {
-	v3s16 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
-	VoxelArea data_area(v3s16(0,0,0), data_size - v3s16(1,1,1));
+	v3s32 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
+	VoxelArea data_area(v3s32(0,0,0), data_size - v3s32(1,1,1));
 
 	expandNodesIfNeeded();
 	// Copy from VoxelManipulator to data
-	src.copyTo(data, data_area, v3s16(0,0,0),
+	src.copyTo(data, data_area, v3s32(0,0,0),
 			getPosRelative(), data_size);
 	tryShrinkNodes();
 }
@@ -959,7 +960,7 @@ std::string analyze_block(MapBlock *block)
 
 	std::ostringstream desc;
 
-	v3s16 p = block->getPos();
+	v3s32 p = block->getPos();
 	char spos[25];
 	porting::mt_snprintf(spos, sizeof(spos), "(%2d,%2d,%2d), ", p.X, p.Y, p.Z);
 	desc<<spos;
@@ -995,11 +996,11 @@ std::string analyze_block(MapBlock *block)
 	bool some_ignore = false;
 	bool full_air = true;
 	bool some_air = false;
-	for(s16 z0=0; z0<MAP_BLOCKSIZE; z0++)
-	for(s16 y0=0; y0<MAP_BLOCKSIZE; y0++)
-	for(s16 x0=0; x0<MAP_BLOCKSIZE; x0++)
+	for(s32 z0=0; z0<MAP_BLOCKSIZE; z0++)
+	for(s32 y0=0; y0<MAP_BLOCKSIZE; y0++)
+	for(s32 x0=0; x0<MAP_BLOCKSIZE; x0++)
 	{
-		v3s16 p(x0,y0,z0);
+		v3s32 p(x0,y0,z0);
 		MapNode n = block->getNodeNoEx(p);
 		content_t c = n.getContent();
 		if(c == CONTENT_IGNORE)

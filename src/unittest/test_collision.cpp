@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -209,8 +210,8 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 	auto env = std::make_unique<TestEnvironment>(gamedef);
 	g_collision_problems_encountered = false;
 
-	for (s16 x = 0; x < MAP_BLOCKSIZE; x++)
-	for (s16 z = 0; z < MAP_BLOCKSIZE; z++)
+	for (s32 x = 0; x < MAP_BLOCKSIZE; x++)
+	for (s32 z = 0; z < MAP_BLOCKSIZE; z++)
 		env->getMap().setNode({x, 0, z}, MapNode(t_CONTENT_STONE));
 
 	v3f pos, speed, accel;
@@ -249,7 +250,7 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 		auto &ci = res.collisions.front();
 		UASSERTEQ(int, ci.type, COLLISION_NODE);
 		UASSERTEQ(int, ci.axis, COLLISION_AXIS_Y);
-		UASSERTEQ(v3s16, ci.node_p, v3s16(0, 0, 0));
+		UASSERTEQ(v3s32, ci.node_p, v3s32(0, 0, 0));
 	}
 
 	/* glitched into ground */
@@ -268,7 +269,7 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 		auto &ci = res.collisions.front();
 		UASSERTEQ(int, ci.type, COLLISION_NODE);
 		UASSERTEQ(int, ci.axis, COLLISION_AXIS_Y);
-		UASSERTEQ(v3s16, ci.node_p, v3s16(0, 0, 0));
+		UASSERTEQ(v3s32, ci.node_p, v3s32(0, 0, 0));
 	}
 
 	/* falling on ground */
@@ -290,7 +291,7 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 		auto &ci = res.collisions.front();
 		UASSERTEQ(int, ci.type, COLLISION_NODE);
 		UASSERTEQ(int, ci.axis, COLLISION_AXIS_Y);
-		UASSERTEQ(v3s16, ci.node_p, v3s16(0, 0, 0));
+		UASSERTEQ(v3s32, ci.node_p, v3s32(0, 0, 0));
 	}
 
 	/* jumping on ground */
@@ -315,7 +316,7 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 		auto &ci = res.collisions.front();
 		UASSERTEQ(int, ci.type, COLLISION_NODE);
 		UASSERTEQ(int, ci.axis, COLLISION_AXIS_Y);
-		UASSERTEQ(v3s16, ci.node_p, v3s16(0, 0, 0));
+		UASSERTEQ(v3s32, ci.node_p, v3s32(0, 0, 0));
 	}
 
 	/* moving over ground, no gravity */
@@ -347,7 +348,7 @@ void TestCollision::testCollisionMoveSimple(IGameDef *gamedef)
 		auto &ci = res.collisions.front();
 		UASSERTEQ(int, ci.type, COLLISION_NODE);
 		UASSERTEQ(int, ci.axis, COLLISION_AXIS_Y);
-		UASSERTEQ(v3s16, ci.node_p, v3s16(5, 0, 5));
+		UASSERTEQ(v3s32, ci.node_p, v3s32(5, 0, 5));
 	}
 
 	/* not moving never collides */

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -23,21 +24,21 @@ class MapSector
 {
 public:
 
-	MapSector(Map *parent, v2s16 pos, IGameDef *gamedef);
+	MapSector(Map *parent, v2s32 pos, IGameDef *gamedef);
 	virtual ~MapSector();
 
 	/// @brief Deletes all blocks (regardless of reference count).
 	/// @param used_count output: number of blocks which were still ref'd
 	void deleteBlocks(size_t *used_count = nullptr);
 
-	v2s16 getPos() const
+	v2s32 getPos() const
 	{
 		return m_pos;
 	}
 
-	MapBlock *getBlockNoCreateNoEx(s16 y);
-	std::unique_ptr<MapBlock> createBlankBlockNoInsert(s16 y);
-	MapBlock *createBlankBlock(s16 y);
+	MapBlock *getBlockNoCreateNoEx(s32 y);
+	std::unique_ptr<MapBlock> createBlankBlockNoInsert(s32 y);
+	MapBlock *createBlankBlock(s32 y);
 
 	void insertBlock(std::unique_ptr<MapBlock> block);
 
@@ -64,22 +65,22 @@ public:
 protected:
 
 	// The pile of MapBlocks
-	std::unordered_map<s16, std::unique_ptr<MapBlock>> m_blocks;
+	std::unordered_map<s32, std::unique_ptr<MapBlock>> m_blocks;
 
 	Map *m_parent;
 	// Position on parent (in MapBlock widths)
-	v2s16 m_pos;
+	v2s32 m_pos;
 
 	IGameDef *m_gamedef;
 
 	// Last-used block is cached here for quicker access.
 	// Be sure to set this to nullptr when the cached block is deleted
 	MapBlock *m_block_cache = nullptr;
-	s16 m_block_cache_y;
+	s32 m_block_cache_y;
 
 	/*
 		Private methods
 	*/
-	MapBlock *getBlockBuffered(s16 y);
+	MapBlock *getBlockBuffered(s32 y);
 
 };

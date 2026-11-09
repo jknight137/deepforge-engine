@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -589,7 +590,7 @@ public:
 	 * contains all nodes' selection boxes. The returned box might be larger
 	 * than the minimal size if the largest node is removed from the manager.
 	 */
-	inline core::aabbox3d<s16> getSelectionBoxIntUnion() const {
+	inline core::aabbox3d<s32> getSelectionBoxIntUnion() const {
 		return m_selection_box_int_union;
 	}
 
@@ -800,7 +801,7 @@ private:
 	 * contains all nodes' selection boxes.
 	 * Might be larger if big nodes are removed from the manager.
 	 */
-	core::aabbox3d<s16> m_selection_box_int_union{{0, 0, 0}};
+	core::aabbox3d<s32> m_selection_box_int_union{{0, 0, 0}};
 
 	/*!
 	 * NodeResolver instances to notify once node registration has finished.

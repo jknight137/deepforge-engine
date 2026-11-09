@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -17,23 +18,23 @@ protected:
 	static void collectNodeIds(lua_State *L, int idx,
 		const NodeDefManager *ndef, std::vector<content_t> &filter);
 
-	static void checkArea(v3s16 &minp, v3s16 &maxp);
+	static void checkArea(v3s32 &minp, v3s32 &maxp);
 
-	// F must be (v3s16 pos) -> MapNode
+	// F must be (v3s32 pos) -> MapNode
 	template <typename F>
-	static int findNodeNear(lua_State *L, v3s16 pos, int radius,
+	static int findNodeNear(lua_State *L, v3s32 pos, int radius,
 		const std::vector<content_t> &filter, int start_radius, F &&getNode);
 
 	// F must be (G callback) -> void
-	// with G being (v3s16 p, MapNode n) -> bool
+	// with G being (v3s32 p, MapNode n) -> bool
 	// and behave like Map::forEachNodeInArea
 	template <typename F>
 	static int findNodesInArea(lua_State *L,  const NodeDefManager *ndef,
 		const std::vector<content_t> &filter, bool grouped, F &&iterate);
 
-	// F must be (v3s16 pos) -> MapNode
+	// F must be (v3s32 pos) -> MapNode
 	template <typename F>
-	static int findNodesInAreaUnderAir(lua_State *L, v3s16 minp, v3s16 maxp,
+	static int findNodesInAreaUnderAir(lua_State *L, v3s32 minp, v3s32 maxp,
 		const std::vector<content_t> &filter, F &&getNode);
 
 	static const EnumString es_ClearObjectsMode[];

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -233,7 +234,7 @@ public:
 		The block from which the object was loaded from, and in which
 		a copy of the static data resides.
 	*/
-	v3s16 m_static_block = v3s16(1337,1337,1337);
+	v3s32 m_static_block = v3s32(1337,1337,1337);
 
 	// Names of players to whom the object is to be sent, not considering parents.
 	using Observers = std::optional<std::unordered_set<std::string>>;

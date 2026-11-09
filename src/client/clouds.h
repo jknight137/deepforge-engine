@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -67,7 +68,7 @@ public:
 
 	void update(const v3f &camera_p, const video::SColorf &color);
 
-	void updateCameraOffset(v3s16 camera_offset)
+	void updateCameraOffset(v3s32 camera_offset)
 	{
 		m_camera_offset = camera_offset;
 		updateBox();
@@ -158,7 +159,7 @@ private:
 	// Value of m_origin at the time the mesh was last updated
 	v2f m_mesh_origin;
 	// Value of center_of_drawing_in_noise_i at the time the mesh was last updated
-	v2s16 m_last_noise_center;
+	v2s32 m_last_noise_center;
 	// Was the mesh ever generated?
 	bool m_mesh_valid = false;
 
@@ -168,7 +169,7 @@ private:
 	u32 m_seed;
 	v3f m_camera_pos;
 
-	v3s16 m_camera_offset;
+	v3s32 m_camera_offset;
 	bool m_camera_inside_cloud = false;
 
 	bool m_enable_3d;

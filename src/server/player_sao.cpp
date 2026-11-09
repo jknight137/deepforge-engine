@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -35,7 +36,7 @@ PlayerSAO::PlayerSAO(ServerEnvironment *env_, RemotePlayer *player_, session_t p
 	m_prop.textures.emplace_back("player.png");
 	m_prop.textures.emplace_back("player_back.png");
 	m_prop.colors.clear();
-	m_prop.spritediv = v2s16(1,1);
+	m_prop.spritediv = v2s32(1,1);
 	m_prop.eye_height = 1.625f;
 	// End of default appearance
 	m_prop.is_visible = true;
@@ -154,7 +155,7 @@ void PlayerSAO::step(float dtime, bool send_recommended)
 	if (not_immortal && m_flags.drowning
 			&& m_drowning_interval.step(dtime, 2.0f)) {
 		// Get nose/mouth position, approximate with eye position
-		v3s16 p = floatToInt(getEyePosition(), BS);
+		v3s32 p = floatToInt(getEyePosition(), BS);
 		MapNode n = m_env->getMap().getNode(p);
 		const ContentFeatures &c = m_env->getGameDef()->ndef()->get(n);
 		// If node generates drown
@@ -174,7 +175,7 @@ void PlayerSAO::step(float dtime, bool send_recommended)
 	if (not_immortal && m_flags.breathing
 			&& m_breathing_interval.step(dtime, 0.5f)) {
 		// Get nose/mouth position, approximate with eye position
-		v3s16 p = floatToInt(getEyePosition(), BS);
+		v3s32 p = floatToInt(getEyePosition(), BS);
 		MapNode n = m_env->getMap().getNode(p);
 		const ContentFeatures &c = m_env->getGameDef()->ndef()->get(n);
 		// If player is alive & not drowning & not in ignore & not immortal, breathe
@@ -187,14 +188,14 @@ void PlayerSAO::step(float dtime, bool send_recommended)
 			&& m_node_hurt_interval.step(dtime, 1.0f)) {
 		u32 damage_per_second = 0;
 		std::string nodename;
-		v3s16 node_pos;
+		v3s32 node_pos;
 		// Lowest and highest damage points are 0.1 within collisionbox
 		float dam_top = m_prop.collisionbox.MaxEdge.Y - 0.1f;
 
 		// Sequence of damage points, starting 0.1 above feet and progressing
 		// upwards in 1 node intervals, stopping below top damage point.
 		for (float dam_height = 0.1f; dam_height < dam_top; dam_height++) {
-			v3s16 p = floatToInt(getBasePosition() +
+			v3s32 p = floatToInt(getBasePosition() +
 				v3f(0.0f, dam_height * BS, 0.0f), BS);
 			MapNode n = m_env->getMap().getNode(p);
 			const ContentFeatures &c = m_env->getGameDef()->ndef()->get(n);
@@ -206,7 +207,7 @@ void PlayerSAO::step(float dtime, bool send_recommended)
 		}
 
 		// Top damage point
-		v3s16 ptop = floatToInt(getBasePosition() +
+		v3s32 ptop = floatToInt(getBasePosition() +
 			v3f(0.0f, dam_top * BS, 0.0f), BS);
 		MapNode ntop = m_env->getMap().getNode(ptop);
 		const ContentFeatures &c = m_env->getGameDef()->ndef()->get(ntop);
@@ -360,7 +361,7 @@ void PlayerSAO::setPos(const v3f &pos)
 		return;
 
 	// Send mapblock of target location
-	v3s16 blockpos = getNodeBlockPos(floatToInt(pos, BS));
+	v3s32 blockpos = getNodeBlockPos(floatToInt(pos, BS));
 	m_env->getServer()->SendBlock(getPeerID(), blockpos);
 
 	setBasePosition(pos);
@@ -384,7 +385,7 @@ void PlayerSAO::addPos(const v3f &added_pos)
 
 	// Send mapblock of target location
 	v3f pos = getBasePosition() + added_pos;
-	v3s16 blockpos = v3s16(pos.X / MAP_BLOCKSIZE, pos.Y / MAP_BLOCKSIZE, pos.Z / MAP_BLOCKSIZE);
+	v3s32 blockpos = v3s32(pos.X / MAP_BLOCKSIZE, pos.Y / MAP_BLOCKSIZE, pos.Z / MAP_BLOCKSIZE);
 	m_env->getServer()->SendBlock(getPeerID(), blockpos);
 
 	setBasePosition(pos);

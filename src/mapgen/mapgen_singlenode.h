@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013-2018 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -29,5 +30,5 @@ public:
 	virtual MapgenType getType() const { return MAPGEN_SINGLENODE; }
 
 	void makeChunk(BlockMakeData *data);
-	int getSpawnLevelAtPoint(v2s16 p);
+	int getSpawnLevelAtPoint(v2s32 p);
 };

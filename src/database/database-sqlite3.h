@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -184,10 +185,10 @@ public:
 	MapDatabaseSQLite3(const std::string &savedir);
 	virtual ~MapDatabaseSQLite3();
 
-	bool saveBlock(const v3s16 &pos, std::string_view data);
-	void loadBlock(const v3s16 &pos, std::string *block);
-	bool deleteBlock(const v3s16 &pos);
-	void listAllLoadableBlocks(std::vector<v3s16> &dst);
+	bool saveBlock(const v3s32 &pos, std::string_view data);
+	void loadBlock(const v3s32 &pos, std::string *block);
+	bool deleteBlock(const v3s32 &pos);
+	void listAllLoadableBlocks(std::vector<v3s32> &dst);
 
 	PARENT_CLASS_FUNCS
 
@@ -198,7 +199,7 @@ protected:
 private:
 	/// @brief Bind block position into statement at column index
 	/// @return index of next column after position
-	int bindPos(sqlite3_stmt *stmt, v3s16 pos, int index = 1);
+	int bindPos(sqlite3_stmt *stmt, v3s32 pos, int index = 1);
 
 	bool m_new_format = false;
 

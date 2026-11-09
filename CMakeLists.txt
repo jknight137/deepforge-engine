@@ -1,11 +1,12 @@
+# Modified for Deepforge on 2026-11-09; original notices retained.
 cmake_minimum_required(VERSION 3.12)
 if(POLICY CMP0177)
     cmake_policy(SET CMP0177 NEW)
 endif()
 
 # This can be read from ${PROJECT_NAME} after project() is called
-project(luanti)
-set(PROJECT_NAME_CAPITALIZED "Luanti")
+project(deepforge)
+set(PROJECT_NAME_CAPITALIZED "Deepforge")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -16,7 +17,7 @@ set(CLANG_MINIMUM_VERSION "7.0.1")
 set(VERSION_MAJOR 5)
 set(VERSION_MINOR 18)
 set(VERSION_PATCH 0)
-set(VERSION_EXTRA "" CACHE STRING "Stuff to append to version string")
+set(VERSION_EXTRA "deepforge1" CACHE STRING "Stuff to append to version string")
 
 # Change to false for releases
 set(DEVELOPMENT_BUILD FALSE)
@@ -86,7 +87,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type: Debug or Release" FORCE)
 endif()
 
-set(ENABLE_UPDATE_CHECKER (NOT ${DEVELOPMENT_BUILD}) CACHE BOOL
+set(ENABLE_UPDATE_CHECKER OFF CACHE BOOL
 	"Whether to enable update checks by default")
 
 # Included stuff
@@ -255,6 +256,7 @@ if(BUILD_CLIENT)
 endif()
 
 install(FILES "README.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
+install(FILES "LICENSE.txt" "COPYING.LESSER" "THIRD_PARTY_NOTICES.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "doc/lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "doc/client_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "doc/menu_lua_api.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
@@ -263,22 +265,22 @@ install(FILES "doc/world_format.md" DESTINATION "${DOCDIR}" COMPONENT "Docs")
 install(FILES "minetest.conf.example" DESTINATION "${EXAMPLE_CONF_DIR}")
 
 if(UNIX AND NOT APPLE)
-	install(FILES "doc/luanti.6" "doc/luantiserver.6" DESTINATION "${MANDIR}/man6")
-	install(FILES "misc/org.luanti.luanti.desktop" DESTINATION "${XDG_APPS_DIR}")
-	install(FILES "misc/org.luanti.luanti.metainfo.xml" DESTINATION "${METAINFODIR}")
-	install(FILES "misc/luanti.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
-	install(FILES "misc/luanti-xorg-icon-128.png"
+	install(FILES "doc/deepforge.6" "doc/deepforgeserver.6" DESTINATION "${MANDIR}/man6")
+	install(FILES "misc/io.github.jknight137.deepforge.desktop" DESTINATION "${XDG_APPS_DIR}")
+	install(FILES "misc/io.github.jknight137.deepforge.metainfo.xml" DESTINATION "${METAINFODIR}")
+	install(FILES "misc/deepforge.svg" DESTINATION "${ICONDIR}/hicolor/scalable/apps")
+	install(FILES "misc/deepforge-icon-128.png"
 		DESTINATION "${ICONDIR}/hicolor/128x128/apps"
-		RENAME "luanti.png")
+		RENAME "deepforge.png")
 endif()
 
 if(APPLE)
-	install(FILES "misc/luanti-icon.icns" DESTINATION "${SHAREDIR}")
+	install(FILES "misc/deepforge-icon.icns" DESTINATION "${SHAREDIR}")
 	install(FILES "${CMAKE_BINARY_DIR}/Info.plist" DESTINATION "${BUNDLE_PATH}/Contents")
 endif()
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
-	set(client_RESOURCES "${CMAKE_SOURCE_DIR}/misc/luanti-icon.icns")
+	set(client_RESOURCES "${CMAKE_SOURCE_DIR}/misc/deepforge-icon.icns")
 endif()
 
 # Library pack
@@ -336,7 +338,7 @@ if(WIN32)
 
 	if(NOT RUN_IN_PLACE)
 		set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION_STRING}-nsis")
-		install(FILES "misc/luanti-icon.ico" DESTINATION ".")
+		install(FILES "misc/deepforge-icon.ico" DESTINATION ".")
 		install(FILES "misc/sfx-launcher.nsi" DESTINATION ".")
 		# normalize to 0/1
 		set(DEVELOPMENT_BUILD01 0)

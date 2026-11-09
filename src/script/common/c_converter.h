@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -10,6 +11,8 @@
 /******************************************************************************/
 /******************************************************************************/
 #pragma once
+#include "util/world_coordinates.h"
+#include <stdexcept>
 
 #include <vector>
 #include <string>
@@ -45,9 +48,9 @@ bool getintfield(lua_State *L, int table, const char *fieldname, T &result)
 	return got;
 }
 
-// Retrieve a v3s16 where all components are optional (falls back to default)
-v3s16 getv3s16field_default(lua_State *L, int table,
-		const char *fieldname, v3s16 default_);
+// Retrieve a v3s32 where all components are optional (falls back to default)
+v3s32 getv3s16field_default(lua_State *L, int table,
+		const char *fieldname, v3s32 default_);
 
 bool getstringfield(lua_State *L, int table,
 		const char *fieldname, std::string &result);
@@ -72,7 +75,7 @@ void setboolfield(lua_State *L, int table,
 v3f checkFloatPos(lua_State *L, int index);
 v2f check_v2f(lua_State *L, int index);
 v3f check_v3f(lua_State *L, int index);
-v3s16 check_v3s16(lua_State *L, int index);
+v3s32 check_nodepos(lua_State *L, int index);
 
 // TODO: some day we should figure out the type-checking situation so it's done
 // everywhere. (right now {x=true, y=false} as v2f is {0,0} with no warning)
@@ -82,11 +85,11 @@ v3f read_v3f(lua_State *L, int index);
 /// @warning relaxed type-checking, prefer `check_v2f`.
 v2f read_v2f(lua_State *L, int index);
 /// @warning relaxed type-checking
-v2s16 read_v2s16(lua_State *L, int index);
+v2s32 read_v2s16(lua_State *L, int index);
 /// @warning relaxed type-checking
 v2s32 read_v2s32(lua_State *L, int index);
-/// @warning relaxed type-checking, prefer `check_v3s16`.
-v3s16 read_v3s16(lua_State *L, int index);
+/// @warning relaxed type-checking, prefer `check_nodepos`.
+v3s32 read_nodepos(lua_State *L, int index);
 
 video::SColor read_ARGB8(lua_State *L, int index);
 bool read_color(lua_State *L, int index, video::SColor *color);
@@ -109,10 +112,10 @@ std::vector<aabb3f> read_aabb3f_vector  (lua_State *L, int index, f32 scale);
 size_t read_stringlist(lua_State *L, int index,
 		std::vector<std::string> *result);
 
-void push_v2s16(lua_State *L, v2s16 p);
+void push_v2pos(lua_State *L, v2s32 p);
 void push_v2s32(lua_State *L, v2s32 p);
 void push_v2u32(lua_State *L, v2u32 p);
-void push_v3s16(lua_State *L, v3s16 p);
+void push_nodepos(lua_State *L, v3s32 p);
 void push_aabb3f(lua_State *L, aabb3f box, f32 divisor = 1.0f);
 void push_ARGB8(lua_State *L, video::SColor color);
 void pushFloatPos(lua_State *L, v3f p);
@@ -126,9 +129,7 @@ size_t write_array_slice_float(lua_State *L, int table_index, float *data,
 
 // This must match the implementation in builtin/game/misc_s.lua
 // Note that this returns a floating point result as Lua integers are 32-bit
-inline lua_Number hash_node_position(v3s16 pos)
+inline lua_Number hash_node_position(v3s32 pos)
 {
-	return (((s64)pos.Z + 0x8000L) << 32)
-			| (((s64)pos.Y + 0x8000L) << 16)
-			| ((s64)pos.X + 0x8000L);
+	return static_cast<lua_Number>(hashWorldNodePosition(pos));
 }

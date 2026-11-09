@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2017 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -31,7 +32,7 @@ struct ActiveABM
 	std::vector<content_t> required_neighbors;
 	std::vector<content_t> without_neighbors;
 	int chance;
-	s16 min_y, max_y;
+	s32 min_y, max_y;
 };
 
 #define CONTENT_TYPE_CACHE_MAX 64
@@ -116,7 +117,7 @@ u32 ABMHandler::countObjects(MapBlock *block, ServerMap *map, u32 &wider)
 	for(s16 z=-1; z<=1; z++)
 	{
 		MapBlock *block2 = map->getBlockNoCreateNoEx(
-			block->getPos() + v3s16(x,y,z));
+			block->getPos() + v3s32(x,y,z));
 		if (!block2) {
 			wider_unknown_count++;
 			continue;
@@ -161,7 +162,7 @@ void ABMHandler::apply(MapBlock *block, int &blocks_scanned, int &abms_run, int 
 
 	bool want_contents_cached = block->contents.empty() && !block->do_not_cache_contents;
 
-	v3s16 p0;
+	v3s32 p0;
 	for(p0.Z=0; p0.Z<MAP_BLOCKSIZE; p0.Z++)
 	for(p0.Y=0; p0.Y<MAP_BLOCKSIZE; p0.Y++)
 	for(p0.X=0; p0.X<MAP_BLOCKSIZE; p0.X++)
@@ -185,7 +186,7 @@ void ABMHandler::apply(MapBlock *block, int &blocks_scanned, int &abms_run, int 
 		if (c >= m_aabms.size() || !m_aabms[c])
 			continue;
 
-		v3s16 p = p0 + block->getPosRelative();
+		v3s32 p = p0 + block->getPosRelative();
 		for (ActiveABM &aabm : *m_aabms[c]) {
 			if (p.Y < aabm.min_y || p.Y > aabm.max_y)
 				continue;
@@ -197,7 +198,7 @@ void ABMHandler::apply(MapBlock *block, int &blocks_scanned, int &abms_run, int 
 			const bool check_required_neighbors = !aabm.required_neighbors.empty();
 			const bool check_without_neighbors = !aabm.without_neighbors.empty();
 			if (check_required_neighbors || check_without_neighbors) {
-				v3s16 p1;
+				v3s32 p1;
 				bool have_required = false;
 				for(p1.X = p0.X-1; p1.X <= p0.X+1; p1.X++)
 				for(p1.Y = p0.Y-1; p1.Y <= p0.Y+1; p1.Y++)
@@ -448,7 +449,7 @@ std::unordered_map<std::string, u32>
 
 namespace {
 	struct LBMToRun {
-		std::unordered_set<v3s16> p; // node positions
+		std::unordered_set<v3s32> p; // node positions
 		std::vector<LoadingBlockModifierDef*> l; // ordered list of LBMs
 
 		template <typename C>
@@ -473,7 +474,7 @@ void LBMManager::applyLBMs(ServerEnvironment *env, MapBlock *block,
 
 	// Note: the iteration count of this outer loop is typically very low, so it's ok.
 	for (auto it = getLBMsIntroducedAfter(stamp); it != m_lbm_lookup.end(); ++it) {
-		v3s16 pos;
+		v3s32 pos;
 		content_t c;
 
 		// Cache previous lookups since it has a high performance penalty.

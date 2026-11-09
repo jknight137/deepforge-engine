@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -65,7 +66,7 @@ void Map::dispatchEvent(const MapEditEvent &event)
 	}
 }
 
-MapSector * Map::getSectorNoGenerateNoLock(v2s16 p)
+MapSector * Map::getSectorNoGenerateNoLock(v2s32 p)
 {
 	if(m_sector_cache != NULL && p == m_sector_cache_p){
 		MapSector * sector = m_sector_cache;
@@ -86,14 +87,14 @@ MapSector * Map::getSectorNoGenerateNoLock(v2s16 p)
 	return sector;
 }
 
-MapSector *Map::getSectorNoGenerate(v2s16 p)
+MapSector *Map::getSectorNoGenerate(v2s32 p)
 {
 	return getSectorNoGenerateNoLock(p);
 }
 
-MapBlock *Map::getBlockNoCreateNoEx(v3s16 p3d)
+MapBlock *Map::getBlockNoCreateNoEx(v3s32 p3d)
 {
-	v2s16 p2d(p3d.X, p3d.Z);
+	v2s32 p2d(p3d.X, p3d.Z);
 	MapSector *sector = getSectorNoGenerate(p2d);
 	if (!sector)
 		return nullptr;
@@ -101,7 +102,7 @@ MapBlock *Map::getBlockNoCreateNoEx(v3s16 p3d)
 	return block;
 }
 
-MapBlock *Map::getBlockNoCreate(v3s16 p3d)
+MapBlock *Map::getBlockNoCreate(v3s32 p3d)
 {
 	MapBlock *block = getBlockNoCreateNoEx(p3d);
 	if(block == NULL)
@@ -109,17 +110,17 @@ MapBlock *Map::getBlockNoCreate(v3s16 p3d)
 	return block;
 }
 
-bool Map::isValidPosition(v3s16 p)
+bool Map::isValidPosition(v3s32 p)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
+	v3s32 blockpos = getNodeBlockPos(p);
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	return (block != NULL);
 }
 
 // Returns a CONTENT_IGNORE node if not found
-MapNode Map::getNode(v3s16 p, bool *is_valid_position)
+MapNode Map::getNode(v3s32 p, bool *is_valid_position)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
+	v3s32 blockpos = getNodeBlockPos(p);
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if (block == NULL) {
 		if (is_valid_position != NULL)
@@ -127,7 +128,7 @@ MapNode Map::getNode(v3s16 p, bool *is_valid_position)
 		return {CONTENT_IGNORE};
 	}
 
-	v3s16 relpos = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 relpos = p - blockpos*MAP_BLOCKSIZE;
 	MapNode node = block->getNodeNoCheck(relpos);
 	if (is_valid_position != NULL)
 		*is_valid_position = true;
@@ -135,12 +136,12 @@ MapNode Map::getNode(v3s16 p, bool *is_valid_position)
 }
 
 static void set_node_in_block(const NodeDefManager *nodedef, MapBlock *block,
-		v3s16 relpos, MapNode n)
+		v3s32 relpos, MapNode n)
 {
 	// Never allow placing CONTENT_IGNORE, it causes problems
 	if(n.getContent() == CONTENT_IGNORE){
-		v3s16 blockpos = block->getPos();
-		v3s16 p = blockpos * MAP_BLOCKSIZE + relpos;
+		v3s32 blockpos = block->getPos();
+		v3s32 p = blockpos * MAP_BLOCKSIZE + relpos;
 		errorstream<<"Not allowing to place CONTENT_IGNORE"
 				<<" while trying to replace \""
 				<<nodedef->get(block->getNodeNoCheck(relpos)).name
@@ -151,24 +152,24 @@ static void set_node_in_block(const NodeDefManager *nodedef, MapBlock *block,
 }
 
 // throws InvalidPositionException if not found
-void Map::setNode(v3s16 p, MapNode n)
+void Map::setNode(v3s32 p, MapNode n)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
+	v3s32 blockpos = getNodeBlockPos(p);
 	MapBlock *block = getBlockNoCreate(blockpos);
-	v3s16 relpos = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 relpos = p - blockpos*MAP_BLOCKSIZE;
 	set_node_in_block(m_gamedef->ndef(), block, relpos, n);
 }
 
-void Map::addNodeAndUpdate(v3s16 p, MapNode n,
-		std::map<v3s16, MapBlock*> &modified_blocks,
+void Map::addNodeAndUpdate(v3s32 p, MapNode n,
+		std::map<v3s32, MapBlock*> &modified_blocks,
 		bool remove_metadata)
 {
 	// Collect old node for rollback
 	RollbackNode rollback_oldnode(this, p, m_gamedef);
 
-	v3s16 blockpos = getNodeBlockPos(p);
+	v3s32 blockpos = getNodeBlockPos(p);
 	MapBlock *block = getBlockNoCreate(blockpos);
-	v3s16 relpos = p - blockpos * MAP_BLOCKSIZE;
+	v3s32 relpos = p - blockpos * MAP_BLOCKSIZE;
 
 	// This is needed for updating the lighting
 	MapNode oldnode = block->getNodeNoCheck(relpos);
@@ -195,7 +196,7 @@ void Map::addNodeAndUpdate(v3s16 p, MapNode n,
 		set_node_in_block(m_gamedef->ndef(), block, relpos, n);
 
 		// Update lighting
-		std::vector<std::pair<v3s16, MapNode> > oldnodes;
+		std::vector<std::pair<v3s32, MapNode> > oldnodes;
 		oldnodes.emplace_back(p, oldnode);
 		voxalgo::update_lighting_nodes(this, oldnodes, modified_blocks);
 	}
@@ -214,13 +215,13 @@ void Map::addNodeAndUpdate(v3s16 p, MapNode n,
 	}
 }
 
-void Map::removeNodeAndUpdate(v3s16 p,
-		std::map<v3s16, MapBlock*> &modified_blocks)
+void Map::removeNodeAndUpdate(v3s32 p,
+		std::map<v3s32, MapBlock*> &modified_blocks)
 {
 	addNodeAndUpdate(p, MapNode(CONTENT_AIR), modified_blocks, true);
 }
 
-bool Map::addNodeWithEvent(v3s16 p, MapNode n, bool remove_metadata)
+bool Map::addNodeWithEvent(v3s32 p, MapNode n, bool remove_metadata)
 {
 	MapEditEvent event;
 	event.type = remove_metadata ? MEET_ADDNODE : MEET_SWAPNODE;
@@ -229,7 +230,7 @@ bool Map::addNodeWithEvent(v3s16 p, MapNode n, bool remove_metadata)
 
 	bool succeeded = true;
 	try{
-		std::map<v3s16, MapBlock*> modified_blocks;
+		std::map<v3s32, MapBlock*> modified_blocks;
 		addNodeAndUpdate(p, n, modified_blocks, remove_metadata);
 
 		event.setModifiedBlocks(modified_blocks);
@@ -243,7 +244,7 @@ bool Map::addNodeWithEvent(v3s16 p, MapNode n, bool remove_metadata)
 	return succeeded;
 }
 
-bool Map::removeNodeWithEvent(v3s16 p)
+bool Map::removeNodeWithEvent(v3s32 p)
 {
 	MapEditEvent event;
 	event.type = MEET_REMOVENODE;
@@ -251,7 +252,7 @@ bool Map::removeNodeWithEvent(v3s16 p)
 
 	bool succeeded = true;
 	try{
-		std::map<v3s16, MapBlock*> modified_blocks;
+		std::map<v3s32, MapBlock*> modified_blocks;
 		removeNodeAndUpdate(p, modified_blocks);
 
 		event.setModifiedBlocks(modified_blocks);
@@ -284,14 +285,14 @@ struct TimeOrderedMapBlock {
 	Updates usage timers
 */
 void Map::timerUpdate(float dtime, float unload_timeout, s32 max_loaded_blocks,
-		std::vector<v3s16> *unloaded_blocks)
+		std::vector<v3s32> *unloaded_blocks)
 {
 	bool save_before_unloading = maySaveBlocks();
 
 	// Profile modified reasons
 	Profiler modprofiler;
 
-	std::vector<v2s16> sector_deletion_queue;
+	std::vector<v2s32> sector_deletion_queue;
 	u32 deleted_blocks_count = 0;
 	u32 saved_blocks_count = 0;
 	u32 block_count_all = 0;
@@ -316,7 +317,7 @@ void Map::timerUpdate(float dtime, float unload_timeout, s32 max_loaded_blocks,
 
 				if (block->refGet() == 0
 						&& block->getUsageTimer() > unload_timeout) {
-					v3s16 p = block->getPos();
+					v3s32 p = block->getPos();
 
 					// Save if modified
 					if (block->getModified() != MOD_STATE_CLEAN
@@ -370,7 +371,7 @@ void Map::timerUpdate(float dtime, float unload_timeout, s32 max_loaded_blocks,
 				continue;
 			}
 
-			v3s16 p = block->getPos();
+			v3s32 p = block->getPos();
 
 			// Save if modified
 			if (block->getModified() != MOD_STATE_CLEAN && save_before_unloading) {
@@ -427,14 +428,14 @@ void Map::timerUpdate(float dtime, float unload_timeout, s32 max_loaded_blocks,
 	}
 }
 
-void Map::unloadUnreferencedBlocks(std::vector<v3s16> *unloaded_blocks)
+void Map::unloadUnreferencedBlocks(std::vector<v3s32> *unloaded_blocks)
 {
 	timerUpdate(0, -1, 0, unloaded_blocks);
 }
 
-void Map::deleteSectors(const std::vector<v2s16> &sectorList)
+void Map::deleteSectors(const std::vector<v2s32> &sectorList)
 {
-	for (v2s16 j : sectorList) {
+	for (v2s32 j : sectorList) {
 		MapSector *sector = m_sectors[j];
 		// If sector is in sector cache, remove it from there
 		if (m_sector_cache == sector)
@@ -450,20 +451,20 @@ void Map::PrintInfo(std::ostream &out)
 	out<<"Map: ";
 }
 
-std::vector<v3s16> Map::findNodesWithMetadata(v3s16 p1, v3s16 p2)
+std::vector<v3s32> Map::findNodesWithMetadata(v3s32 p1, v3s32 p2)
 {
-	std::vector<v3s16> positions_with_meta;
+	std::vector<v3s32> positions_with_meta;
 
 	sortBoxVerticies(p1, p2);
-	v3s16 bpmin = getNodeBlockPos(p1);
-	v3s16 bpmax = getNodeBlockPos(p2);
+	v3s32 bpmin = getNodeBlockPos(p1);
+	v3s32 bpmax = getNodeBlockPos(p2);
 
 	VoxelArea area(p1, p2);
 
-	for (s16 z = bpmin.Z; z <= bpmax.Z; z++)
-	for (s16 y = bpmin.Y; y <= bpmax.Y; y++)
-	for (s16 x = bpmin.X; x <= bpmax.X; x++) {
-		v3s16 blockpos(x, y, z);
+	for (s32 z = bpmin.Z; z <= bpmax.Z; z++)
+	for (s32 y = bpmin.Y; y <= bpmax.Y; y++)
+	for (s32 x = bpmin.X; x <= bpmax.X; x++) {
+		v3s32 blockpos(x, y, z);
 
 		MapBlock *block = getBlockNoCreateNoEx(blockpos);
 		if (!block) {
@@ -477,10 +478,10 @@ std::vector<v3s16> Map::findNodesWithMetadata(v3s16 p1, v3s16 p2)
 			continue;
 		}
 
-		v3s16 p_base = blockpos * MAP_BLOCKSIZE;
-		std::vector<v3s16> keys = block->m_node_metadata.getAllKeys();
+		v3s32 p_base = blockpos * MAP_BLOCKSIZE;
+		std::vector<v3s32> keys = block->m_node_metadata.getAllKeys();
 		for (size_t i = 0; i != keys.size(); i++) {
-			v3s16 p(keys[i] + p_base);
+			v3s32 p(keys[i] + p_base);
 			if (!area.contains(p))
 				continue;
 
@@ -491,10 +492,10 @@ std::vector<v3s16> Map::findNodesWithMetadata(v3s16 p1, v3s16 p2)
 	return positions_with_meta;
 }
 
-NodeMetadata *Map::getNodeMetadata(v3s16 p)
+NodeMetadata *Map::getNodeMetadata(v3s32 p)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::getNodeMetadata(): Need to emerge "
@@ -510,11 +511,11 @@ NodeMetadata *Map::getNodeMetadata(v3s16 p)
 	return meta;
 }
 
-bool Map::setNodeMetadata(v3s16 p, NodeMetadata *meta)
+bool Map::setNodeMetadata(v3s32 p, NodeMetadata *meta)
 {
 	assert(meta);
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::setNodeMetadata(): Need to emerge "
@@ -534,10 +535,10 @@ bool Map::setNodeMetadata(v3s16 p, NodeMetadata *meta)
 	return true;
 }
 
-void Map::removeNodeMetadata(v3s16 p)
+void Map::removeNodeMetadata(v3s32 p)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(block == NULL)
 	{
@@ -549,10 +550,10 @@ void Map::removeNodeMetadata(v3s16 p)
 		m_metadata_trash.emplace_back(std::move(old));
 }
 
-NodeTimer Map::getNodeTimer(v3s16 p)
+NodeTimer Map::getNodeTimer(v3s32 p)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::getNodeTimer(): Need to emerge "
@@ -571,9 +572,9 @@ NodeTimer Map::getNodeTimer(v3s16 p)
 
 void Map::setNodeTimer(const NodeTimer &t)
 {
-	v3s16 p = t.position;
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 p = t.position;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(!block){
 		infostream<<"Map::setNodeTimer(): Need to emerge "
@@ -589,10 +590,10 @@ void Map::setNodeTimer(const NodeTimer &t)
 	block->setNodeTimer(nt);
 }
 
-void Map::removeNodeTimer(v3s16 p)
+void Map::removeNodeTimer(v3s32 p)
 {
-	v3s16 blockpos = getNodeBlockPos(p);
-	v3s16 p_rel = p - blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos = getNodeBlockPos(p);
+	v3s32 p_rel = p - blockpos*MAP_BLOCKSIZE;
 	MapBlock *block = getBlockNoCreateNoEx(blockpos);
 	if(block == NULL)
 	{
@@ -603,8 +604,8 @@ void Map::removeNodeTimer(v3s16 p)
 	block->removeNodeTimer(p_rel);
 }
 
-bool Map::determineAdditionalOcclusionCheck(const v3s16 pos_camera,
-	const core::aabbox3d<s16> &block_bounds, v3s16 &check)
+bool Map::determineAdditionalOcclusionCheck(const v3s32 pos_camera,
+	const core::aabbox3d<s32> &block_bounds, v3s32 &check)
 {
 	/*
 		This functions determines the node inside the target block that is
@@ -632,32 +633,32 @@ bool Map::determineAdditionalOcclusionCheck(const v3s16 pos_camera,
 
 	// straight
 	if (x_inside && y_inside) {
-		check = v3s16(pos_camera.X, pos_camera.Y, 0);
+		check = v3s32(pos_camera.X, pos_camera.Y, 0);
 		check.Z = CLOSEST_EDGE(pos_camera, block_bounds, Z);
 		return true;
 	} else if (y_inside && z_inside) {
-		check = v3s16(0, pos_camera.Y, pos_camera.Z);
+		check = v3s32(0, pos_camera.Y, pos_camera.Z);
 		check.X = CLOSEST_EDGE(pos_camera, block_bounds, X);
 		return true;
 	} else if (x_inside && z_inside) {
-		check = v3s16(pos_camera.X, 0, pos_camera.Z);
+		check = v3s32(pos_camera.X, 0, pos_camera.Z);
 		check.Y = CLOSEST_EDGE(pos_camera, block_bounds, Y);
 		return true;
 	}
 
 	// diagonal
 	if (x_inside) {
-		check = v3s16(pos_camera.X, 0, 0);
+		check = v3s32(pos_camera.X, 0, 0);
 		check.Y = CLOSEST_EDGE(pos_camera, block_bounds, Y);
 		check.Z = CLOSEST_EDGE(pos_camera, block_bounds, Z);
 		return true;
 	} else if (y_inside) {
-		check = v3s16(0, pos_camera.Y, 0);
+		check = v3s32(0, pos_camera.Y, 0);
 		check.X = CLOSEST_EDGE(pos_camera, block_bounds, X);
 		check.Z = CLOSEST_EDGE(pos_camera, block_bounds, Z);
 		return true;
 	} else if (z_inside) {
-		check = v3s16(0, 0, pos_camera.Z);
+		check = v3s32(0, 0, pos_camera.Z);
 		check.X = CLOSEST_EDGE(pos_camera, block_bounds, X);
 		check.Y = CLOSEST_EDGE(pos_camera, block_bounds, Y);
 		return true;
@@ -667,7 +668,7 @@ bool Map::determineAdditionalOcclusionCheck(const v3s16 pos_camera,
 	return false;
 }
 
-bool Map::isOccluded(const v3s16 pos_camera, const v3s16 pos_target,
+bool Map::isOccluded(const v3s32 pos_camera, const v3s32 pos_target,
 	float end_offset, u32 needed_count, bool dense)
 {
 	v3f direction = intToFloat(pos_target - pos_camera, BS);
@@ -739,24 +740,24 @@ bool Map::isOccluded(const v3s16 pos_camera, const v3s16 pos_target,
 	return false;
 }
 
-bool Map::isBlockOccluded(v3s16 pos_relative, v3s16 cam_pos_nodes, bool dense)
+bool Map::isBlockOccluded(v3s32 pos_relative, v3s32 cam_pos_nodes, bool dense)
 {
 	// Check occlusion for center and all 8 corners of the mapblock
 	// Overshoot a little for less flickering
-	static const s16 bs2 = MAP_BLOCKSIZE / 2 + 1;
-	static const v3s16 dir9[9] = {
-		v3s16( 0,  0,  0),
-		v3s16( 1,  1,  1) * bs2,
-		v3s16( 1,  1, -1) * bs2,
-		v3s16( 1, -1,  1) * bs2,
-		v3s16( 1, -1, -1) * bs2,
-		v3s16(-1,  1,  1) * bs2,
-		v3s16(-1,  1, -1) * bs2,
-		v3s16(-1, -1,  1) * bs2,
-		v3s16(-1, -1, -1) * bs2,
+	static const s32 bs2 = MAP_BLOCKSIZE / 2 + 1;
+	static const v3s32 dir9[9] = {
+		v3s32( 0,  0,  0),
+		v3s32( 1,  1,  1) * bs2,
+		v3s32( 1,  1, -1) * bs2,
+		v3s32( 1, -1,  1) * bs2,
+		v3s32( 1, -1, -1) * bs2,
+		v3s32(-1,  1,  1) * bs2,
+		v3s32(-1,  1, -1) * bs2,
+		v3s32(-1, -1,  1) * bs2,
+		v3s32(-1, -1, -1) * bs2,
 	};
 
-	v3s16 pos_blockcenter = pos_relative + (MAP_BLOCKSIZE / 2);
+	v3s32 pos_blockcenter = pos_relative + (MAP_BLOCKSIZE / 2);
 
 	// The occlusion search of 'isOccluded()' must stop short of the target
 	// point by distance 'end_offset' to not enter the target mapblock.
@@ -771,7 +772,7 @@ bool Map::isBlockOccluded(v3s16 pos_relative, v3s16 cam_pos_nodes, bool dense)
 	u32 needed_count = 2;
 
 	// Additional occlusion check, see comments in that function
-	v3s16 check;
+	v3s32 check;
 	if (determineAdditionalOcclusionCheck(cam_pos_nodes, MapBlock::getBox(pos_relative), check)) {
 		// node is always on a side facing the camera, end_offset can be lower
 		if (!isOccluded(cam_pos_nodes, check,
@@ -779,7 +780,7 @@ bool Map::isBlockOccluded(v3s16 pos_relative, v3s16 cam_pos_nodes, bool dense)
 			return false;
 	}
 
-	for (const v3s16 &dir : dir9) {
+	for (const v3s32 &dir : dir9) {
 		if (!isOccluded(cam_pos_nodes, pos_blockcenter + dir,
 				end_offset, needed_count, dense))
 			return false;
@@ -802,14 +803,14 @@ MMVManip::~MMVManip()
 	}
 }
 
-void MMVManip::initialEmerge(v3s16 p_min, v3s16 p_max, bool load_if_inexistent)
+void MMVManip::initialEmerge(v3s32 p_min, v3s32 p_max, bool load_if_inexistent)
 {
 	TimeTaker timer1("initialEmerge", &emerge_time);
 
 	assert(m_map);
 
 	VoxelArea block_area_nodes
-			(p_min*MAP_BLOCKSIZE, (p_max+1)*MAP_BLOCKSIZE-v3s16(1,1,1));
+			(p_min*MAP_BLOCKSIZE, (p_max+1)*MAP_BLOCKSIZE-v3s32(1,1,1));
 
 	u32 size_MB = block_area_nodes.getVolume() * sizeof(MapNode) / 1000000U;
 	if (size_MB >= 4) {
@@ -818,7 +819,7 @@ void MMVManip::initialEmerge(v3s16 p_min, v3s16 p_max, bool load_if_inexistent)
 		infostream << " (" << size_MB << "MB)" << std::endl;
 	}
 
-	std::map<v3s16, bool> had_blocks;
+	std::map<v3s32, bool> had_blocks;
 	// we can skip this calculation if the areas are disjoint
 	if (!m_area.intersect(block_area_nodes).hasEmptyExtent())
 		had_blocks = getCoveredBlocks();
@@ -830,7 +831,7 @@ void MMVManip::initialEmerge(v3s16 p_min, v3s16 p_max, bool load_if_inexistent)
 	for(s32 y=p_min.Y; y<=p_max.Y; y++)
 	for(s32 x=p_min.X; x<=p_max.X; x++)
 	{
-		v3s16 p(x,y,z);
+		v3s32 p(x,y,z);
 		// if this block was already in the vmanip and it has data, skip
 		if (auto it = had_blocks.find(p); it != had_blocks.end() && it->second)
 			continue;
@@ -845,7 +846,7 @@ void MMVManip::initialEmerge(v3s16 p_min, v3s16 p_max, bool load_if_inexistent)
 				block->copyTo(*this);
 			} else {
 				// Mark area inexistent
-				VoxelArea a(p*MAP_BLOCKSIZE, (p+1)*MAP_BLOCKSIZE-v3s16(1,1,1));
+				VoxelArea a(p*MAP_BLOCKSIZE, (p+1)*MAP_BLOCKSIZE-v3s32(1,1,1));
 				setFlags(a, VOXELFLAG_NO_DATA);
 			}
 		}
@@ -855,43 +856,43 @@ void MMVManip::initialEmerge(v3s16 p_min, v3s16 p_max, bool load_if_inexistent)
 		m_is_dirty = false;
 }
 
-std::map<v3s16, bool> MMVManip::getCoveredBlocks() const
+std::map<v3s32, bool> MMVManip::getCoveredBlocks() const
 {
-	std::map<v3s16, bool> ret;
+	std::map<v3s32, bool> ret;
 	if (m_area.hasEmptyExtent())
 		return ret;
 
 	// Figure out if *any* node in this block has data according to m_flags
-	const auto &check_block = [this] (v3s16 bp) -> bool {
-		v3s16 pmin = bp * MAP_BLOCKSIZE;
-		v3s16 pmax = pmin + v3s16(MAP_BLOCKSIZE-1);
-		for(s16 z=pmin.Z; z<=pmax.Z; z++)
-		for(s16 y=pmin.Y; y<=pmax.Y; y++)
-		for(s16 x=pmin.X; x<=pmax.X; x++) {
+	const auto &check_block = [this] (v3s32 bp) -> bool {
+		v3s32 pmin = bp * MAP_BLOCKSIZE;
+		v3s32 pmax = pmin + v3s32(MAP_BLOCKSIZE-1);
+		for(s32 z=pmin.Z; z<=pmax.Z; z++)
+		for(s32 y=pmin.Y; y<=pmax.Y; y++)
+		for(s32 x=pmin.X; x<=pmax.X; x++) {
 			if (!(m_flags[m_area.index(x,y,z)] & VOXELFLAG_NO_DATA))
 				return true;
 		}
 		return false;
 	};
 
-	v3s16 bpmin = getNodeBlockPos(m_area.MinEdge);
-	v3s16 bpmax = getNodeBlockPos(m_area.MaxEdge);
+	v3s32 bpmin = getNodeBlockPos(m_area.MinEdge);
+	v3s32 bpmax = getNodeBlockPos(m_area.MaxEdge);
 
 	if (bpmin * MAP_BLOCKSIZE != m_area.MinEdge)
 		throw BaseException("MMVManip not block-aligned");
-	if ((bpmax+1) * MAP_BLOCKSIZE - v3s16(1) != m_area.MaxEdge)
+	if ((bpmax+1) * MAP_BLOCKSIZE - v3s32(1) != m_area.MaxEdge)
 		throw BaseException("MMVManip not block-aligned");
 
-	for(s16 z=bpmin.Z; z<=bpmax.Z; z++)
-	for(s16 y=bpmin.Y; y<=bpmax.Y; y++)
-	for(s16 x=bpmin.X; x<=bpmax.X; x++) {
-		v3s16 bp(x,y,z);
+	for(s32 z=bpmin.Z; z<=bpmax.Z; z++)
+	for(s32 y=bpmin.Y; y<=bpmax.Y; y++)
+	for(s32 x=bpmin.X; x<=bpmax.X; x++) {
+		v3s32 bp(x,y,z);
 		ret[bp] = check_block(bp);
 	}
 	return ret;
 }
 
-void MMVManip::blitBackAll(std::map<v3s16, MapBlock*> *modified_blocks,
+void MMVManip::blitBackAll(std::map<v3s32, MapBlock*> *modified_blocks,
 	bool overwrite_generated) const
 {
 	if (m_area.hasEmptyExtent())
@@ -905,7 +906,7 @@ void MMVManip::blitBackAll(std::map<v3s16, MapBlock*> *modified_blocks,
 	for (auto &it : loaded_blocks) {
 		if (!it.second)
 			continue;
-		v3s16 p = it.first;
+		v3s32 p = it.first;
 		MapBlock *block = m_map->getBlockNoCreateNoEx(p);
 		if (!block) {
 			if (!blockpos_over_max_limit(p)) {

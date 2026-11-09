@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
 
 	// Run legacy and Catch2 unit tests
 	if (cmd_args.getFlag("run-unittests") || cmd_args.exists("test-module")) {
-		porting::attachOrCreateConsole();
+		// Keep isolated unit checks in their caller console.
 #if BUILD_UNITTESTS
 		if (cmd_args.exists("test-module"))
 			return run_tests(cmd_args.get("test-module")) ? 0 : 1;
@@ -1317,7 +1318,7 @@ static bool migrate_map_database(const GameParams &game_params, const Settings &
 
 	volatile auto &kill = *porting::signal_handler_killstatus();
 
-	std::vector<v3s16> blocks;
+	std::vector<v3s32> blocks;
 	old_db->listAllLoadableBlocks(blocks);
 
 	actionstream << "Will migrate " << blocks.size() << " blocks" << std::endl;
@@ -1326,7 +1327,7 @@ static bool migrate_map_database(const GameParams &game_params, const Settings &
 	size_t count = 0, sum = 0;
 	u64 last_update_time = 0;
 	std::string data;
-	for (const v3s16 bpos : blocks) {
+	for (const v3s32 bpos : blocks) {
 		if (kill)
 			return false;
 
@@ -1383,7 +1384,7 @@ static bool recompress_map_database(const GameParams &game_params, const Setting
 	const s16 map_compression_level = rangelim(g_settings->getS16("map_compression_level_disk"), -1, 9);
 
 	// Direct DB manipulation is ok because the server doesn't actually run
-	std::vector<v3s16> blocks;
+	std::vector<v3s32> blocks;
 	db->listAllLoadableBlocks(blocks);
 
 	actionstream << "Recompressing " << blocks.size() << " blocks with compression level " <<
@@ -1395,7 +1396,7 @@ static bool recompress_map_database(const GameParams &game_params, const Setting
 	std::ostringstream oss(std::ios_base::binary);
 	std::string data;
 	db->beginSave();
-	for (const v3s16 bpos : blocks) {
+	for (const v3s32 bpos : blocks) {
 		if (kill)
 			return false;
 

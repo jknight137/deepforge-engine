@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -37,9 +38,9 @@ struct BlockMakeData {
 	MMVManip *vmanip = nullptr;
 	// Global map seed
 	u64 seed = 0;
-	v3s16 blockpos_min;
-	v3s16 blockpos_max;
-	UniqueQueue<v3s16> transforming_liquid;
+	v3s32 blockpos_min;
+	v3s32 blockpos_max;
+	UniqueQueue<v3s32> transforming_liquid;
 	const NodeDefManager *nodedef = nullptr;
 
 	BlockMakeData() = default;
@@ -66,7 +67,7 @@ constexpr const char *emergeActionStrs[] = {
 
 // Callback
 typedef void (*EmergeCompletionCallback)(
-	v3s16 blockpos, EmergeAction action, void *param);
+	v3s32 blockpos, EmergeAction action, void *param);
 
 typedef std::vector<
 	std::pair<
@@ -168,28 +169,28 @@ public:
 
 	bool enqueueBlockEmerge(
 		session_t peer_id,
-		v3s16 blockpos,
+		v3s32 blockpos,
 		bool allow_generate,
 		bool ignore_queue_limits=false);
 
 	bool enqueueBlockEmergeEx(
-		v3s16 blockpos,
+		v3s32 blockpos,
 		session_t peer_id,
 		u16 flags,
 		EmergeCompletionCallback callback,
 		void *callback_param);
 
 	size_t getQueueSize();
-	bool isBlockInQueue(v3s16 pos);
+	bool isBlockInQueue(v3s32 pos);
 
 	Mapgen *getCurrentMapgen();
 
 	// Mapgen helpers methods
-	int getSpawnLevelAtPoint(v2s16 p);
-	bool isBlockUnderground(v3s16 blockpos);
+	int getSpawnLevelAtPoint(v2s32 p);
+	bool isBlockUnderground(v3s32 blockpos);
 
 	/// @return min edge of chunk in block units
-	static v3s16 getContainingChunk(v3s16 blockpos, v3s16 chunksize);
+	static v3s32 getContainingChunk(v3s32 blockpos, v3s32 chunksize);
 
 private:
 	void initThreads(bool should_multithread);
@@ -204,7 +205,7 @@ private:
 	MapDatabaseAccessor *m_db = nullptr;
 
 	std::mutex m_queue_mutex;
-	std::map<v3s16, BlockEmergeData> m_blocks_enqueued;
+	std::map<v3s32, BlockEmergeData> m_blocks_enqueued;
 	std::unordered_map<u16, u32> m_peer_queue_count;
 
 	u32 m_qlimit_total;
@@ -226,14 +227,14 @@ private:
 	EmergeThread *getOptimalThread();
 
 	bool pushBlockEmergeData(
-		v3s16 pos,
+		v3s32 pos,
 		u16 peer_requested,
 		u16 flags,
 		EmergeCompletionCallback callback,
 		void *callback_param,
 		bool *entry_already_exists);
 
-	bool popBlockEmergeData(v3s16 pos, BlockEmergeData *bedata);
+	bool popBlockEmergeData(v3s32 pos, BlockEmergeData *bedata);
 
 	void reportCompletedEmerge(EmergeAction action);
 

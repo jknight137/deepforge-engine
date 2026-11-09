@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013, 2017 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -29,7 +30,7 @@ void QueuedMeshUpdate::retrieveBlocks(Map *map, u16 cell_size)
 	else
 		assert(map_blocks.size() == total); // must not change
 	size_t i = 0;
-	v3s16 pos;
+	v3s32 pos;
 	// order is not important, but it must be consistent
 	// note the extra margin!
 	for (pos.X = p.X - 1; pos.X <= p.X + cell_size; pos.X++)
@@ -49,7 +50,7 @@ void QueuedMeshUpdate::retrieveBlocks(Map *map, u16 cell_size)
 bool QueuedMeshUpdate::checkSkip(u16 cell_size)
 {
 	bool all_air = true;
-	const v3s16 p_max = p + v3s16(cell_size);
+	const v3s32 p_max = p + v3s32(cell_size);
 	assert(!map_blocks.empty());
 	for (auto *block : map_blocks) {
 		// ignore extra margin
@@ -100,7 +101,7 @@ MeshUpdateQueue::~MeshUpdateQueue()
 	clear(true);
 }
 
-bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server,
+bool MeshUpdateQueue::addBlock(Map *map, v3s32 p, bool ack_block_to_server,
 	bool urgent, bool from_neighbor)
 {
 	// If block that causes update does not exist, skip.
@@ -111,7 +112,7 @@ bool MeshUpdateQueue::addBlock(Map *map, v3s16 p, bool ack_block_to_server,
 
 	// Mesh is placed at the corner block of a chunk
 	// (where all coordinate are divisible by the chunk size)
-	const v3s16 mesh_position = mesh_grid.getMeshPos(p);
+	const v3s32 mesh_position = mesh_grid.getMeshPos(p);
 
 	MutexAutoLock lock(m_mutex);
 
@@ -171,7 +172,7 @@ void MeshUpdateQueue::reAddBlock(MeshUpdateResult &r)
 {
 	const MeshGrid mesh_grid = m_client->getMeshGrid();
 
-	const v3s16 mesh_position = mesh_grid.getMeshPos(r.p);
+	const v3s32 mesh_position = mesh_grid.getMeshPos(r.p);
 
 	MutexAutoLock lock(m_mutex);
 
@@ -237,7 +238,7 @@ QueuedMeshUpdate *MeshUpdateQueue::pop()
 	return result;
 }
 
-void MeshUpdateQueue::done(v3s16 pos)
+void MeshUpdateQueue::done(v3s32 pos)
 {
 	MutexAutoLock lock(m_mutex);
 	m_inflight_blocks.erase(pos);
@@ -365,7 +366,7 @@ MeshUpdateManager::MeshUpdateManager(Client *client):
 		m_workers.push_back(std::make_unique<MeshUpdateWorkerThread>(client, &m_queue_in, this));
 }
 
-void MeshUpdateManager::updateBlock(Map *map, v3s16 p, bool ack_block_to_server,
+void MeshUpdateManager::updateBlock(Map *map, v3s32 p, bool ack_block_to_server,
 		bool urgent, bool update_neighbors)
 {
 	static thread_local const bool many_neighbors =
@@ -378,10 +379,10 @@ void MeshUpdateManager::updateBlock(Map *map, v3s16 p, bool ack_block_to_server,
 	}
 	if (update_neighbors) {
 		if (many_neighbors) {
-			for (v3s16 dp : g_26dirs)
+			for (v3s32 dp : g_26dirs)
 				m_queue_in.addBlock(map, p + dp, false, urgent, true);
 		} else {
-			for (v3s16 dp : g_6dirs)
+			for (v3s32 dp : g_6dirs)
 				m_queue_in.addBlock(map, p + dp, false, urgent, true);
 		}
 	}
@@ -416,7 +417,7 @@ bool MeshUpdateManager::getNextResult(MeshUpdateResult &r)
 	return true;
 }
 
-void MeshUpdateManager::forceRegenerate(Map *map, const std::vector<v3s16> &pp)
+void MeshUpdateManager::forceRegenerate(Map *map, const std::vector<v3s32> &pp)
 {
 	// This invalidates all previously produced results (if still pending)
 	m_queue_in.setEpoch(++m_epoch);
@@ -424,7 +425,7 @@ void MeshUpdateManager::forceRegenerate(Map *map, const std::vector<v3s16> &pp)
 	verbosestream << "MeshUpdateManager: m_epoch=" << m_epoch << "; will queue "
 		<< pp.size() << " blocks to be updated" << std::endl;
 
-	for (v3s16 p : pp) {
+	for (v3s32 p : pp) {
 		m_queue_in.addBlock(map, p, false, false, false);
 	}
 	deferUpdate();

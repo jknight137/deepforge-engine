@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2015 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -66,15 +67,15 @@ struct MinimapPixel {
 };
 
 struct MinimapMapblock {
-	void getMinimapNodes(VoxelManipulator *vmanip, const NodeDefManager *nodedef, const v3s16 &pos);
+	void getMinimapNodes(VoxelManipulator *vmanip, const NodeDefManager *nodedef, const v3s32 &pos);
 
 	MinimapPixel data[MAP_BLOCKSIZE * MAP_BLOCKSIZE];
 };
 
 struct MinimapData {
 	MinimapModeDef mode;
-	v3s16 pos;
-	v3s16 old_pos;
+	v3s32 pos;
+	v3s32 old_pos;
 	MinimapPixel minimap_scan[MINIMAP_MAX_SX * MINIMAP_MAX_SY];
 	bool map_invalidated;
 	bool minimap_shape_round;
@@ -90,7 +91,7 @@ struct MinimapData {
 };
 
 struct QueuedMinimapUpdate {
-	v3s16 pos;
+	v3s32 pos;
 	MinimapMapblock *data = nullptr;
 };
 
@@ -99,9 +100,9 @@ public:
 	MinimapUpdateThread() : UpdateThread("Minimap") {}
 	virtual ~MinimapUpdateThread();
 
-	void getMap(v3s16 pos, s16 size, s16 height);
-	void enqueueBlock(v3s16 pos, MinimapMapblock *data);
-	bool pushBlockUpdate(v3s16 pos, MinimapMapblock *data);
+	void getMap(v3s32 pos, s16 size, s16 height);
+	void enqueueBlock(v3s32 pos, MinimapMapblock *data);
+	bool pushBlockUpdate(v3s32 pos, MinimapMapblock *data);
 	bool popBlockUpdate(QueuedMinimapUpdate *update);
 
 	MinimapData *data = nullptr;
@@ -112,7 +113,7 @@ protected:
 private:
 	std::mutex m_queue_mutex;
 	std::deque<QueuedMinimapUpdate> m_update_queue;
-	std::map<v3s16, MinimapMapblock *> m_blocks_cache;
+	std::map<v3s32, MinimapMapblock *> m_blocks_cache;
 };
 
 class Minimap {
@@ -120,12 +121,12 @@ public:
 	Minimap(Client *client);
 	~Minimap();
 
-	void addBlock(v3s16 pos, MinimapMapblock *data);
+	void addBlock(v3s32 pos, MinimapMapblock *data);
 
 	v3f getYawVec();
 
-	void setPos(v3s16 pos);
-	v3s16 getPos() const { return data->pos; }
+	void setPos(v3s32 pos);
+	v3s32 getPos() const { return data->pos; }
 	void setAngle(f32 angle);
 	f32 getAngle() const { return m_angle; }
 	void toggleMinimapShape();

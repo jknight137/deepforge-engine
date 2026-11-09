@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -150,7 +151,7 @@ void content_nodemeta_deserialize_legacy(std::istream &is,
 	{
 		u16 p16 = readU16(is);
 
-		v3s16 p(0,0,0);
+		v3s32 p(0,0,0);
 		p.Z += p16 / MAP_BLOCKSIZE / MAP_BLOCKSIZE;
 		p16 -= p.Z * MAP_BLOCKSIZE * MAP_BLOCKSIZE;
 		p.Y += p16 / MAP_BLOCKSIZE;

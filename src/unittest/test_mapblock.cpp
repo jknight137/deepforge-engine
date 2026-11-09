@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -109,8 +110,8 @@ void TestMapBlock::testMonoblock(IGameDef *gamedef)
 	UASSERT(block.data[0].param0 == 42);
 
 	VoxelManipulator vmm;
-	v3s16 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
-	vmm.addArea(VoxelArea(block.getPosRelative(), block.getPosRelative() + data_size + v3s16(1,1,1)));
+	v3s32 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
+	vmm.addArea(VoxelArea(block.getPosRelative(), block.getPosRelative() + data_size + v3s32(1,1,1)));
 	block.copyTo(vmm);
 	UASSERT(block.m_is_mono_block);
 	UASSERT(vmm.getNode({5,5,5}).param0 == 42);
@@ -173,9 +174,9 @@ void TestMapBlock::testSaveLoad(IGameDef *gamedef, const u8 version)
 		MapBlock block({}, gamedef);
 		// Fill with data
 		PcgRandom r(seed);
-		for (s16 z=0; z < MAP_BLOCKSIZE; z++)
-		for (s16 y=0; y < MAP_BLOCKSIZE; y++)
-		for (s16 x=0; x < MAP_BLOCKSIZE; x++) {
+		for (s32 z=0; z < MAP_BLOCKSIZE; z++)
+		for (s32 y=0; y < MAP_BLOCKSIZE; y++)
+		for (s32 x=0; x < MAP_BLOCKSIZE; x++) {
 			u32 rval = r.next();
 			block.setNodeNoCheck(x, y, z,
 					MapNode(rval % max, (rval >> 16) & 0xff, (rval >> 24) & 0xff));
@@ -192,9 +193,9 @@ void TestMapBlock::testSaveLoad(IGameDef *gamedef, const u8 version)
 
 		// Check data
 		PcgRandom r(seed);
-		for (s16 z=0; z < MAP_BLOCKSIZE; z++)
-		for (s16 y=0; y < MAP_BLOCKSIZE; y++)
-		for (s16 x=0; x < MAP_BLOCKSIZE; x++) {
+		for (s32 z=0; z < MAP_BLOCKSIZE; z++)
+		for (s32 y=0; y < MAP_BLOCKSIZE; y++)
+		for (s32 x=0; x < MAP_BLOCKSIZE; x++) {
 			u32 rval = r.next();
 			auto expect =
 				MapNode(rval % max, (rval >> 16) & 0xff, (rval >> 24) & 0xff);
@@ -213,9 +214,9 @@ void TestMapBlock::testSave29(IGameDef *gamedef)
 	{
 		// Prepare test block
 		MapBlock block({}, gamedef);
-		for (s16 z=0; z < MAP_BLOCKSIZE; z++)
-		for (s16 y=0; y < MAP_BLOCKSIZE; y++)
-		for (s16 x=0; x < MAP_BLOCKSIZE; x++) {
+		for (s32 z=0; z < MAP_BLOCKSIZE; z++)
+		for (s32 y=0; y < MAP_BLOCKSIZE; y++)
+		for (s32 x=0; x < MAP_BLOCKSIZE; x++) {
 			block.setNodeNoCheck(x, y, z, MapNode(CONTENT_AIR));
 		}
 		block.setNode({0, 0, 0}, MapNode(t_CONTENT_STONE));
@@ -320,7 +321,7 @@ void TestMapBlock::testLoad29(IGameDef *gamedef)
 	UASSERT(content_chest != CONTENT_IGNORE);
 
 	// there are bricks at each corner
-	const v3s16 pl[] = {
+	const v3s32 pl[] = {
 		{0, 0, 0}, {15, 0, 0}, {0, 15, 0}, {0, 0, 15},
 		{15, 15, 0}, {15, 0, 15}, {0, 15, 15}, {15, 15, 15},
 	};
@@ -406,9 +407,9 @@ void TestMapBlock::testLoad20(IGameDef *gamedef)
 	UASSERTEQ(auto, get_node(10, 6, 4), "air");
 	UASSERTEQ(auto, get_node(11, 6, 3), "default:furnace");
 
-	for (s16 z=0; z < MAP_BLOCKSIZE; z++)
-	for (s16 y=0; y < MAP_BLOCKSIZE; y++)
-	for (s16 x=0; x < MAP_BLOCKSIZE; x++) {
+	for (s32 z=0; z < MAP_BLOCKSIZE; z++)
+	for (s32 y=0; y < MAP_BLOCKSIZE; y++)
+	for (s32 x=0; x < MAP_BLOCKSIZE; x++) {
 		UASSERT(block.getNodeNoCheck(x, y, z).getContent() != CONTENT_IGNORE);
 	}
 

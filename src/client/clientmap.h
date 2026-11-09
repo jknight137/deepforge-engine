@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -69,12 +70,12 @@ public:
 		return false;
 	}
 
-	void updateCamera(v3f pos, v3f dir, f32 fov, v3s16 offset, video::SColor light_color);
+	void updateCamera(v3f pos, v3f dir, f32 fov, v3s32 offset, video::SColor light_color);
 
 	/*
 		Forcefully get a sector from somewhere
 	*/
-	MapSector * emergeSector(v2s16 p) override;
+	MapSector * emergeSector(v2s32 p) override;
 
 	/*
 		ISceneNode methods
@@ -89,8 +90,8 @@ public:
 		return m_box;
 	}
 
-	void getBlocksInViewRange(v3s16 cam_pos_nodes,
-		v3s16 *p_blocks_min, v3s16 *p_blocks_max, float range=-1.0f);
+	void getBlocksInViewRange(v3s32 cam_pos_nodes,
+		v3s32 *p_blocks_min, v3s32 *p_blocks_max, float range=-1.0f);
 
 	void updateDrawList();
 	/// @brief clears m_drawlist and m_keeplist
@@ -100,7 +101,7 @@ public:
 	void touchMapBlocks();
 
 	/// @brief returns a distance-sorted list of all block mesh positions
-	void getBlocksWithMeshes(std::vector<v3s16> &out);
+	void getBlocksWithMeshes(std::vector<v3s32> &out);
 
 	void updateDrawListShadow(v3f shadow_light_pos, v3f shadow_light_dir, float radius, float length);
 	void clearDrawListShadow();
@@ -135,7 +136,7 @@ protected:
 
 	void reportMetrics(u64 save_time_us, u32 saved_blocks, u32 all_blocks) override;
 private:
-	bool isMeshOccluded(MapBlock *mesh_block, u16 mesh_size, v3s16 cam_pos_nodes);
+	bool isMeshOccluded(MapBlock *mesh_block, u16 mesh_size, v3s32 cam_pos_nodes);
 
 	bool useLoopsCuller() const;
 
@@ -146,9 +147,9 @@ private:
 	class MapBlockComparer
 	{
 	public:
-		MapBlockComparer(const v3s16 &camera_block) : m_camera_block(camera_block) {}
+		MapBlockComparer(const v3s32 &camera_block) : m_camera_block(camera_block) {}
 
-		bool operator() (const v3s16 &left, const v3s16 &right) const
+		bool operator() (const v3s32 &left, const v3s32 &right) const
 		{
 			auto distance_left = left.getDistanceFromSQ(m_camera_block);
 			auto distance_right = right.getDistanceFromSQ(m_camera_block);
@@ -156,7 +157,7 @@ private:
 		}
 
 	private:
-		v3s16 m_camera_block;
+		v3s32 m_camera_block;
 	};
 
 	Client *m_client;
@@ -170,15 +171,15 @@ private:
 	v3f m_camera_position = v3f(0,0,0);
 	v3f m_camera_direction = v3f(0,0,1);
 	f32 m_camera_fov = M_PI;
-	v3s16 m_camera_offset;
+	v3s32 m_camera_offset;
 	video::SColor m_camera_light_color = video::SColor(0xFFFFFFFF);
 	bool m_needs_update_transparent_meshes = true;
 
-	std::map<v3s16, MapBlock*, MapBlockComparer> m_drawlist;
+	std::map<v3s32, MapBlock*, MapBlockComparer> m_drawlist;
 	// List of additional blocks to keep (relevant with mesh_chunk > 1, since
 	// not all blocks contain a mesh)
 	std::vector<MapBlock*> m_keeplist;
-	std::map<v3s16, MapBlock*> m_drawlist_shadow;
+	std::map<v3s32, MapBlock*> m_drawlist_shadow;
 	bool m_needs_update_drawlist;
 	CachedMeshBuffers m_dynamic_buffers;
 

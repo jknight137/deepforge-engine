@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -20,7 +21,7 @@
 #include "mapblock.h"
 
 
-RollbackNode::RollbackNode(Map *map, v3s16 p, IGameDef *gamedef)
+RollbackNode::RollbackNode(Map *map, v3s32 p, IGameDef *gamedef)
 {
 	const NodeDefManager *ndef = gamedef->ndef();
 	MapNode n = map->getNode(p);
@@ -89,7 +90,7 @@ bool RollbackAction::isImportant(IGameDef *gamedef) const
 }
 
 
-bool RollbackAction::getPosition(v3s16 *dst) const
+bool RollbackAction::getPosition(v3s32 *dst) const
 {
 	switch (type) {
 	case TYPE_SET_NODE:

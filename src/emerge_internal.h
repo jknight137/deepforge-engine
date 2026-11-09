@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -34,7 +35,7 @@ public:
 	void signal();
 
 	// Requires queue mutex held
-	bool pushBlock(v3s16 pos);
+	bool pushBlock(v3s32 pos);
 
 	void cancelPendingItems();
 
@@ -44,7 +45,7 @@ public:
 protected:
 
 	void runCompletionCallbacks(
-		v3s16 pos, EmergeAction action,
+		v3s32 pos, EmergeAction action,
 		const EmergeCallbackList &callbacks);
 
 private:
@@ -55,14 +56,14 @@ private:
 
 	std::unique_ptr<EmergeScripting> m_script;
 	// read from scripting:
-	UniqueQueue<v3s16> *m_trans_liquid; //< non-null only when generating a mapblock
+	UniqueQueue<v3s32> *m_trans_liquid; //< non-null only when generating a mapblock
 
 	Event m_queue_event;
-	std::queue<v3s16> m_block_queue;
+	std::queue<v3s32> m_block_queue;
 
 	bool initScripting();
 
-	bool popBlockEmerge(v3s16 *pos, BlockEmergeData *bedata);
+	bool popBlockEmerge(v3s32 *pos, BlockEmergeData *bedata);
 
 	/**
 	 * Try to get a block from memory and decide what to do.
@@ -75,11 +76,11 @@ private:
 	 * @param data info for mapgen
 	 * @return what to do for this block
 	 */
-	EmergeAction getBlockOrStartGen(v3s16 pos, bool allow_gen,
+	EmergeAction getBlockOrStartGen(v3s32 pos, bool allow_gen,
 		const std::string *from_db,  MapBlock **block, BlockMakeData *data);
 
-	MapBlock *finishGen(v3s16 pos, BlockMakeData *bmdata,
-		std::map<v3s16, MapBlock *> *modified_blocks);
+	MapBlock *finishGen(v3s32 pos, BlockMakeData *bmdata,
+		std::map<v3s32, MapBlock *> *modified_blocks);
 
 	friend class EmergeManager;
 	friend class EmergeScripting;

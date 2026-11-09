@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -30,65 +31,65 @@ inline constexpr T rangelim(const T &d, const T2 &min, const T3 &max)
 // sqrt(3.0) / 2.0 in literal form.
 static constexpr const f32 BLOCK_MAX_RADIUS = 0.866025403784f * MAP_BLOCKSIZE * BS;
 
-inline s16 getContainerPos(s16 p, s16 d)
+inline s32 getContainerPos(s32 p, s32 d)
 {
 	return (p >= 0 ? p : p - d + 1) / d;
 }
 
-inline v2s16 getContainerPos(v2s16 p, s16 d)
+inline v2s32 getContainerPos(v2s32 p, s32 d)
 {
-	return v2s16(
+	return v2s32(
 		getContainerPos(p.X, d),
 		getContainerPos(p.Y, d)
 	);
 }
 
-inline v3s16 getContainerPos(v3s16 p, s16 d)
+inline v3s32 getContainerPos(v3s32 p, s32 d)
 {
-	return v3s16(
+	return v3s32(
 		getContainerPos(p.X, d),
 		getContainerPos(p.Y, d),
 		getContainerPos(p.Z, d)
 	);
 }
 
-inline v2s16 getContainerPos(v2s16 p, v2s16 d)
+inline v2s32 getContainerPos(v2s32 p, v2s32 d)
 {
-	return v2s16(
+	return v2s32(
 		getContainerPos(p.X, d.X),
 		getContainerPos(p.Y, d.Y)
 	);
 }
 
-inline v3s16 getContainerPos(v3s16 p, v3s16 d)
+inline v3s32 getContainerPos(v3s32 p, v3s32 d)
 {
-	return v3s16(
+	return v3s32(
 		getContainerPos(p.X, d.X),
 		getContainerPos(p.Y, d.Y),
 		getContainerPos(p.Z, d.Z)
 	);
 }
 
-inline void getContainerPosWithOffset(s16 p, s16 d, s16 &container, s16 &offset)
+inline void getContainerPosWithOffset(s32 p, s32 d, s32 &container, s32 &offset)
 {
 	container = (p >= 0 ? p : p - d + 1) / d;
 	offset = p & (d - 1);
 }
 
-inline void getContainerPosWithOffset(const v2s16 &p, s16 d, v2s16 &container, v2s16 &offset)
+inline void getContainerPosWithOffset(const v2s32 &p, s32 d, v2s32 &container, v2s32 &offset)
 {
 	getContainerPosWithOffset(p.X, d, container.X, offset.X);
 	getContainerPosWithOffset(p.Y, d, container.Y, offset.Y);
 }
 
-inline void getContainerPosWithOffset(const v3s16 &p, s16 d, v3s16 &container, v3s16 &offset)
+inline void getContainerPosWithOffset(const v3s32 &p, s32 d, v3s32 &container, v3s32 &offset)
 {
 	getContainerPosWithOffset(p.X, d, container.X, offset.X);
 	getContainerPosWithOffset(p.Y, d, container.Y, offset.Y);
 	getContainerPosWithOffset(p.Z, d, container.Z, offset.Z);
 }
 
-inline bool isInArea(v3s16 p, s16 d)
+inline bool isInArea(v3s32 p, s32 d)
 {
 	return (
 		p.X >= 0 && p.X < d &&
@@ -97,7 +98,7 @@ inline bool isInArea(v3s16 p, s16 d)
 	);
 }
 
-inline bool isInArea(v2s16 p, s16 d)
+inline bool isInArea(v2s32 p, s32 d)
 {
 	return (
 		p.X >= 0 && p.X < d &&
@@ -105,7 +106,7 @@ inline bool isInArea(v2s16 p, s16 d)
 	);
 }
 
-inline bool isInArea(v3s16 p, v3s16 d)
+inline bool isInArea(v3s32 p, v3s32 d)
 {
 	return (
 		p.X >= 0 && p.X < d.X &&
@@ -153,6 +154,19 @@ inline constexpr core::vector3d<T> componentwise_max(const core::vector3d<T> &a,
 	return {std::max(a.X, b.X), std::max(a.Y, b.Y), std::max(a.Z, b.Z)};
 }
 
+// Validate bounded node queries without multiplying overflowing extents.
+inline bool isNodeAreaWithinVolume(v3s32 minp, v3s32 maxp, u64 maximum)
+{
+    const s64 extent[3] = {(s64)maxp.X-minp.X+1, (s64)maxp.Y-minp.Y+1, (s64)maxp.Z-minp.Z+1};
+    u64 volume = 1;
+    for (s64 side : extent) {
+        if (side <= 0 || side > 65536 || volume > maximum / (u64)side)
+            return false;
+        volume *= (u64)side;
+    }
+    return true;
+}
+
 /// @brief Describes a grid with given step, originating at (0,0,0)
 struct MeshGrid {
 	u16 cell_size;
@@ -160,31 +174,31 @@ struct MeshGrid {
 	u32 getCellVolume() const { return cell_size * cell_size * cell_size; }
 
 	/// @brief returns coordinate of mesh cell given coordinate of a map block
-	s16 getCellPos(s16 p) const
+	s32 getCellPos(s32 p) const
 	{
 		return (p - (p < 0) * (cell_size - 1)) / cell_size;
 	}
 
 	/// @brief returns position of mesh cell in the grid given position of a map block
-	v3s16 getCellPos(v3s16 block_pos) const
+	v3s32 getCellPos(v3s32 block_pos) const
 	{
-		return v3s16(getCellPos(block_pos.X), getCellPos(block_pos.Y), getCellPos(block_pos.Z));
+		return v3s32(getCellPos(block_pos.X), getCellPos(block_pos.Y), getCellPos(block_pos.Z));
 	}
 
 	/// @brief returns closest step of the grid smaller than p
-	s16 getMeshPos(s16 p) const
+	s32 getMeshPos(s32 p) const
 	{
 		return getCellPos(p) * cell_size;
 	}
 
 	/// @brief Returns coordinates of the origin of the grid cell containing p
-	v3s16 getMeshPos(v3s16 p) const
+	v3s32 getMeshPos(v3s32 p) const
 	{
-		return v3s16(getMeshPos(p.X), getMeshPos(p.Y), getMeshPos(p.Z));
+		return v3s32(getMeshPos(p.X), getMeshPos(p.Y), getMeshPos(p.Z));
 	}
 
 	/// @brief Returns true if p is an origin of a cell in the grid.
-	bool isMeshPos(v3s16 &p) const
+	bool isMeshPos(v3s32 &p) const
 	{
 		return p.X % cell_size == 0
 				&& p.Y % cell_size == 0
@@ -193,7 +207,7 @@ struct MeshGrid {
 
 	/// @brief Returns index of the given offset in a grid cell
 	/// All offset coordinates must be smaller than the size of the cell
-	u16 getOffsetIndex(v3s16 offset) const
+	u16 getOffsetIndex(v3s32 offset) const
 	{
 		return (offset.Z * cell_size + offset.Y) * cell_size + offset.X;
 	}
@@ -317,7 +331,7 @@ u64 murmur_hash_64_ua(const void *key, size_t len, unsigned int seed);
  * @param range viewing range
  * @param distance_ptr return location for distance from the camera
  */
-bool isBlockInSight(const v3s16 blockpos_b, v3f camera_pos, v3f camera_dir,
+bool isBlockInSight(const v3s32 blockpos_b, v3f camera_pos, v3f camera_dir,
 		const f32 camera_fov, const f32 range, f32 *distance_ptr=nullptr);
 
 /**
@@ -329,10 +343,10 @@ bool isBlockInSight(const v3s16 blockpos_b, v3f camera_pos, v3f camera_dir,
  * @param range viewing range
  * @param distance_ptr return location for distance from the camera
  */
-bool isBlockInSightEx(const v3s16 blockpos_b, v3f camera_pos, v3f camera_dir,
+bool isBlockInSightEx(const v3s32 blockpos_b, v3f camera_pos, v3f camera_dir,
 		const f32 target_cos_sq, const f32 adjdist, const f32 range, f32 *distance_ptr);
 
-s16 adjustDist(s16 dist, float zoom_fov);
+s32 adjustDist(s32 dist, float zoom_fov);
 
 
 inline f32 getFovAdj(f32 camera_fov)
@@ -375,9 +389,9 @@ inline constexpr T sqr(T f)
 	Returns integer position of node in given floating point position
 */
 [[nodiscard]]
-inline v3s16 floatToInt(v3f p, f32 d)
+inline v3s32 floatToInt(v3f p, f32 d)
 {
-	return v3s16(
+	return v3s32(
 		(p.X + (p.X > 0 ? d / 2 : -d / 2)) / d,
 		(p.Y + (p.Y > 0 ? d / 2 : -d / 2)) / d,
 		(p.Z + (p.Z > 0 ? d / 2 : -d / 2)) / d);
@@ -387,9 +401,9 @@ inline v3s16 floatToInt(v3f p, f32 d)
 	Returns integer position of node in given double precision position
  */
 [[nodiscard]]
-inline v3s16 doubleToInt(v3d p, double d)
+inline v3s32 doubleToInt(v3d p, double d)
 {
-	return v3s16(
+	return v3s32(
 		(p.X + (p.X > 0 ? d / 2 : -d / 2)) / d,
 		(p.Y + (p.Y > 0 ? d / 2 : -d / 2)) / d,
 		(p.Z + (p.Z > 0 ? d / 2 : -d / 2)) / d);
@@ -399,14 +413,14 @@ inline v3s16 doubleToInt(v3d p, double d)
 	Returns floating point position of node in given integer position
 */
 [[nodiscard]]
-inline v3f intToFloat(v3s16 p, f32 d)
+inline v3f intToFloat(v3s32 p, f32 d)
 {
 	return v3f::from(p) * d;
 }
 
 // Returns box of a node as in-world box. Usually d=BS
 [[nodiscard]]
-inline aabb3f getNodeBox(v3s16 p, float d)
+inline aabb3f getNodeBox(v3s32 p, float d)
 {
 	return aabb3f(
 		v3f::from(p) * d - 0.5f * d,

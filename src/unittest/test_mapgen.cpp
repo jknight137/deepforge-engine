@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2024 Luanti core developers & community
@@ -82,7 +83,7 @@ void TestMapgen::testBiomeGen(IGameDef *gamedef)
 
 	std::unique_ptr<BiomeParams> params(BiomeManager::createBiomeParams(BIOMEGEN_ORIGINAL));
 
-	constexpr v3s16 CSIZE(16, 16, 16); // misleading name. measured in nodes.
+	constexpr v3s32 CSIZE(16, 16, 16); // misleading name. measured in nodes.
 	std::unique_ptr<BiomeGen> biomegen(
 		bmgr.createBiomeGen(BIOMEGEN_ORIGINAL, params.get(), CSIZE)
 	);
@@ -92,21 +93,21 @@ void TestMapgen::testBiomeGen(IGameDef *gamedef)
 		//   getBiomeAtIndex (Y only)
 		//   getNextTransitionY
 		const struct {
-			s16 check_y;
+			s32 check_y;
 			const char *name;
-			s16 next_y;
+			s32 next_y;
 		} expected_biomes[] = {
 			{ MAX_MAP_GENERATION_LIMIT, "deciduous_forest", 0 },
 			{ 1, "deciduous_forest", 0 },
-			{    0, "deciduous_forest_shore", S16_MIN },
-			{ -100, "deciduous_forest_shore", S16_MIN },
+			{    0, "deciduous_forest_shore", S32_MIN },
+			{ -100, "deciduous_forest_shore", S32_MIN },
 		};
 		for (const auto &expected : expected_biomes) {
 			Biome *biome = biomegen->getBiomeAtIndex(
 				(1 * CSIZE.X) + 1, // index in CSIZE 2D noise map
-				v3s16(2000, expected.check_y, -1000) // absolute coordinates
+				v3s32(2000, expected.check_y, -1000) // absolute coordinates
 			);
-			s16 next_y = biomegen->getNextTransitionY(expected.check_y);
+			s32 next_y = biomegen->getNextTransitionY(expected.check_y);
 
 			//UASSERTEQ(auto, biome->name, expected.name);
 			//UASSERTEQ(auto, next_y, expected.next_y);
@@ -128,13 +129,13 @@ void TestMapgen::testBiomeGen(IGameDef *gamedef)
 
 void TestMapgen::testMapgenEdges()
 {
-	v3s16 emin, emax;
+	v3s32 emin, emax;
 
-	std::tie(emin, emax) = get_mapgen_edges(31007, v3s16(5));
-	UASSERTEQ(auto, emin, v3s16(-30912));
-	UASSERTEQ(auto, emax, v3s16(30927));
+	std::tie(emin, emax) = get_mapgen_edges(31007, v3s32(5));
+	UASSERTEQ(auto, emin, v3s32(-30912));
+	UASSERTEQ(auto, emax, v3s32(30927));
 
-	std::tie(emin, emax) = get_mapgen_edges(502 * MAP_BLOCKSIZE, v3s16(1, 2, 1));
-	UASSERTEQ(auto, emin, v3s16(-8016));
-	UASSERTEQ(auto, emax, v3s16(8031, 8015, 8031));
+	std::tie(emin, emax) = get_mapgen_edges(502 * MAP_BLOCKSIZE, v3s32(1, 2, 1));
+	UASSERTEQ(auto, emin, v3s32(-8016));
+	UASSERTEQ(auto, emax, v3s32(8031, 8015, 8031));
 }

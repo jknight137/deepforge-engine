@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -32,7 +33,7 @@ namespace {
 //!       collisions are forwarded to the struct `CollisionInfo`.
 struct NearbyCollisionInfo {
 	// node
-	NearbyCollisionInfo(bool is_ul, int bouncy, v3s16 pos, const aabb3f &box) :
+	NearbyCollisionInfo(bool is_ul, int bouncy, v3s32 pos, const aabb3f &box) :
 		obj(nullptr),
 		box(box),
 		position(pos),
@@ -51,7 +52,7 @@ struct NearbyCollisionInfo {
 
 	ActiveObject *obj;
 	aabb3f box;
-	v3s16 position;
+	v3s32 position;
 	u8 bouncy;
 	bool is_unloaded = false,
 		is_step_up = false;
@@ -217,7 +218,7 @@ bool wouldCollideWithCeiling(
 	return false;
 }
 
-static bool add_area_node_boxes(const v3s16 min, const v3s16 max, IGameDef *gamedef,
+static bool add_area_node_boxes(const v3s32 min, const v3s32 max, IGameDef *gamedef,
 		Environment *env, std::vector<NearbyCollisionInfo> &cinfo)
 {
 	const auto *nodedef = gamedef->getNodeDefManager();
@@ -228,7 +229,7 @@ static bool add_area_node_boxes(const v3s16 min, const v3s16 max, IGameDef *game
 
 	const bool air_walkable = nodedef->get(CONTENT_AIR).walkable;
 
-	v3s16 last_bp(S16_MAX);
+	v3s32 last_bp(S16_MAX);
 	MapBlock *last_block = nullptr;
 
 	// Note: as the area used here is usually small, iterating entire blocks
@@ -236,11 +237,11 @@ static bool add_area_node_boxes(const v3s16 min, const v3s16 max, IGameDef *game
 	// Note #2: the >= min check will prevent an overflow from causing an
 	// infinite loop.
 
-	v3s16 p;
+	v3s32 p;
 	for (p.Z = min.Z; p.Z >= min.Z && p.Z <= max.Z; p.Z++)
 	for (p.Y = min.Y; p.Y >= min.Y && p.Y <= max.Y; p.Y++)
 	for (p.X = min.X; p.X >= min.X && p.X <= max.X; p.X++) {
-		v3s16 bp, relp;
+		v3s32 bp, relp;
 		getNodeBlockPosWithOffset(p, bp, relp);
 		if (bp != last_bp) {
 			last_block = map->getBlockNoCreateNoEx(bp);
@@ -253,7 +254,7 @@ static bool add_area_node_boxes(const v3s16 min, const v3s16 max, IGameDef *game
 			// ahead in the "innermost" axis of the MapBlock (X).
 			// This still worth it as it reduces the number of nodes to look at
 			// and entries in `cinfo`.
-			v3s16 rowend(bp.X * MAP_BLOCKSIZE + MAP_BLOCKSIZE - 1, p.Y, p.Z);
+			v3s32 rowend(bp.X * MAP_BLOCKSIZE + MAP_BLOCKSIZE - 1, p.Y, p.Z);
 			aabb3f box = getNodeBox(p, BS);
 			box.addInternalBox(getNodeBox(rowend, BS));
 			// Collide with unloaded block
@@ -475,8 +476,8 @@ CollisionMoveResult collisionMoveSimple(Environment *env, IGameDef *gamedef,
 			MYMAX(pos_f->Y, newpos_f.Y),
 			MYMAX(pos_f->Z, newpos_f.Z)
 		);
-		v3s16 min = floatToInt(minpos_f + box_0.MinEdge, BS) - v3s16(1, 1, 1);
-		v3s16 max = floatToInt(maxpos_f + box_0.MaxEdge, BS) + v3s16(1, 1, 1);
+		v3s32 min = floatToInt(minpos_f + box_0.MinEdge, BS) - v3s32(1, 1, 1);
+		v3s32 max = floatToInt(maxpos_f + box_0.MaxEdge, BS) + v3s32(1, 1, 1);
 
 		bool any_position_valid = add_area_node_boxes(min, max, gamedef, env, cinfo);
 
@@ -675,8 +676,8 @@ bool collision_check_intersection(Environment *env, IGameDef *gamedef,
 
 	std::vector<NearbyCollisionInfo> cinfo;
 	{
-		v3s16 min = floatToInt(pos_f + box_0.MinEdge, BS) - v3s16(1, 1, 1);
-		v3s16 max = floatToInt(pos_f + box_0.MaxEdge, BS) + v3s16(1, 1, 1);
+		v3s32 min = floatToInt(pos_f + box_0.MinEdge, BS) - v3s32(1, 1, 1);
+		v3s32 max = floatToInt(pos_f + box_0.MaxEdge, BS) + v3s32(1, 1, 1);
 
 		bool any_position_valid = add_area_node_boxes(min, max, gamedef, env, cinfo);
 

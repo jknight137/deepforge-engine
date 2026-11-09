@@ -1,11 +1,12 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 -- Luanti
 -- Copyright (C) 2018-20 rubenwardy
 -- SPDX-License-Identifier: LGPL-2.1-or-later
 
-if not core.get_http_api then
+if not core.get_http_api or (core.settings:get("contentdb_url") or "") == "" then
 	function create_contentdb_dlg()
 		return messagebox("contentdb",
-				fgettext("ContentDB is not available when Luanti was compiled without cURL"))
+				fgettext("No content catalogue is configured. Install project content locally or configure a catalogue endpoint."))
 	end
 	return
 end

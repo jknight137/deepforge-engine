@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -45,7 +46,7 @@ void TestSchematic::runTests(IGameDef *gamedef)
 
 void TestSchematic::testMtsSerializeDeserialize(const NodeDefManager *ndef)
 {
-	static const v3s16 size(7, 6, 4);
+	static const v3s32 size(7, 6, 4);
 	static const u32 volume = size.X * size.Y * size.Z;
 
 	std::stringstream ss(std::ios_base::binary |
@@ -66,7 +67,7 @@ void TestSchematic::testMtsSerializeDeserialize(const NodeDefManager *ndef)
 	schem.slice_probs = new u8[size.Y];
 	for (size_t i = 0; i != volume; i++)
 		schem.schemdata[i] = MapNode(test_schem1_data[i], MTSCHEM_PROB_ALWAYS, 0);
-	for (s16 y = 0; y != size.Y; y++)
+	for (s32 y = 0; y != size.Y; y++)
 		schem.slice_probs[y] = MTSCHEM_PROB_ALWAYS;
 
 	UASSERT(schem.serializeToMts(&ss));
@@ -88,14 +89,14 @@ void TestSchematic::testMtsSerializeDeserialize(const NodeDefManager *ndef)
 	UASSERT(schem2.size == size);
 	for (size_t i = 0; i != volume; i++)
 		UASSERT(schem2.schemdata[i] == schem.schemdata[i]);
-	for (s16 y = 0; y != size.Y; y++)
+	for (s32 y = 0; y != size.Y; y++)
 		UASSERTEQ(u8, schem2.slice_probs[y], schem.slice_probs[y]);
 }
 
 
 void TestSchematic::testLuaTableSerialize(const NodeDefManager *ndef)
 {
-	static const v3s16 size(3, 3, 3);
+	static const v3s32 size(3, 3, 3);
 	static const u32 volume = size.X * size.Y * size.Z;
 
 	Schematic schem;
@@ -106,7 +107,7 @@ void TestSchematic::testLuaTableSerialize(const NodeDefManager *ndef)
 	schem.slice_probs = new u8[size.Y];
 	for (size_t i = 0; i != volume; i++)
 		schem.schemdata[i] = MapNode(test_schem2_data[i], test_schem2_prob[i], 0);
-	for (s16 y = 0; y != size.Y; y++)
+	for (s32 y = 0; y != size.Y; y++)
 		schem.slice_probs[y] = MTSCHEM_PROB_ALWAYS;
 
 	std::vector<std::string> &names = schem.m_nodenames;
@@ -123,7 +124,7 @@ void TestSchematic::testLuaTableSerialize(const NodeDefManager *ndef)
 
 void TestSchematic::testFileSerializeDeserialize(const NodeDefManager *ndef)
 {
-	static const v3s16 size(3, 3, 3);
+	static const v3s32 size(3, 3, 3);
 	static const u32 volume = size.X * size.Y * size.Z;
 	static const content_t content_map[] = {
 		CONTENT_AIR,

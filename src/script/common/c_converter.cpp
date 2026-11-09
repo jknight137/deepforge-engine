@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -114,12 +115,12 @@ void push_v2f(lua_State *L, v2f p)
 	lua_call(L, 2, 1);
 }
 
-v2s16 read_v2s16(lua_State *L, int index)
+v2s32 read_v2s16(lua_State *L, int index)
 {
-	return v2s16::from(read_v2f(L, index));
+	return v2s32::from(read_v2f(L, index));
 }
 
-void push_v2s16(lua_State *L, v2s16 p)
+void push_v2pos(lua_State *L, v2s32 p)
 {
 	push_v2s32(L, v2s32::from(p));
 }
@@ -245,7 +246,7 @@ v3f checkFloatPos(lua_State *L, int index)
 	return check_v3f(L, index) * BS;
 }
 
-void push_v3s16(lua_State *L, v3s16 p)
+void push_nodepos(lua_State *L, v3s32 p)
 {
 	lua_rawgeti(L, LUA_REGISTRYINDEX, CUSTOM_RIDX_PUSH_VECTOR);
 	lua_pushinteger(L, p.X);
@@ -254,17 +255,25 @@ void push_v3s16(lua_State *L, v3s16 p)
 	lua_call(L, 3, 1);
 }
 
-v3s16 read_v3s16(lua_State *L, int index)
+v3s32 read_nodepos(lua_State *L, int index)
 {
 	// Correct rounding at <0
 	v3d pf = read_v3d(L, index);
+	if (!std::isfinite(pf.X) || !std::isfinite(pf.Y) || !std::isfinite(pf.Z) ||
+			pf.X < -1000000 || pf.X > 1000000 || pf.Y < -1000000 ||
+			pf.Y > 1000000 || pf.Z < -1000000 || pf.Z > 1000000)
+		throw LuaError("Node position is nonfinite or outside the supported coordinate domain");
 	return doubleToInt(pf, 1.0);
 }
 
-v3s16 check_v3s16(lua_State *L, int index)
+v3s32 check_nodepos(lua_State *L, int index)
 {
 	// Correct rounding at <0
 	v3d pf = check_v3d(L, index);
+	if (!std::isfinite(pf.X) || !std::isfinite(pf.Y) || !std::isfinite(pf.Z) ||
+			pf.X < -1000000 || pf.X > 1000000 || pf.Y < -1000000 ||
+			pf.Y > 1000000 || pf.Z < -1000000 || pf.Z > 1000000)
+		throw LuaError("Node position is nonfinite or outside the supported coordinate domain");
 	return doubleToInt(pf, 1.0);
 }
 
@@ -580,8 +589,8 @@ bool getboolfield_default(lua_State *L, int table,
 	return result;
 }
 
-v3s16 getv3s16field_default(lua_State *L, int table,
-		const char *fieldname, v3s16 default_)
+v3s32 getv3s16field_default(lua_State *L, int table,
+		const char *fieldname, v3s32 default_)
 {
 	getv3intfield(L, table, fieldname, default_);
 	return default_;

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 /*
 Luanti
 SPDX-License-Identifier: LGPL-2.1-or-later
@@ -117,7 +118,7 @@ void MapgenValleysParams::readParams(const Settings *settings)
 {
 	settings->getFlagStrNoEx("mgvalleys_spflags", spflags, flagdesc_mapgen_valleys);
 	settings->getU16NoEx("mgvalleys_altitude_chill",       altitude_chill);
-	settings->getS16NoEx("mgvalleys_large_cave_depth",     large_cave_depth);
+	settings->getS32NoEx("mgvalleys_large_cave_depth",     large_cave_depth);
 	settings->getU16NoEx("mgvalleys_small_cave_num_min",   small_cave_num_min);
 	settings->getU16NoEx("mgvalleys_small_cave_num_max",   small_cave_num_max);
 	settings->getU16NoEx("mgvalleys_large_cave_num_min",   large_cave_num_min);
@@ -126,11 +127,11 @@ void MapgenValleysParams::readParams(const Settings *settings)
 	settings->getU16NoEx("mgvalleys_river_depth",          river_depth);
 	settings->getU16NoEx("mgvalleys_river_size",           river_size);
 	settings->getFloatNoEx("mgvalleys_cave_width",         cave_width);
-	settings->getS16NoEx("mgvalleys_cavern_limit",         cavern_limit);
-	settings->getS16NoEx("mgvalleys_cavern_taper",         cavern_taper);
+	settings->getS32NoEx("mgvalleys_cavern_limit",         cavern_limit);
+	settings->getS32NoEx("mgvalleys_cavern_taper",         cavern_taper);
 	settings->getFloatNoEx("mgvalleys_cavern_threshold",   cavern_threshold);
-	settings->getS16NoEx("mgvalleys_dungeon_ymin",         dungeon_ymin);
-	settings->getS16NoEx("mgvalleys_dungeon_ymax",         dungeon_ymax);
+	settings->getS32NoEx("mgvalleys_dungeon_ymin",         dungeon_ymin);
+	settings->getS32NoEx("mgvalleys_dungeon_ymax",         dungeon_ymax);
 
 	settings->getNoiseParams("mgvalleys_np_filler_depth",       np_filler_depth);
 	settings->getNoiseParams("mgvalleys_np_inter_valley_fill",  np_inter_valley_fill);
@@ -151,7 +152,7 @@ void MapgenValleysParams::writeParams(Settings *settings) const
 {
 	settings->setFlagStr("mgvalleys_spflags", spflags, flagdesc_mapgen_valleys);
 	settings->setU16("mgvalleys_altitude_chill",       altitude_chill);
-	settings->setS16("mgvalleys_large_cave_depth",     large_cave_depth);
+	settings->setS32("mgvalleys_large_cave_depth",     large_cave_depth);
 	settings->setU16("mgvalleys_small_cave_num_min",   small_cave_num_min);
 	settings->setU16("mgvalleys_small_cave_num_max",   small_cave_num_max);
 	settings->setU16("mgvalleys_large_cave_num_min",   large_cave_num_min);
@@ -160,11 +161,11 @@ void MapgenValleysParams::writeParams(Settings *settings) const
 	settings->setU16("mgvalleys_river_depth",          river_depth);
 	settings->setU16("mgvalleys_river_size",           river_size);
 	settings->setFloat("mgvalleys_cave_width",         cave_width);
-	settings->setS16("mgvalleys_cavern_limit",         cavern_limit);
-	settings->setS16("mgvalleys_cavern_taper",         cavern_taper);
+	settings->setS32("mgvalleys_cavern_limit",         cavern_limit);
+	settings->setS32("mgvalleys_cavern_taper",         cavern_taper);
 	settings->setFloat("mgvalleys_cavern_threshold",   cavern_threshold);
-	settings->setS16("mgvalleys_dungeon_ymin",         dungeon_ymin);
-	settings->setS16("mgvalleys_dungeon_ymax",         dungeon_ymax);
+	settings->setS32("mgvalleys_dungeon_ymin",         dungeon_ymin);
+	settings->setS32("mgvalleys_dungeon_ymax",         dungeon_ymax);
 
 	settings->setNoiseParams("mgvalleys_np_filler_depth",       np_filler_depth);
 	settings->setNoiseParams("mgvalleys_np_inter_valley_fill",  np_inter_valley_fill);
@@ -204,12 +205,12 @@ void MapgenValleys::makeChunk(BlockMakeData *data)
 	this->vm = data->vmanip;
 	this->ndef = data->nodedef;
 
-	v3s16 blockpos_min = data->blockpos_min;
-	v3s16 blockpos_max = data->blockpos_max;
+	v3s32 blockpos_min = data->blockpos_min;
+	v3s32 blockpos_max = data->blockpos_max;
 	node_min = blockpos_min * MAP_BLOCKSIZE;
-	node_max = (blockpos_max + v3s16(1, 1, 1)) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	node_max = (blockpos_max + v3s32(1, 1, 1)) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 	full_node_min = (blockpos_min - 1) * MAP_BLOCKSIZE;
-	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 
 	blockseed = getBlockSeed2(full_node_min, seed);
 
@@ -219,7 +220,7 @@ void MapgenValleys::makeChunk(BlockMakeData *data)
 	m_bgen->calcBiomeNoise(node_min);
 
 	// Generate terrain
-	s16 stone_surface_max_y = generateTerrain();
+	s32 stone_surface_max_y = generateTerrain();
 
 	// Create heightmap
 	updateHeightmap(node_min, node_max);
@@ -267,7 +268,7 @@ void MapgenValleys::makeChunk(BlockMakeData *data)
 	updateLiquid(&data->transforming_liquid, full_node_min, full_node_max);
 
 	if (flags & MG_LIGHT)
-		calcLighting(node_min - v3s16(0, 1, 0), node_max + v3s16(0, 1, 0),
+		calcLighting(node_min - v3s32(0, 1, 0), node_max + v3s32(0, 1, 0),
 			full_node_min, full_node_max);
 
 	this->generating = false;
@@ -276,7 +277,7 @@ void MapgenValleys::makeChunk(BlockMakeData *data)
 }
 
 
-int MapgenValleys::getSpawnLevelAtPoint(v2s16 p)
+int MapgenValleys::getSpawnLevelAtPoint(v2s32 p)
 {
 	// Check if in a river channel
 	float n_rivers = NoiseFractal2D(&noise_rivers->np, p.X, p.Y, seed);
@@ -300,14 +301,14 @@ int MapgenValleys::getSpawnLevelAtPoint(v2s16 p)
 
 	// Raising the maximum spawn level above 'water_level + 16' is necessary for custom
 	// parameters that set average terrain level much higher than water_level.
-	s16 max_spawn_y = std::fmax(
+	s32 max_spawn_y = std::fmax(
 		noise_terrain_height->np.offset +
 		noise_valley_depth->np.offset * noise_valley_depth->np.offset,
 		water_level + 16);
 
 	// Starting spawn search at max_spawn_y + 128 ensures 128 nodes of open
 	// space above spawn position. Avoids spawning in possibly sealed voids.
-	for (s16 y = max_spawn_y + 128; y >= water_level; y--) {
+	for (s32 y = max_spawn_y + 128; y >= water_level; y--) {
 		float n_fill = NoiseFractal3D(&noise_inter_valley_fill->np, p.X, y, p.Y, seed);
 		float surface_delta = (float)y - surface_y;
 		float density = slope * n_fill - surface_delta;
@@ -315,7 +316,7 @@ int MapgenValleys::getSpawnLevelAtPoint(v2s16 p)
 		if (density > 0.0f) {  // If solid
 			// Sometimes surface level is below river water level in places that are not
 			// river channels.
-			if (y < water_level || y > max_spawn_y || y < (s16)river_y)
+			if (y < water_level || y > max_spawn_y || y < (s32)river_y)
 				// Unsuitable spawn point
 				return MAX_MAP_GENERATION_LIMIT;
 
@@ -344,11 +345,11 @@ int MapgenValleys::generateTerrain()
 	noise_inter_valley_fill->noiseMap3D(node_min.X, node_min.Y - 1, node_min.Z);
 
 	const v3s32 &em = vm->m_area.getExtent();
-	s16 surface_max_y = -MAX_MAP_GENERATION_LIMIT;
+	s32 surface_max_y = -MAX_MAP_GENERATION_LIMIT;
 	u32 index_2d = 0;
 
-	for (s16 z = node_min.Z; z <= node_max.Z; z++)
-	for (s16 x = node_min.X; x <= node_max.X; x++, index_2d++) {
+	for (s32 z = node_min.Z; z <= node_max.Z; z++)
+	for (s32 x = node_min.X; x <= node_max.X; x++, index_2d++) {
 		float n_slope          = noise_inter_valley_slope->result[index_2d];
 		float n_rivers         = noise_rivers->result[index_2d];
 		float n_terrain_height = noise_terrain_height->result[index_2d];
@@ -401,11 +402,11 @@ int MapgenValleys::generateTerrain()
 		}
 
 		// Highest solid node in column
-		s16 column_max_y = surface_y;
+		s32 column_max_y = surface_y;
 		u32 index_3d = (z - node_min.Z) * zstride_1u1d + (x - node_min.X);
 		u32 index_data = vm->m_area.index(x, node_min.Y - 1, z);
 
-		for (s16 y = node_min.Y - 1; y <= node_max.Y + 1; y++) {
+		for (s32 y = node_min.Y - 1; y <= node_max.Y + 1; y++) {
 			if (vm->m_data[index_data].getContent() == CONTENT_IGNORE) {
 				float n_fill = noise_inter_valley_fill->result[index_3d];
 				float surface_delta = (float)y - surface_y;
@@ -420,7 +421,7 @@ int MapgenValleys::generateTerrain()
 						column_max_y = y;
 				} else if (y <= water_level) {
 					vm->m_data[index_data] = n_water; // Water
-				} else if (y <= (s16)river_y) {
+				} else if (y <= (s32)river_y) {
 					vm->m_data[index_data] = n_river_water; // River water
 				} else {
 					vm->m_data[index_data] = n_air; // Air

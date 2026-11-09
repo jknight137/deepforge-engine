@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -88,7 +89,7 @@ void Database_Redis::endSave()
 	freeReplyObject(reply);
 }
 
-bool Database_Redis::saveBlock(const v3s16 &pos, std::string_view data)
+bool Database_Redis::saveBlock(const v3s32 &pos, std::string_view data)
 {
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 
@@ -112,7 +113,7 @@ bool Database_Redis::saveBlock(const v3s16 &pos, std::string_view data)
 	return true;
 }
 
-void Database_Redis::loadBlock(const v3s16 &pos, std::string *block)
+void Database_Redis::loadBlock(const v3s32 &pos, std::string *block)
 {
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx,
@@ -152,7 +153,7 @@ void Database_Redis::loadBlock(const v3s16 &pos, std::string *block)
 		"Redis command 'HGET %s %s' gave invalid reply."));
 }
 
-bool Database_Redis::deleteBlock(const v3s16 &pos)
+bool Database_Redis::deleteBlock(const v3s32 &pos)
 {
 	std::string tmp = i64tos(getBlockAsInteger(pos));
 
@@ -172,7 +173,7 @@ bool Database_Redis::deleteBlock(const v3s16 &pos)
 	return true;
 }
 
-void Database_Redis::listAllLoadableBlocks(std::vector<v3s16> &dst)
+void Database_Redis::listAllLoadableBlocks(std::vector<v3s32> &dst)
 {
 	redisReply *reply = static_cast<redisReply *>(redisCommand(ctx, "HKEYS %s", hash.c_str()));
 	if (!reply) {

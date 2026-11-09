@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -60,7 +61,7 @@ private:
 	List of metadata of all the nodes of a block
 */
 
-typedef std::map<v3s16, NodeMetadata *> NodeMetadataMap;
+typedef std::map<v3s32, NodeMetadata *> NodeMetadataMap;
 
 class NodeMetadataList
 {
@@ -77,16 +78,16 @@ public:
 		bool absolute_pos = false);
 
 	// Return all keys
-	std::vector<v3s16> getAllKeys() const;
+	std::vector<v3s32> getAllKeys() const;
 	// Get pointer to data
-	NodeMetadata *get(v3s16 p) const;
+	NodeMetadata *get(v3s32 p) const;
 
 	/// @brief Deletes data
 	/// @return the old data (if it was owned)
-	std::unique_ptr<NodeMetadata> remove(v3s16 p);
+	std::unique_ptr<NodeMetadata> remove(v3s32 p);
 	/// @brief Deletes old data and sets a new one
 	/// @return the old data (if it was owned)
-	std::unique_ptr<NodeMetadata> set(v3s16 p, NodeMetadata *d);
+	std::unique_ptr<NodeMetadata> set(v3s32 p, NodeMetadata *d);
 	/// @brief Deletes all entries
 	/// @warning Make sure no pointers are still in use!
 	void clear();

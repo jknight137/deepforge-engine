@@ -142,3 +142,9 @@ lib/irrlichtmt
 
 # Generated mod storage database
 client/mod_storage.sqlite
+
+# Local Deepforge build and Python state
+.sdk/
+build/
+__pycache__/
+*.pyc

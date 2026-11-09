@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -27,7 +28,7 @@
 
 struct TextDestNodeMetadata : public TextDest
 {
-	TextDestNodeMetadata(v3s16 p, Client *client)
+	TextDestNodeMetadata(v3s32 p, Client *client)
 	{
 		m_p = p;
 		m_client = client;
@@ -37,7 +38,7 @@ struct TextDestNodeMetadata : public TextDest
 		m_client->sendNodemetaFields(m_p, "", fields);
 	}
 
-	v3s16 m_p;
+	v3s32 m_p;
 	Client *m_client;
 };
 
@@ -138,7 +139,7 @@ struct LegacyDeathFormspecHandler : public TextDest
 class NodeMetadataFormSource: public IFormSource
 {
 public:
-	NodeMetadataFormSource(ClientMap *map, v3s16 p):
+	NodeMetadataFormSource(ClientMap *map, v3s32 p):
 		m_map(map),
 		m_p(p)
 	{
@@ -165,7 +166,7 @@ public:
 	}
 
 	ClientMap *m_map;
-	v3s16 m_p;
+	v3s32 m_p;
 };
 
 class PlayerInventoryFormSource: public IFormSource
@@ -291,7 +292,7 @@ void GameFormSpec::showPauseMenuFormSpec(const std::string &formspec, const std:
 	fs->drop(); // 1 reference held by `g_menumgr`
 }
 
-void GameFormSpec::showNodeFormspec(const std::string &formspec, const v3s16 &nodepos)
+void GameFormSpec::showNodeFormspec(const std::string &formspec, const v3s32 &nodepos)
 {
 	infostream << "Launching custom inventory view" << std::endl;
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -68,7 +69,7 @@ int NodeTimerRef::l_get_elapsed(lua_State *L)
 
 // Creates an NodeTimerRef and leaves it on top of stack
 // Not callable from Lua; all references are created on the C side.
-void NodeTimerRef::create(lua_State *L, v3s16 p, ServerMap *map)
+void NodeTimerRef::create(lua_State *L, v3s32 p, ServerMap *map)
 {
 	NodeTimerRef *o = new NodeTimerRef(p, map);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;

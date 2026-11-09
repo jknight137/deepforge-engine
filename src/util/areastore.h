@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015 est31 <mtest31@outlook.com>
@@ -21,14 +22,14 @@
 struct Area {
 	Area(u32 area_id) : id(area_id) {}
 
-	Area(const v3s16 &mine, const v3s16 &maxe, u32 area_id = U32_MAX) :
+	Area(const v3s32 &mine, const v3s32 &maxe, u32 area_id = U32_MAX) :
 		id(area_id), minedge(mine), maxedge(maxe)
 	{
 		sortBoxVerticies(minedge, maxedge);
 	}
 
 	u32 id;
-	v3s16 minedge, maxedge;
+	v3s32 minedge, maxedge;
 	std::string data;
 };
 
@@ -57,17 +58,17 @@ public:
 
 	/// Finds areas that the passed position is contained in.
 	/// Stores output in passed vector.
-	void getAreasForPos(std::vector<Area *> *result, v3s16 pos);
+	void getAreasForPos(std::vector<Area *> *result, v3s32 pos);
 
 	/// Finds areas that are overlapping the area defined by the passed edges.
 	/// This finds any areas that intersect with the passed area at any point.
 	virtual void getOverlappingAreas(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge) = 0;
+		v3s32 minedge, v3s32 maxedge) = 0;
 
 	/// Finds areas that are completely contained inside the area defined
 	/// by the passed edges.
 	virtual void getContainingAreas(std::vector<Area *> *result,
-		v3s16 minedge, v3s16 maxedge) = 0;
+		v3s32 minedge, v3s32 maxedge) = 0;
 
 	/// Sets cache parameters.
 	void setCacheParams(bool enabled, u8 block_radius, size_t limit);
@@ -92,7 +93,7 @@ protected:
 
 	/// Implementation of getAreasForPos.
 	/// getAreasForPos calls this if the cache is disabled.
-	virtual void getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos) = 0;
+	virtual void getAreasForPosImpl(std::vector<Area *> *result, v3s32 pos) = 0;
 
 	/// Returns the next area ID and increments it.
 	u32 getNextId() const;
@@ -104,13 +105,13 @@ protected:
 
 private:
 	/// Called by the cache when a value isn't found in the cache.
-	static void cacheMiss(void *data, const v3s16 &mpos, std::vector<Area *> *dest);
+	static void cacheMiss(void *data, const v3s32 &mpos, std::vector<Area *> *dest);
 
 	bool m_cache_enabled = true;
 	/// Range, in nodes, of the getAreasForPos cache.
 	/// If you modify this, call invalidateCache()
 	u8 m_cacheblock_radius = 64;
-	LRUCache<v3s16, std::vector<Area *> > m_res_cache;
+	LRUCache<v3s32, std::vector<Area *> > m_res_cache;
 };
 
 
@@ -119,11 +120,11 @@ public:
 	void reserve(size_t count) override { m_areas.reserve(count); }
 	bool insertArea(Area *a) override;
 	bool removeArea(u32 id) override;
-	void getOverlappingAreas(std::vector<Area *> *result, v3s16 minedge, v3s16 maxedge) override;
-	void getContainingAreas(std::vector<Area *> *result, v3s16 minedge, v3s16 maxedge) override;
+	void getOverlappingAreas(std::vector<Area *> *result, v3s32 minedge, v3s32 maxedge) override;
+	void getContainingAreas(std::vector<Area *> *result, v3s32 minedge, v3s32 maxedge) override;
 
 protected:
-	void getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos) override;
+	void getAreasForPosImpl(std::vector<Area *> *result, v3s32 pos) override;
 
 private:
 	std::vector<Area *> m_areas;
@@ -139,11 +140,11 @@ public:
 
 	bool insertArea(Area *a) override;
 	bool removeArea(u32 id) override;
-	void getOverlappingAreas(std::vector<Area *> *result, v3s16 minedge, v3s16 maxedge) override;
-	void getContainingAreas(std::vector<Area *> *result, v3s16 minedge, v3s16 maxedge) override;
+	void getOverlappingAreas(std::vector<Area *> *result, v3s32 minedge, v3s32 maxedge) override;
+	void getContainingAreas(std::vector<Area *> *result, v3s32 minedge, v3s32 maxedge) override;
 
 protected:
-	void getAreasForPosImpl(std::vector<Area *> *result, v3s16 pos) override;
+	void getAreasForPosImpl(std::vector<Area *> *result, v3s32 pos) override;
 
 private:
 	SpatialIndex::ISpatialIndex *m_tree = nullptr;

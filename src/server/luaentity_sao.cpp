@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -494,21 +495,21 @@ std::string LuaEntitySAO::generateSetTextureModCommand() const
 	return os.str();
 }
 
-std::string LuaEntitySAO::generateSetSpriteCommand(v2s16 p, u16 num_frames,
+std::string LuaEntitySAO::generateSetSpriteCommand(v2s32 p, u16 num_frames,
 	f32 framelength, bool select_horiz_by_yawpitch)
 {
 	std::ostringstream os(std::ios::binary);
 	// command
 	writeU8(os, AO_CMD_SET_SPRITE);
 	// parameters
-	writeV2S16(os, p);
+	writeV2S16(os, v2s16::from(p));
 	writeU16(os, num_frames);
 	writeF32(os, framelength);
 	writeU8(os, select_horiz_by_yawpitch);
 	return os.str();
 }
 
-void LuaEntitySAO::setSprite(v2s16 p, int num_frames, float framelength,
+void LuaEntitySAO::setSprite(v2s32 p, int num_frames, float framelength,
 		bool select_horiz_by_yawpitch)
 {
 	std::string str = generateSetSpriteCommand(

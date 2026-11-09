@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2014 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -128,9 +129,9 @@ void RemoteClient::GetNextBlocks (
 	// Predict to next block
 	v3f playerpos_predicted = playerpos + playerspeeddir * (MAP_BLOCKSIZE * BS);
 
-	v3s16 center_nodepos = floatToInt(playerpos_predicted, BS);
+	v3s32 center_nodepos = floatToInt(playerpos_predicted, BS);
 
-	v3s16 center = getNodeBlockPos(center_nodepos);
+	v3s32 center = getNodeBlockPos(center_nodepos);
 
 	// Camera position and direction
 	v3f camera_pos = sao->getEyePosition();
@@ -204,16 +205,16 @@ void RemoteClient::GetNextBlocks (
 		0.0f :
 		std::max(camera_fov, sao->getZoomFOV() * core::DEGTORAD);
 
-	const s16 full_d_max = std::min(adjustDist(m_max_send_distance, prop_zoom_fov),
+	const s16 full_d_max = std::min<s32>(adjustDist(m_max_send_distance, prop_zoom_fov),
 		wanted_range);
-	const s16 d_opt = std::min(adjustDist(m_block_optimize_distance, prop_zoom_fov),
+	const s16 d_opt = std::min<s32>(adjustDist(m_block_optimize_distance, prop_zoom_fov),
 		wanted_range);
-	const s16 d_cull_opt = std::min(adjustDist(m_block_cull_optimize_distance, prop_zoom_fov),
+	const s16 d_cull_opt = std::min<s32>(adjustDist(m_block_cull_optimize_distance, prop_zoom_fov),
 		wanted_range);
 	// f32 to prevent overflow, it is also what isBlockInSight(...) expects
 	const f32 d_blocks_in_sight = full_d_max * BS * MAP_BLOCKSIZE;
 
-	s16 d_max_gen = std::min(adjustDist(m_max_gen_distance, prop_zoom_fov),
+	s16 d_max_gen = std::min<s32>(adjustDist(m_max_gen_distance, prop_zoom_fov),
 		wanted_range);
 
 	s16 d_max = full_d_max;
@@ -240,7 +241,7 @@ void RemoteClient::GetNextBlocks (
 	s32 nearest_sent_d = -1;
 	//bool queue_is_full = false;
 
-	const v3s16 cam_pos_nodes = floatToInt(camera_pos, BS);
+	const v3s32 cam_pos_nodes = floatToInt(camera_pos, BS);
 
 	// Calculate FOV attributes here, once per call
 	// see numeric.h for details
@@ -256,7 +257,7 @@ void RemoteClient::GetNextBlocks (
 		const auto &list = FacePositionCache::getFacePositions(d);
 
 		for (auto li = list.begin(); li != list.end(); ++li) {
-			v3s16 p = *li + center;
+			v3s32 p = *li + center;
 
 			/*
 				Send throttling
@@ -410,7 +411,7 @@ queue_full_break:
 	}
 }
 
-void RemoteClient::GotBlock(v3s16 p)
+void RemoteClient::GotBlock(v3s32 p)
 {
 	if (m_blocks_sending.erase(p) > 0) {
 		// only add to sent blocks if it actually was sending
@@ -421,14 +422,14 @@ void RemoteClient::GotBlock(v3s16 p)
 	}
 }
 
-void RemoteClient::SentBlock(v3s16 p)
+void RemoteClient::SentBlock(v3s32 p)
 {
 	if (!m_blocks_sending.insert(p).second)
 		infostream<<"RemoteClient::SentBlock(): Sent block"
 				" already in m_blocks_sending"<<std::endl;
 }
 
-void RemoteClient::SetBlockNotSent(v3s16 p, bool low_priority)
+void RemoteClient::SetBlockNotSent(v3s32 p, bool low_priority)
 {
 	m_nothing_to_send_pause_timer = 0;
 
@@ -453,9 +454,9 @@ void RemoteClient::SetBlockNotSent(v3s16 p, bool low_priority)
 	}
 }
 
-void RemoteClient::SetBlocksNotSent(const std::vector<v3s16> &blocks, bool low_priority)
+void RemoteClient::SetBlocksNotSent(const std::vector<v3s32> &blocks, bool low_priority)
 {
-	for (v3s16 p : blocks) {
+	for (v3s32 p : blocks) {
 		SetBlockNotSent(p, low_priority);
 	}
 }
@@ -471,7 +472,7 @@ void RemoteClient::fixupNodePrediction(InteractAction action,
 
 	// The client may have an outdated mapblock if the placement or dig
 	// prediction was wrong or if an old mapblock is still being sent to it.
-	v3s16 blockpos = getNodeBlockPos(pointed.node_undersurface);
+	v3s32 blockpos = getNodeBlockPos(pointed.node_undersurface);
 	if (!prediction_success
 			|| m_blocks_sending.find(blockpos) != m_blocks_sending.end()) {
 		SetBlockNotSent(blockpos);
@@ -481,7 +482,7 @@ void RemoteClient::fixupNodePrediction(InteractAction action,
 	if (action != INTERACT_PLACE)
 		return;
 
-	v3s16 blockpos2 = getNodeBlockPos(pointed.node_abovesurface);
+	v3s32 blockpos2 = getNodeBlockPos(pointed.node_abovesurface);
 	if (blockpos2 != blockpos && (!prediction_success
 			|| m_blocks_sending.find(blockpos2) != m_blocks_sending.end())) {
 		SetBlockNotSent(blockpos2);
@@ -708,7 +709,7 @@ std::vector<session_t> ClientInterface::getClientIDs(ClientState min_state)
 	return reply;
 }
 
-void ClientInterface::markBlocksNotSent(const std::vector<v3s16> &positions, bool low_priority)
+void ClientInterface::markBlocksNotSent(const std::vector<v3s32> &positions, bool low_priority)
 {
 	RecursiveMutexAutoLock clientslock(m_clients_mutex);
 	for (const auto &client : m_clients) {

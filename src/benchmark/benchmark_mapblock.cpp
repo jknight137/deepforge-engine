@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2023 Luanti Authors
@@ -12,7 +13,7 @@ static void allocateSome(MBContainer &vec, u32 n)
 {
 	vec.reserve(vec.size() + n);
 	for (u32 i = 0; i < n; i++) {
-		auto *mb = new MapBlock(v3s16(i & 0xff, 0, (i >> 8) & S16_MAX), nullptr);
+		auto *mb = new MapBlock(v3s32(i & 0xff, 0, (i >> 8) & S16_MAX), nullptr);
 		vec.push_back(mb);
 	}
 }
@@ -43,11 +44,11 @@ static void workOnMetadata(const MBContainer &vec)
 		if (block->refGet() > 2)
 			block->refDrop();
 
-		v3s16 pos = block->getPos() * MAP_BLOCKSIZE;
+		v3s32 pos = block->getPos() * MAP_BLOCKSIZE;
 		if (foo)
-			pos += v3s16(MAP_BLOCKSIZE / 2);
+			pos += v3s32(MAP_BLOCKSIZE / 2);
 
-		if (pos.getDistanceFrom(v3s16(0)) > 30000)
+		if (pos.getDistanceFrom(v3s32(0)) > 30000)
 			continue;
 
 		block->resetUsageTimer();
@@ -65,8 +66,8 @@ static u32 workOnNodes(const MBContainer &vec)
 		if (block->isOrphan())
 			continue;
 
-		v3s16 pos_of_block = block->getPosRelative();
-		v3s16 pos;
+		v3s32 pos_of_block = block->getPosRelative();
+		v3s32 pos;
 		MapNode n;
 		for (pos.X = 0; pos.X < MAP_BLOCKSIZE; pos.X++) {
 			for (pos.Y = 0; pos.Y < MAP_BLOCKSIZE; pos.Y++) {
@@ -94,7 +95,7 @@ static u32 workOnBoth(const MBContainer &vec)
 
 		bool want_contents_cached = block->contents.empty() && !block->do_not_cache_contents;
 
-		v3s16 p0;
+		v3s32 p0;
 		for(p0.X=0; p0.X<MAP_BLOCKSIZE; p0.X++)
 		for(p0.Y=0; p0.Y<MAP_BLOCKSIZE; p0.Y++)
 		for(p0.Z=0; p0.Z<MAP_BLOCKSIZE; p0.Z++)

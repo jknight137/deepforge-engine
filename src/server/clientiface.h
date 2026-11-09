@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2014 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -194,7 +195,7 @@ enum ClientStateEvent
 */
 struct PrioritySortedBlockTransfer
 {
-	PrioritySortedBlockTransfer(float a_priority, const v3s16 &a_pos, session_t a_peer_id)
+	PrioritySortedBlockTransfer(float a_priority, const v3s32 &a_pos, session_t a_peer_id)
 	{
 		priority = a_priority;
 		pos = a_pos;
@@ -205,7 +206,7 @@ struct PrioritySortedBlockTransfer
 		return priority < other.priority;
 	}
 	float priority;
-	v3s16 pos;
+	v3s32 pos;
 	session_t peer_id;
 };
 
@@ -247,12 +248,12 @@ public:
 	void GetNextBlocks(ServerEnvironment *env, EmergeManager* emerge,
 			float dtime, std::vector<PrioritySortedBlockTransfer> &dest);
 
-	void GotBlock(v3s16 p);
+	void GotBlock(v3s32 p);
 
-	void SentBlock(v3s16 p);
+	void SentBlock(v3s32 p);
 
-	void SetBlockNotSent(v3s16 p, bool low_priority = false);
-	void SetBlocksNotSent(const std::vector<v3s16> &blocks, bool low_priority = false);
+	void SetBlockNotSent(v3s32 p, bool low_priority = false);
+	void SetBlocksNotSent(const std::vector<v3s32> &blocks, bool low_priority = false);
 
 	/**
 	 * Trigger block sending to undo client-side predicted node changes
@@ -269,7 +270,7 @@ public:
 
 	u32 getSendingCount() const { return m_blocks_sending.size(); }
 
-	bool isBlockSent(v3s16 p) const
+	bool isBlockSent(v3s32 p) const
 	{
 		return m_blocks_sent.find(p) != m_blocks_sent.end();
 	}
@@ -360,17 +361,17 @@ private:
 		List of block positions.
 		No MapBlock* is stored here because the blocks can get deleted.
 	*/
-	std::unordered_set<v3s16> m_blocks_sent;
+	std::unordered_set<v3s32> m_blocks_sent;
 
 	/*
 		Cache of blocks that have been occlusion culled at the current distance.
 		As GetNextBlocks traverses the same distance multiple times, this saves
 		significant CPU time.
 	 */
-	std::unordered_set<v3s16> m_blocks_occ;
+	std::unordered_set<v3s32> m_blocks_occ;
 
 	s16 m_nearest_unsent_d = 0;
-	v3s16 m_last_center;
+	v3s32 m_last_center;
 	v3f m_last_camera_dir;
 
 	const u16 m_max_simul_sends;
@@ -394,7 +395,7 @@ private:
 		Block is added when it is sent with BLOCKDATA.
 		Block is removed when GOTBLOCKS is received.
 	*/
-	std::unordered_set<v3s16> m_blocks_sending;
+	std::unordered_set<v3s32> m_blocks_sending;
 
 	/*
 		Count of excess GotBlocks().
@@ -448,7 +449,7 @@ public:
 	std::vector<session_t> getClientIDs(ClientState min_state=CS_Active);
 
 	/* mark blocks as not sent on all active clients */
-	void markBlocksNotSent(const std::vector<v3s16> &positions, bool low_priority = false);
+	void markBlocksNotSent(const std::vector<v3s32> &positions, bool low_priority = false);
 
 	/* verify if server user limit was reached */
 	bool isUserLimitReached();

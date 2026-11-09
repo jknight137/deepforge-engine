@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -78,7 +79,7 @@ void set_default_settings()
 	settings->setDefault("language", "");
 	settings->setDefault("name", "");
 	settings->setDefault("bind_address", "");
-	settings->setDefault("serverlist_url", "https://servers.luanti.org");
+	settings->setDefault("serverlist_url", "");
 
 	// Client
 	settings->setDefault("address", "");
@@ -413,7 +414,7 @@ void set_default_settings()
 	settings->setDefault("chat_font_size", "0"); // Default "font_size"
 
 	// ContentDB
-	settings->setDefault("contentdb_url", "https://content.luanti.org");
+	settings->setDefault("contentdb_url", "");
 	settings->setDefault("contentdb_enable_updates_indicator", "true");
 	settings->setDefault("contentdb_max_concurrent_downloads", "3");
 
@@ -424,7 +425,7 @@ void set_default_settings()
 #endif
 
 #if ENABLE_UPDATE_CHECKER
-	settings->setDefault("update_information_url", "https://www.luanti.org/release_info.json");
+	settings->setDefault("update_information_url", "");
 #else
 	settings->setDefault("update_information_url", "");
 #endif
@@ -531,7 +532,7 @@ void set_default_settings()
 	// Mapgen
 	settings->setDefault("mg_name", "v7");
 	settings->setDefault("water_level", "1");
-	settings->setDefault("mapgen_limit", "31007");
+	settings->setDefault("mapgen_limit", "65535");
 	settings->setDefault("chunksize", "5");
 	settings->setDefault("fixed_map_seed", "");
 	settings->setDefault("max_block_generate_distance", "10");

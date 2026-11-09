@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -177,8 +178,8 @@ void ObjectProperties::serialize(std::ostream &os) const
 	for (const std::string &texture : textures) {
 		os << serializeString16(texture);
 	}
-	writeV2S16(os, spritediv);
-	writeV2S16(os, initial_sprite_basepos);
+	writeV2S16(os, v2s16::from(spritediv));
+	writeV2S16(os, v2s16::from(initial_sprite_basepos));
 	writeU8(os, is_visible);
 	writeU8(os, makes_footstep_sound);
 	writeF32(os, automatic_rotate);
@@ -259,8 +260,8 @@ void ObjectProperties::deSerialize(std::istream &is)
 	for (u32 i = 0; i < texture_count; i++){
 		textures.push_back(deSerializeString16(is));
 	}
-	spritediv = readV2S16(is);
-	initial_sprite_basepos = readV2S16(is);
+	spritediv = v2s32::from(readV2S16(is));
+	initial_sprite_basepos = v2s32::from(readV2S16(is));
 	is_visible = readU8(is);
 	makes_footstep_sound = readU8(is);
 	automatic_rotate = readF32(is);

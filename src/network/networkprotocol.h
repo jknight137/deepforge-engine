@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -9,10 +10,10 @@
 extern const u16 LATEST_PROTOCOL_VERSION;
 
 // Server's supported network protocol range
-constexpr u16 SERVER_PROTOCOL_VERSION_MIN = 37;
+constexpr u16 SERVER_PROTOCOL_VERSION_MIN = 32001;
 
 // Client's supported network protocol range
-constexpr u16 CLIENT_PROTOCOL_VERSION_MIN = 37;
+constexpr u16 CLIENT_PROTOCOL_VERSION_MIN = 32001;
 
 extern const u16 FORMSPEC_API_VERSION;
 
@@ -69,20 +70,20 @@ enum ToClientCommand : u16
 
 	TOCLIENT_BLOCKDATA = 0x20,
 	/*
-		v3s16 position
+		v3s32 position
 		serialized MapBlock
 	*/
 
 	TOCLIENT_ADDNODE = 0x21,
 	/*
-		v3s16 position
+		v3s32 position
 		serialized mapnode
 		u8 keep_metadata
 	*/
 
 	TOCLIENT_REMOVENODE = 0x22,
 	/*
-		v3s16 position
+		v3s32 position
 	*/
 
 	TOCLIENT_INVENTORY = 0x27,
@@ -560,7 +561,7 @@ enum ToClientCommand : u16
 
 	TOCLIENT_LOCAL_PLAYER_ANIMATIONS = 0x51,
 	/*
-		typedef v2x = v2f if protocol version >= 46, else v2s16
+		typedef v2x = v2f if protocol version >= 46, else v2s32
 		v2x stand/idle
 		v2x walk
 		v2x dig
@@ -773,8 +774,8 @@ enum ToServerCommand : u16
 	/*
 		[0] u16 command
 		[2] u8 count
-		[3] v3s16 pos_0
-		[3+6] v3s16 pos_1
+		[3] v3s32 pos_0
+		[3+6] v3s32 pos_1
 		...
 	*/
 
@@ -782,8 +783,8 @@ enum ToServerCommand : u16
 	/*
 		[0] u16 command
 		[2] u8 count
-		[3] v3s16 pos_0
-		[3+6] v3s16 pos_1
+		[3] v3s32 pos_0
+		[3+6] v3s32 pos_1
 		...
 	*/
 
@@ -839,7 +840,7 @@ enum ToServerCommand : u16
 
 	TOSERVER_NODEMETA_FIELDS = 0x3b,
 	/*
-		v3s16 p
+		v3s32 p
 		u16 len
 		u8[len] form name (reserved for future use)
 		u16 number of fields
@@ -917,7 +918,7 @@ enum ToServerCommand : u16
 
 	TOSERVER_UPDATE_CLIENT_INFO = 0x53,
 	/*
-		v2s16 render_target_size
+		v2s32 render_target_size
 		f32 gui_scaling
 		f32 hud_scaling
 		v2f32 max_fs_info

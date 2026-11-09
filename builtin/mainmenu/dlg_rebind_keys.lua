@@ -1,14 +1,15 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 -- Luanti
 -- SPDX-License-Identifier: LGPL-2.1-or-later
 -- Modified based on dlg_reinstall_mtg.lua
 -- Note that this is only needed for migrating from <5.11 to 5.12.
 
-local doc_url = "https://docs.luanti.org/for-players/controls/"
+local doc_url = "https://github.com/jknight137/deepforge-engine/blob/main/README.md#controls"
 
 local function get_formspec(dialogdata)
 	local markup = table.concat({
 		"<big>" .. hgettext("Keybindings changed") .. "</big>",
-		hgettext("The input handling system was reworked in Luanti 5.12.0."),
+		hgettext("Your saved keyboard configuration uses an older input format."),
 		hgettext("As a result, your keybindings may have been changed."),
 		hgettext("Check out the key settings or refer to the documentation:"),
 		("<action name='doc_url'><style color='cyan' hovercolor='orangered'>%s</style></action>"):format(doc_url),

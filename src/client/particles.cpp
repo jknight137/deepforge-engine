@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -182,7 +183,7 @@ video::SColor Particle::updateLight(ClientEnvironment *env)
 	u8 light = 0;
 	bool pos_ok;
 
-	v3s16 p = v3s16(
+	v3s32 p = v3s32(
 		floor(m_pos.X+0.5),
 		floor(m_pos.Y+0.5),
 		floor(m_pos.Z+0.5)
@@ -249,7 +250,7 @@ void Particle::updateVertices(ClientEnvironment *env, video::SColor color)
 
 	// Update position -- see #10398
 	auto *player = env->getLocalPlayer();
-	v3s16 camera_offset = env->getCameraOffset();
+	v3s32 camera_offset = env->getCameraOffset();
 
 	for (u16 i = 0; i < 4; i++) {
 		video::S3DVertex &vertex = vertices[i];
@@ -348,7 +349,7 @@ void ParticleSpawner::spawnParticle(ClientEnvironment *env, float radius,
 		pos *= BS;
 		attached_absolute_pos_rot_matrix->transformVect(pos);
 		pos /= BS;
-		v3s16 camera_offset = m_particlemanager->m_env->getCameraOffset();
+		v3s32 camera_offset = m_particlemanager->m_env->getCameraOffset();
 		pos.X += camera_offset.X;
 		pos.Y += camera_offset.Y;
 		pos.Z += camera_offset.Z;
@@ -919,7 +920,7 @@ bool ParticleManager::getNodeParticleParams(Client *client, const MapNode &n,
 // The final burst of particles when a node is finally dug, *not* particles
 // spawned during the digging of a node.
 
-void ParticleManager::addDiggingParticles(LocalPlayer *player, v3s16 pos, const MapNode &n)
+void ParticleManager::addDiggingParticles(LocalPlayer *player, v3s32 pos, const MapNode &n)
 {
 	for (u16 j = 0; j < 16; j++) {
 		addNodeParticle(player, pos, n);
@@ -929,7 +930,7 @@ void ParticleManager::addDiggingParticles(LocalPlayer *player, v3s16 pos, const 
 // During the digging of a node particles are spawned individually by this
 // function, called from Game::handleDigging() in game.cpp.
 
-void ParticleManager::addNodeParticle(LocalPlayer *player, v3s16 pos, const MapNode &n)
+void ParticleManager::addNodeParticle(LocalPlayer *player, v3s32 pos, const MapNode &n)
 {
 	ParticleParameters p;
 	video::ITexture *ref = nullptr;

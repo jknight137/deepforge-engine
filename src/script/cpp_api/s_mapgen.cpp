@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2022 sfan5 <sfan5@live.de>
@@ -34,9 +35,9 @@ void ScriptApiMapgen::on_generated(BlockMakeData *bmdata, u32 seed)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
-	v3s16 minp = bmdata->blockpos_min * MAP_BLOCKSIZE;
-	v3s16 maxp = bmdata->blockpos_max * MAP_BLOCKSIZE +
-				 v3s16(1,1,1) * (MAP_BLOCKSIZE - 1);
+	v3s32 minp = bmdata->blockpos_min * MAP_BLOCKSIZE;
+	v3s32 maxp = bmdata->blockpos_max * MAP_BLOCKSIZE +
+				 v3s32(1,1,1) * (MAP_BLOCKSIZE - 1);
 
 	LuaVoxelManip::create(L, bmdata->vmanip, true);
 	const int vmanip = lua_gettop(L);
@@ -49,8 +50,8 @@ void ScriptApiMapgen::on_generated(BlockMakeData *bmdata, u32 seed)
 	// Call callbacks
 	lua_getfield(L, -1, "registered_on_generateds");
 	lua_pushvalue(L, vmanip);
-	push_v3s16(L, minp);
-	push_v3s16(L, maxp);
+	push_nodepos(L, minp);
+	push_nodepos(L, maxp);
 	lua_pushnumber(L, seed);
 	runCallbacks(4, RUN_CALLBACKS_MODE_FIRST);
 	lua_pop(L, 1); // return val

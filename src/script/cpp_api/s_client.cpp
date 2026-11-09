@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -126,7 +127,7 @@ void ScriptApiClient::environment_step(float dtime)
 	}
 }
 
-bool ScriptApiClient::on_dignode(v3s16 p, MapNode node)
+bool ScriptApiClient::on_dignode(v3s32 p, MapNode node)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -135,7 +136,7 @@ bool ScriptApiClient::on_dignode(v3s16 p, MapNode node)
 	lua_getfield(L, -1, "registered_on_dignode");
 
 	// Push data
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 
 	// Call functions
@@ -148,7 +149,7 @@ bool ScriptApiClient::on_dignode(v3s16 p, MapNode node)
 	return lua_toboolean(L, -1);
 }
 
-bool ScriptApiClient::on_punchnode(v3s16 p, MapNode node)
+bool ScriptApiClient::on_punchnode(v3s32 p, MapNode node)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -157,7 +158,7 @@ bool ScriptApiClient::on_punchnode(v3s16 p, MapNode node)
 	lua_getfield(L, -1, "registered_on_punchnode");
 
 	// Push data
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 
 	// Call functions

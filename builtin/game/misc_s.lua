@@ -1,3 +1,4 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 -- The distinction of what goes here is a bit tricky, basically it's everything
 -- that does not (directly or indirectly) need access to ServerEnvironment,
 -- Server or writable access to IGameDef on the engine side.
@@ -9,19 +10,34 @@
 
 -- This must match the implementation in src/script/common/c_converter.h
 function core.hash_node_position(pos)
-	return (pos.z + 0x8000) * 0x100000000 + (pos.y + 0x8000) * 0x10000 + (pos.x + 0x8000)
+    local function valid(v) return type(v)=="number" and v==math.floor(v) and math.abs(v)<=65535 end
+    assert(valid(pos.x) and valid(pos.y) and valid(pos.z), "Node coordinate outside supported wide world")
+    if pos.x>=-32768 and pos.x<=32767 and pos.y>=-32768 and pos.y<=32767 and pos.z>=-32768 and pos.z<=32767 then
+        return (pos.z+32768)*4294967296 + (pos.y+32768)*65536 + pos.x+32768
+    end
+    return 2251799813685248 + (pos.z+65536)*17179869184 + (pos.y+65536)*131072 + pos.x+65536
 end
-
 
 function core.get_position_from_hash(hash)
-	local x = (hash % 65536) - 32768
-	hash  = math.floor(hash / 65536)
-	local y = (hash % 65536) - 32768
-	hash  = math.floor(hash / 65536)
-	local z = (hash % 65536) - 32768
-	return vector.new(x, y, z)
+    assert(type(hash)=="number" and hash==math.floor(hash) and hash>=0 and hash<4503599627370496, "Invalid position hash")
+    if hash>=2251799813685248 then
+        hash=hash-2251799813685248
+        local x=hash%131072-65536; hash=math.floor(hash/131072)
+        local y=hash%131072-65536; hash=math.floor(hash/131072)
+        local z=hash%131072-65536
+        assert(x>=-65535 and y>=-65535 and z>=-65535,"Invalid wide position hash")
+        return vector.new(x,y,z)
+    end
+    assert(hash<281474976710656,"Invalid legacy position hash")
+    local x=hash%65536-32768; hash=math.floor(hash/65536)
+    local y=hash%65536-32768; hash=math.floor(hash/65536)
+    return vector.new(x,y,hash%65536-32768)
 end
 
+
+function core.get_world_coordinate_limits()
+    return {min=-65535,max=65535,node_bits=32,hash_bits=52,protocol=32001,wide_storage="sqlite3"}
+end
 
 function core.get_item_group(name, group)
 	local def = core.registered_items[name]

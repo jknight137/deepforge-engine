@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015 est31 <mtest31@outlook.com>
@@ -32,9 +33,9 @@ static void push_area(lua_State *L, const Area *a,
 	}
 	lua_newtable(L);
 	if (include_corners) {
-		push_v3s16(L, a->minedge);
+		push_nodepos(L, a->minedge);
 		lua_setfield(L, -2, "min");
-		push_v3s16(L, a->maxedge);
+		push_nodepos(L, a->maxedge);
 		lua_setfield(L, -2, "max");
 	}
 	if (include_data) {
@@ -111,7 +112,7 @@ int LuaAreaStore::l_get_areas_for_pos(lua_State *L)
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
 	AreaStore *ast = o->as;
 
-	v3s16 pos = check_v3s16(L, 2);
+	v3s32 pos = check_nodepos(L, 2);
 
 	bool include_corners = true;
 	bool include_data = false;
@@ -133,8 +134,8 @@ int LuaAreaStore::l_get_areas_in_area(lua_State *L)
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
 	AreaStore *ast = o->as;
 
-	v3s16 minp = check_v3s16(L, 2);
-	v3s16 maxp = check_v3s16(L, 3);
+	v3s32 minp = check_nodepos(L, 2);
+	v3s32 maxp = check_nodepos(L, 3);
 	sortBoxVerticies(minp, maxp);
 
 	bool include_corners = true;
@@ -163,7 +164,7 @@ int LuaAreaStore::l_insert_area(lua_State *L)
 	LuaAreaStore *o = checkObject<LuaAreaStore>(L, 1);
 	AreaStore *ast = o->as;
 
-	Area a(check_v3s16(L, 2), check_v3s16(L, 3));
+	Area a(check_nodepos(L, 2), check_nodepos(L, 3));
 
 	size_t d_len;
 	const char *data = luaL_checklstring(L, 4, &d_len);

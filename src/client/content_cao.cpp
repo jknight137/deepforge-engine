@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -376,7 +377,7 @@ const v3f GenericCAO::getPosition() const
 		// A better solution might restrict this update to the local player only
 		// or keep player and camera position in sync.
 		GenericCAO::updateParentChain();
-		v3s16 camera_offset = m_env->getCameraOffset();
+		v3s32 camera_offset = m_env->getCameraOffset();
 		return m_matrixnode->getAbsolutePosition() +
 				intToFloat(camera_offset, BS);
 	}
@@ -856,7 +857,7 @@ void GenericCAO::updateLight(u32 day_night_ratio)
 	u8 light_at_pos_intensity = 0;
 	bool pos_ok = false;
 
-	v3s16 pos[3];
+	v3s32 pos[3];
 	u16 npos = getLightPosition(pos);
 	for (u16 i = 0; i < npos; i++) {
 		bool this_ok;
@@ -904,7 +905,7 @@ void GenericCAO::setNodeLight(const video::SColor &light_color)
 	}
 }
 
-u16 GenericCAO::getLightPosition(v3s16 *pos)
+u16 GenericCAO::getLightPosition(v3s32 *pos)
 {
 	const auto &box = m_prop.collisionbox;
 	pos[0] = floatToInt(m_position + box.MinEdge * BS, BS);
@@ -978,7 +979,7 @@ void GenericCAO::updateNodePos()
 
 	if (node) {
 		assert(m_matrixnode);
-		v3s16 camera_offset = m_env->getCameraOffset();
+		v3s32 camera_offset = m_env->getCameraOffset();
 		v3f pos = pos_translator.val_current -
 				intToFloat(camera_offset, BS);
 		getPosRotMatrix().setTranslation(pos);
@@ -1149,7 +1150,7 @@ void GenericCAO::step(float dtime, ClientEnvironment *env)
 				const NodeDefManager *ndef = m_client->ndef();
 				v3f foot_pos = getPosition() * (1.0f/BS)
 						+ v3f(0.0f, m_prop.collisionbox.MinEdge.Y, 0.0f);
-				v3s16 node_below_pos = floatToInt(foot_pos + v3f(0.0f, -0.5f, 0.0f),
+				v3s32 node_below_pos = floatToInt(foot_pos + v3f(0.0f, -0.5f, 0.0f),
 						1.0f);
 				MapNode n = m_env->getMap().getNode(node_below_pos);
 				SoundSpec spec = ndef->get(n).sound_footstep;
@@ -1463,7 +1464,7 @@ void GenericCAO::updateAttachments()
 
 	if (!parent) { // Detach or don't attach
 		if (m_matrixnode) {
-			v3s16 camera_offset = m_env->getCameraOffset();
+			v3s32 camera_offset = m_env->getCameraOffset();
 			v3f old_pos = getPosition();
 
 			m_matrixnode->setParent(m_smgr->getRootSceneNode());
@@ -1704,7 +1705,7 @@ void GenericCAO::processMessage(const std::string &data)
 		}
 		updateTextures(mod);
 	} else if (cmd == AO_CMD_SET_SPRITE) {
-		v2s16 p = readV2S16(is);
+		v2s32 p = v2s32::from(readV2S16(is));
 		int num_frames = readU16(is);
 		float framelength = readF32(is);
 		bool select_horiz_by_yawpitch = readU8(is);

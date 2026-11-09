@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -55,8 +56,8 @@ struct ObjectProperties
 	v3f visual_size = v3f(1, 1, 1);
 	video::SColor nametag_color = video::SColor(255, 255, 255, 255);
 	std::optional<video::SColor> nametag_bgcolor;
-	v2s16 spritediv = v2s16(1, 1);
-	v2s16 initial_sprite_basepos;
+	v2s32 spritediv = v2s32(1, 1);
+	v2s32 initial_sprite_basepos;
 	f32 stepheight = 0.0f;
 	float automatic_rotate = 0.0f;
 	f32 automatic_face_movement_dir_offset = 0.0f;

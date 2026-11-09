@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2016 MillersMan <millersman@users.noreply.github.com>
@@ -14,7 +15,7 @@ ReflowScan::ReflowScan(Map *map, const NodeDefManager *ndef) :
 {
 }
 
-void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue)
+void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s32> *liquid_queue)
 {
 	m_block_pos = block->getPos();
 	m_rel_block_pos = block->getPosRelative();
@@ -31,8 +32,8 @@ void ReflowScan::scan(MapBlock *block, UniqueQueue<v3s16> *liquid_queue)
 	m_lookup_state_bitset = 1 << block_idx;
 
 	// Scan the columns in the block
-	for (s16 z = 0; z < MAP_BLOCKSIZE; z++)
-	for (s16 x = 0; x < MAP_BLOCKSIZE; x++) {
+	for (s32 z = 0; z < MAP_BLOCKSIZE; z++)
+	for (s32 x = 0; x < MAP_BLOCKSIZE; x++) {
 		scanColumn(x, z);
 	}
 
@@ -59,7 +60,7 @@ inline MapBlock *ReflowScan::lookupBlock(int x, int y, int z)
 	if (!result && (m_lookup_state_bitset & (1 << idx)) == 0) {
 		// The block wasn't requested yet so fetch it from Map and store it
 		// in the lookup
-		v3s16 pos = m_block_pos + v3s16(bx - 1, by - 1, bz - 1);
+		v3s32 pos = m_block_pos + v3s32(bx - 1, by - 1, bz - 1);
 		m_lookup[idx] = result = m_map->getBlockNoCreateNoEx(pos);
 		m_lookup_state_bitset |= (1 << idx);
 	}
@@ -127,7 +128,7 @@ void ReflowScan::scanColumn(int x, int z)
 		was_ignore = false;
 	} else {
 		// Scan through the whole block
-		for (s16 y = MAP_BLOCKSIZE - 1; y >= 0; y--) {
+		for (s32 y = MAP_BLOCKSIZE - 1; y >= 0; y--) {
 			MapNode node = block->getNodeNoCheck(dx, y, dz);
 			const ContentFeatures &f = m_ndef->get(node);
 			bool is_ignore = node.getContent() == CONTENT_IGNORE;
@@ -142,7 +143,7 @@ void ReflowScan::scanColumn(int x, int z)
 				bool is_pushed = false;
 				if (f.liquid_type == LIQUID_FLOWING ||
 						isLiquidHorizontallyFlowable(x, y, z)) {
-					m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, y, z));
+					m_liquid_queue->push_back(m_rel_block_pos + v3s32(x, y, z));
 					is_pushed = true;
 				}
 				// Remember waschecked and waspushed to avoid repeated
@@ -155,7 +156,7 @@ void ReflowScan::scanColumn(int x, int z)
 						(!was_checked && isLiquidHorizontallyFlowable(x, y + 1, z)))) {
 					// Activate the lowest node in the column which is one
 					// node above this one
-					m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, y + 1, z));
+					m_liquid_queue->push_back(m_rel_block_pos + v3s32(x, y + 1, z));
 				}
 			}
 
@@ -178,7 +179,7 @@ void ReflowScan::scanColumn(int x, int z)
 			// This is the topmost node in the column and might want to flow away
 			if (f.liquid_type == LIQUID_FLOWING ||
 					isLiquidHorizontallyFlowable(x, -1, z)) {
-				m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, -1, z));
+				m_liquid_queue->push_back(m_rel_block_pos + v3s32(x, -1, z));
 			}
 		} else {
 			// This is the topmost node below a liquid column
@@ -186,7 +187,7 @@ void ReflowScan::scanColumn(int x, int z)
 					(!was_checked && isLiquidHorizontallyFlowable(x, 0, z)))) {
 				// Activate the lowest node in the column which is one
 				// node above this one
-				m_liquid_queue->push_back(m_rel_block_pos + v3s16(x, 0, z));
+				m_liquid_queue->push_back(m_rel_block_pos + v3s32(x, 0, z));
 			}
 		}
 	}

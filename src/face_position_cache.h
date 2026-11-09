@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015 Nerzhul, Loic Blot <loic.blot@unix-experience.fr>
@@ -16,10 +17,10 @@
  */
 class FacePositionCache {
 public:
-	static const std::vector<v3s16> &getFacePositions(u16 d);
+	static const std::vector<v3s32> &getFacePositions(u16 d);
 
 private:
-	static const std::vector<v3s16> &generateFacePosition(u16 d);
-	static std::unordered_map<u16, std::vector<v3s16>> cache;
+	static const std::vector<v3s32> &generateFacePosition(u16 d);
+	static std::unordered_map<u16, std::vector<v3s32>> cache;
 	static std::mutex cache_mutex;
 };

@@ -1,0 +1,7 @@
+# IPv4 loopback service origin. No arbitrary remote endpoints are accepted.
+dadcraft_platform_url (Platform service URL) string http://127.0.0.1:8775
+# Stable namespace shared with the platform service configuration.
+dadcraft_platform_world_id (Platform world ID) string
+# Defaults to platform-engine.token inside the current world directory.
+dadcraft_platform_token_file (Engine token file) string
+dadcraft_platform_poll_interval (Platform poll interval) float 0.2 0.05 5

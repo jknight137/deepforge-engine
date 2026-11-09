@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2018 nerzhul, Loic Blot <loic.blot@unix-experience.fr>
@@ -50,7 +51,7 @@ float LuaHelper::readParam(lua_State *L, int index)
 }
 
 template <>
-v2s16 LuaHelper::readParam(lua_State *L, int index)
+v2s32 LuaHelper::readParam(lua_State *L, int index)
 {
 	return read_v2s16(L, index);
 }

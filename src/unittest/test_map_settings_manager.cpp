@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2014 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -146,7 +147,7 @@ void TestMapSettingsManager::testMapSettingsManager()
 	MapgenParams *params = mgr.makeMapgenParams();
 	UASSERT(params);
 	UASSERT(params->mgtype == MAPGEN_V5);
-	UASSERT(params->chunksize == v3s16(5));
+	UASSERT(params->chunksize == v3s32(5));
 	UASSERT(params->water_level == 15);
 	UASSERT(params->seed == 1234);
 	UASSERT((params->flags & MG_LIGHT) == 0);
@@ -255,25 +256,25 @@ void TestMapSettingsManager::testMapMetaFailures()
 
 void TestMapSettingsManager::testChunks()
 {
-	v3s16 csize(5);
+	v3s32 csize(5);
 
 #define GET(x) EmergeManager::getContainingChunk(x, csize)
 	// origin chunk goes from (-2, -2, -2) -> (3, 3, 3) excl
-	UASSERTEQ(auto, GET(v3s16(-2, -2, -2)), v3s16(-2, -2, -2));
-	UASSERTEQ(auto, GET(v3s16(0, 0, 0)), v3s16(-2, -2, -2));
-	UASSERTEQ(auto, GET(v3s16(1, 1, 1)), v3s16(-2, -2, -2));
-	UASSERTEQ(auto, GET(v3s16(2, 2, 2)), v3s16(-2, -2, -2));
-	UASSERTEQ(auto, GET(v3s16(2, 3, 2)), v3s16(-2, 3, -2));
-	UASSERTEQ(auto, GET(v3s16(0, -3, 0)), v3s16(-2, -7, -2));
+	UASSERTEQ(auto, GET(v3s32(-2, -2, -2)), v3s32(-2, -2, -2));
+	UASSERTEQ(auto, GET(v3s32(0, 0, 0)), v3s32(-2, -2, -2));
+	UASSERTEQ(auto, GET(v3s32(1, 1, 1)), v3s32(-2, -2, -2));
+	UASSERTEQ(auto, GET(v3s32(2, 2, 2)), v3s32(-2, -2, -2));
+	UASSERTEQ(auto, GET(v3s32(2, 3, 2)), v3s32(-2, 3, -2));
+	UASSERTEQ(auto, GET(v3s32(0, -3, 0)), v3s32(-2, -7, -2));
 
-	csize = v3s16(5, 2, 5);
-	UASSERTEQ(auto, GET(v3s16(0, 0, 0)), v3s16(-2, -1, -2));
-	UASSERTEQ(auto, GET(v3s16(0, 1, 0)), v3s16(-2, 1, -2));
-	UASSERTEQ(auto, GET(v3s16(3, 3, 3)), v3s16(3, 3, 3));
+	csize = v3s32(5, 2, 5);
+	UASSERTEQ(auto, GET(v3s32(0, 0, 0)), v3s32(-2, -1, -2));
+	UASSERTEQ(auto, GET(v3s32(0, 1, 0)), v3s32(-2, 1, -2));
+	UASSERTEQ(auto, GET(v3s32(3, 3, 3)), v3s32(3, 3, 3));
 
-	csize = v3s16(1);
-	UASSERTEQ(auto, GET(v3s16(1, 2, 3)), v3s16(1, 2, 3));
-	UASSERTEQ(auto, GET(v3s16(-3, -2, -1)), v3s16(-3, -2, -1));
+	csize = v3s32(1);
+	UASSERTEQ(auto, GET(v3s32(1, 2, 3)), v3s32(1, 2, 3));
+	UASSERTEQ(auto, GET(v3s32(-3, -2, -1)), v3s32(-3, -2, -1));
 
 #undef GET
 }

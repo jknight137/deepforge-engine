@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2023 Luanti Authors
@@ -12,9 +13,9 @@ class TestMap : public Map {
 public:
 	TestMap(IGameDef *gamedef) : Map(gamedef) {}
 
-	MapBlock * createBlockTest(v3s16 p)
+	MapBlock * createBlockTest(v3s32 p)
 	{
-		v2s16 p2d(p.X, p.Z);
+		v2s32 p2d(p.X, p.Z);
 		s16 block_y = p.Y;
 
 		MapSector *sector = getSectorNoGenerate(p2d);
@@ -38,7 +39,7 @@ static void fillMap(TestMap &map, s16 n)
 	for(s16 z=0; z<n; z++)
 	for(s16 y=0; y<n; y++)
 	for(s16 x=0; x<n; x++) {
-		v3s16 p(x,y,z);
+		v3s32 p(x,y,z);
 		// create an empty block
 		map.createBlockTest(p);
 	}
@@ -50,7 +51,7 @@ static int readBlocks(Map &map, s16 n)
 	for(s16 z=0; z<n; z++)
 	for(s16 y=0; y<n; y++)
 	for(s16 x=0; x<n; x++) {
-		v3s16 p(x,y,z);
+		v3s32 p(x,y,z);
 		MapBlock *block = map.getBlockNoCreateNoEx(p);
 		if (block) {
 			result++;
@@ -63,7 +64,7 @@ static int readRandomBlocks(Map &map, s16 n)
 {
 	int result = 0;
 	for(int i=0; i < n * n * n; i++) {
-		v3s16 p(myrand_range(0, n), myrand_range(0, n), myrand_range(0, n));
+		v3s32 p(myrand_range(0, n), myrand_range(0, n), myrand_range(0, n));
 		MapBlock *block = map.getBlockNoCreateNoEx(p);
 		if (block) {
 			result++;
@@ -79,7 +80,7 @@ static int readYColumn(Map &map, s16 n)
 	for(s16 z=0; z<n; z++)
 	for(s16 x=0; x<n; x++)
 	for(s16 y=n-1; y>0; y--) {
-		v3s16 p(x,y,z);
+		v3s32 p(x,y,z);
 		MapBlock *block = map.getBlockNoCreateNoEx(p);
 		if (block) {
 			result++;
@@ -94,7 +95,7 @@ static int readNodes(Map &map, s16 n)
 	for(s16 z=0; z<n * MAP_BLOCKSIZE; z+=8)
 	for(s16 y=0; y<n * MAP_BLOCKSIZE; y+=4)
 	for(s16 x=0; x<n * MAP_BLOCKSIZE; x++) {
-		v3s16 p(x,y,z);
+		v3s32 p(x,y,z);
 		MapNode n = map.getNode(p);
 		if (n.getContent() != CONTENT_IGNORE)
 			result++;

@@ -1,0 +1,8 @@
+Deepforge identity artwork
+==========================
+
+Created 2026-11-09 for Deepforge. The anvil symbol, application icons and header
+layout are dedicated to the public domain under CC0-1.0:
+https://creativecommons.org/publicdomain/zero/1.0/
+The wordmark is rendered using bundled Arimo, whose retained license is in fonts/.
+This notice covers Deepforge replacement identity assets, not other textures.

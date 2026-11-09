@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -55,7 +56,7 @@ public:
 
 	void setTextureMod(const std::string &mod);
 	std::string getTextureMod() const;
-	void setSprite(v2s16 p, int num_frames, float framelength,
+	void setSprite(v2s32 p, int num_frames, float framelength,
 			bool select_horiz_by_yawpitch);
 	std::string getName();
 	bool getCollisionBox(aabb3f *toset) const;
@@ -77,7 +78,7 @@ private:
 	std::string getPropertyPacket();
 	void sendPosition(bool do_interpolate, bool is_movement_end);
 	std::string generateSetTextureModCommand() const;
-	static std::string generateSetSpriteCommand(v2s16 p, u16 num_frames,
+	static std::string generateSetSpriteCommand(v2s32 p, u16 num_frames,
 			f32 framelength, bool select_horiz_by_yawpitch);
 
 	std::string m_init_name;

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -518,7 +519,7 @@ bool setSystemPaths()
 		len = GetEnvironmentVariable("APPDATA", buf, sizeof(buf));
 		FATAL_ERROR_IF(len == 0 || len > sizeof(buf), "Failed to get APPDATA");
 		// TODO: Luanti with migration
-		path_user = std::string(buf) + DIR_DELIM "Minetest";
+		path_user = std::string(buf) + DIR_DELIM "Deepforge";
 	} else {
 		path_user = std::string(buf);
 	}
@@ -583,7 +584,7 @@ bool setSystemPaths()
 		path_user = std::move(user_path_env.value());
 	} else {
 		// TODO: luanti with migration
-		path_user = std::string(getHomeOrFail()) + DIR_DELIM "." "minetest";
+		path_user = std::string(getHomeOrFail()) + DIR_DELIM "." "deepforge";
 	}
 
 	return true;
@@ -630,7 +631,7 @@ bool setSystemPaths()
 		path_user = std::move(user_path_env.value());
 	} else {
 		// TODO: luanti with migration
-		path_user  = std::string(getHomeOrFail()) + DIR_DELIM "." "minetest";
+		path_user  = std::string(getHomeOrFail()) + DIR_DELIM "." "deepforge";
 	}
 	return true;
 }

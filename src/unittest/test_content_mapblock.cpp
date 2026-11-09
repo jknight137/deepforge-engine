@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2023 Vitaliy Lobachevskiy
@@ -53,9 +54,9 @@ public:
 		data.m_enable_water_reflections = false;
 		data.m_blockpos = {0, 0, 0};
 		// MapblockMeshGenerator needs a margin of at least 3
-		for (s16 x = -3; x <= 3; x++)
-		for (s16 y = -3; y <= 3; y++)
-		for (s16 z = -3; z <= 3; z++)
+		for (s32 x = -3; x <= 3; x++)
+		for (s32 y = -3; y <= 3; y++)
+		for (s32 z = -3; z <= 3; z++)
 			data.m_vmanip.setNode({x, y, z}, {CONTENT_AIR, 0, 0});
 		return data;
 	}

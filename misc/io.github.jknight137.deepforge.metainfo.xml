@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.jknight137.deepforge</id>
+  <name>Deepforge</name>
+  <summary>Voxel engine and agentic research testbed</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LGPL-2.1-or-later AND CC-BY-SA-3.0 AND CC-BY-SA-4.0 AND CC-BY-4.0 AND MIT AND Apache-2.0 AND CC0-1.0</project_license>
+  <developer id="io.github.jknight137"><name>Deepforge contributors</name></developer>
+  <description><p>Persistent voxel worlds, larger coordinates, scripting,
+    durable scheduling and external agent control.</p></description>
+  <launchable type="desktop-id">io.github.jknight137.deepforge.desktop</launchable>
+  <url type="vcs-browser">https://github.com/jknight137/deepforge-engine</url>
+  <url type="bugtracker">https://github.com/jknight137/deepforge-engine/issues</url>
+  <provides><binary>deepforge</binary></provides>
+</component>

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014-2020 paramat
@@ -19,26 +20,26 @@ extern const FlagDesc flagdesc_mapgen_v7[];
 
 
 struct MapgenV7Params : public MapgenParams {
-	s16 mount_zero_level = 0;
-	s16 floatland_ymin = 1024;
-	s16 floatland_ymax = 4096;
-	s16 floatland_taper = 256;
+	s32 mount_zero_level = 0;
+	s32 floatland_ymin = 1024;
+	s32 floatland_ymax = 4096;
+	s32 floatland_taper = 256;
 	float float_taper_exp = 2.0f;
 	float floatland_density = -0.6f;
-	s16 floatland_ywater = -31000;
+	s32 floatland_ywater = -31000;
 
 	float cave_width = 0.09f;
-	s16 large_cave_depth = -33;
+	s32 large_cave_depth = -33;
 	u16 small_cave_num_min = 0;
 	u16 small_cave_num_max = 0;
 	u16 large_cave_num_min = 0;
 	u16 large_cave_num_max = 2;
 	float large_cave_flooded = 0.5f;
-	s16 cavern_limit = -256;
-	s16 cavern_taper = 256;
+	s32 cavern_limit = -256;
+	s32 cavern_taper = 256;
 	float cavern_threshold = 0.7f;
-	s16 dungeon_ymin = -31000;
-	s16 dungeon_ymax = 31000;
+	s32 dungeon_ymin = -31000;
+	s32 dungeon_ymax = 31000;
 
 	NoiseParams np_terrain_base;
 	NoiseParams np_terrain_alt;
@@ -72,25 +73,25 @@ public:
 	virtual MapgenType getType() const { return MAPGEN_V7; }
 
 	virtual void makeChunk(BlockMakeData *data);
-	int getSpawnLevelAtPoint(v2s16 p);
+	int getSpawnLevelAtPoint(v2s32 p);
 
-	float baseTerrainLevelAtPoint(s16 x, s16 z);
+	float baseTerrainLevelAtPoint(s32 x, s32 z);
 	float baseTerrainLevelFromMap(int index);
-	bool getMountainTerrainAtPoint(s16 x, s16 y, s16 z);
-	bool getMountainTerrainFromMap(int idx_xyz, int idx_xz, s16 y);
-	bool getRiverChannelFromMap(int idx_xyz, int idx_xz, s16 y);
+	bool getMountainTerrainAtPoint(s32 x, s32 y, s32 z);
+	bool getMountainTerrainFromMap(int idx_xyz, int idx_xz, s32 y);
+	bool getRiverChannelFromMap(int idx_xyz, int idx_xz, s32 y);
 	bool getFloatlandTerrainFromMap(int idx_xyz, float float_offset);
 
 	int generateTerrain();
 
 private:
-	s16 mount_zero_level;
-	s16 floatland_ymin;
-	s16 floatland_ymax;
-	s16 floatland_taper;
+	s32 mount_zero_level;
+	s32 floatland_ymin;
+	s32 floatland_ymax;
+	s32 floatland_taper;
 	float float_taper_exp;
 	float floatland_density;
-	s16 floatland_ywater;
+	s32 floatland_ywater;
 
 	float *float_offset_cache = nullptr;
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -32,7 +33,7 @@ struct CollisionInfo
 
 	CollisionType type = COLLISION_NODE;
 	CollisionAxis axis = COLLISION_AXIS_NONE;
-	v3s16 node_p = v3s16(-32768,-32768,-32768); // COLLISION_NODE
+	v3s32 node_p = v3s32(-32768,-32768,-32768); // COLLISION_NODE
 	ActiveObject *object = nullptr; // COLLISION_OBJECT
 	v3f new_pos;
 	v3f old_speed;

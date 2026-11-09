@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // SPDX-FileCopyrightText: 2025 Luanti authors
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -15,7 +16,7 @@
 int ModApiSSCSM::l_get_node_or_nil(lua_State *L)
 {
 	// pos
-	v3s16 pos = read_v3s16(L, 1);
+	v3s32 pos = read_nodepos(L, 1);
 
 	// Do it
 	auto request = SSCSMRequestGetNode{};

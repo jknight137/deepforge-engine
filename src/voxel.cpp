@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -37,7 +38,7 @@ void VoxelManipulator::print(std::ostream &o, const NodeDefManager *ndef,
 	VoxelPrintMode mode) const
 {
 	auto &em = m_area.getExtent();
-	v3s16 of = m_area.MinEdge;
+	v3s32 of = m_area.MinEdge;
 	o<<"size: "<<em.X<<"x"<<em.Y<<"x"<<em.Z
 	 <<" offset: ("<<of.X<<","<<of.Y<<","<<of.Z<<")"<<std::endl;
 
@@ -113,7 +114,7 @@ void VoxelManipulator::print(std::ostream &o, const NodeDefManager *ndef,
 
 static inline void checkArea(const VoxelArea &a)
 {
-	// won't overflow since cbrt(2^64) > 2^16
+	// Bounded by VoxelArea::MAX_EXTENT; its cube fits in u64.
 	u64 real_volume = static_cast<u64>(a.getExtent().X) * a.getExtent().Y * a.getExtent().Z;
 
 	static_assert(MAX_WORKING_VOLUME < S32_MAX); // hard limit is somewhere here
@@ -177,7 +178,7 @@ void VoxelManipulator::addArea(const VoxelArea &area)
 }
 
 void VoxelManipulator::copyFrom(MapNode *src, bool is_mono_block, const VoxelArea& src_area,
-		v3s16 from_pos, v3s16 to_pos, const v3s16 &size)
+		v3s32 from_pos, v3s32 to_pos, const v3s32 &size)
 {
 	/* The reason for this optimised code is that we're a member function
 	 * and the data type/layout of m_data is know to us: it's stored as
@@ -213,8 +214,8 @@ void VoxelManipulator::copyFrom(MapNode *src, bool is_mono_block, const VoxelAre
 	s32 i_src = src_area.index(from_pos.X, from_pos.Y, from_pos.Z);
 	s32 i_local = m_area.index(to_pos.X, to_pos.Y, to_pos.Z);
 
-	for (s16 z = 0; z < size.Z; z++) {
-		for (s16 y = 0; y < size.Y; y++) {
+	for (s32 z = 0; z < size.Z; z++) {
+		for (s32 y = 0; y < size.Y; y++) {
 			if (is_mono_block) {
 				std::fill_n(m_data + i_local, size.X, src[0]);
 			} else {
@@ -229,14 +230,14 @@ void VoxelManipulator::copyFrom(MapNode *src, bool is_mono_block, const VoxelAre
 }
 
 void VoxelManipulator::copyTo(MapNode *dst, const VoxelArea& dst_area,
-		v3s16 dst_pos, v3s16 from_pos, const v3s16 &size) const
+		v3s32 dst_pos, v3s32 from_pos, const v3s32 &size) const
 {
-	for(s16 z=0; z<size.Z; z++)
-	for(s16 y=0; y<size.Y; y++)
+	for(s32 z=0; z<size.Z; z++)
+	for(s32 y=0; y<size.Y; y++)
 	{
 		s32 i_dst = dst_area.index(dst_pos.X, dst_pos.Y+y, dst_pos.Z+z);
 		s32 i_local = m_area.index(from_pos.X, from_pos.Y+y, from_pos.Z+z);
-		for (s16 x = 0; x < size.X; x++) {
+		for (s32 x = 0; x < size.X; x++) {
 			if (m_data[i_local].getContent() != CONTENT_IGNORE)
 				dst[i_dst] = m_data[i_local];
 			i_dst++;

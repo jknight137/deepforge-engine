@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015 nerzhul, Loic Blot <loic.blot@unix-experience.fr>
@@ -107,7 +108,8 @@ void Server::handleCommand_Init(NetworkPacket* pkt)
 	u16 net_proto_version = 0;
 
 	// Figure out a working version if it is possible at all
-	if (max_net_proto_version >= SERVER_PROTOCOL_VERSION_MIN ||
+	if (min_net_proto_version <= max_net_proto_version &&
+			max_net_proto_version >= SERVER_PROTOCOL_VERSION_MIN &&
 			min_net_proto_version <= LATEST_PROTOCOL_VERSION) {
 		// If maximum is larger than our maximum, go with our maximum
 		if (max_net_proto_version > LATEST_PROTOCOL_VERSION)
@@ -409,8 +411,8 @@ void Server::handleCommand_GotBlocks(NetworkPacket* pkt)
 	/*
 		[0] u16 command
 		[2] u8 count
-		[3] v3s16 pos_0
-		[3+6] v3s16 pos_1
+		[3] v3s32 pos_0
+		[3+6] v3s32 pos_1
 		...
 	*/
 
@@ -423,7 +425,7 @@ void Server::handleCommand_GotBlocks(NetworkPacket* pkt)
 		return;
 
 	for (u16 i = 0; i < count; i++) {
-		v3s16 p;
+		v3s32 p;
 		*pkt >> p;
 		client->GotBlock(p);
 	}
@@ -539,8 +541,8 @@ void Server::handleCommand_DeletedBlocks(NetworkPacket* pkt)
 	/*
 		[0] u16 command
 		[2] u8 count
-		[3] v3s16 pos_0
-		[3+6] v3s16 pos_1
+		[3] v3s32 pos_0
+		[3+6] v3s32 pos_1
 		...
 	*/
 
@@ -553,7 +555,7 @@ void Server::handleCommand_DeletedBlocks(NetworkPacket* pkt)
 		return;
 
 	for (u16 i = 0; i < count; i++) {
-		v3s16 p;
+		v3s32 p;
 		*pkt >> p;
 		client->SetBlockNotSent(p);
 	}
@@ -991,7 +993,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 			MapNode n(CONTENT_IGNORE);
 			bool pos_ok;
 
-			v3s16 p_under = pointed.node_undersurface;
+			v3s32 p_under = pointed.node_undersurface;
 			n = m_env->getMap().getNode(p_under, &pos_ok);
 			if (!pos_ok) {
 				infostream << "Server: Not punching: Node not found. "
@@ -1044,7 +1046,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 		if (pointed.type != POINTEDTHING_NODE)
 			return;
 		bool pos_ok;
-		v3s16 p_under = pointed.node_undersurface;
+		v3s32 p_under = pointed.node_undersurface;
 		MapNode n = m_env->getMap().getNode(p_under, &pos_ok);
 		if (!pos_ok) {
 			infostream << "Server: Not finishing digging: Node not found. "
@@ -1056,7 +1058,7 @@ void Server::handleCommand_Interact(NetworkPacket *pkt)
 		/* Cheat prevention */
 		bool is_valid_dig = true;
 		if ((anticheat_flags & AC_DIGGING) && !isSingleplayer()) {
-			v3s16 nocheat_p = playersao->getNoCheatDigPos();
+			v3s32 nocheat_p = playersao->getNoCheatDigPos();
 			float nocheat_t = playersao->getNoCheatDigTime();
 			playersao->noCheatDigEnd();
 			// If player didn't start digging this, ignore dig
@@ -1287,7 +1289,7 @@ void Server::handleCommand_NodeMetaFields(NetworkPacket* pkt)
 		return;
 	}
 
-	v3s16 p;
+	v3s32 p;
 	std::string formname;
 	StringMap fields;
 

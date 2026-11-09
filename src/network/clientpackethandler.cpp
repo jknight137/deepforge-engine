@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015 nerzhul, Loic Blot <loic.blot@unix-experience.fr>
@@ -86,6 +87,13 @@ void Client::handleCommand_Hello(NetworkPacket* pkt)
 		warningstream << "Client: TOCLIENT_HELLO: Server sent "
 				<< "unsupported serialization_ver=" << (u32)serialization_ver
 				<< std::endl;
+		return;
+	}
+
+	if (proto_ver != LATEST_PROTOCOL_VERSION) {
+		m_access_denied = true;
+		m_access_denied_reason = "This client requires the matching Dadcraft wide-world server.";
+		m_con->Disconnect();
 		return;
 	}
 
@@ -240,14 +248,14 @@ void Client::handleCommand_AccessDenied(NetworkPacket* pkt)
 
 void Client::handleCommand_RemoveNode(NetworkPacket* pkt)
 {
-	v3s16 p;
+	v3s32 p;
 	*pkt >> p;
 	removeNode(p);
 }
 
 void Client::handleCommand_AddNode(NetworkPacket* pkt)
 {
-	v3s16 p;
+	v3s32 p;
 	*pkt >> p;
 
 	std::string_view str = pkt->getRemainingNoCopy();
@@ -277,7 +285,7 @@ void Client::handleCommand_NodemetaChanged(NetworkPacket *pkt)
 	Map &map = m_env.getMap();
 	for (auto i = meta_updates_list.begin();
 			i != meta_updates_list.end(); ++i) {
-		v3s16 pos = i->first;
+		v3s32 pos = i->first;
 
 		if (map.isValidPosition(pos) &&
 				map.setNodeMetadata(pos, i->second))
@@ -291,10 +299,10 @@ void Client::handleCommand_NodemetaChanged(NetworkPacket *pkt)
 void Client::handleCommand_BlockData(NetworkPacket* pkt)
 {
 	// Ignore too small packet
-	if (pkt->getSize() < 6)
+	if (pkt->getSize() < 12)
 		return;
 
-	v3s16 p;
+	v3s32 p;
 	*pkt >> p;
 
 	if (blockpos_over_max_limit(p)) {
@@ -308,7 +316,7 @@ void Client::handleCommand_BlockData(NetworkPacket* pkt)
 	MapSector *sector;
 	MapBlock *block;
 
-	v2s16 p2d(p.X, p.Z);
+	v2s32 p2d(p.X, p.Z);
 	sector = m_env.getMap().emergeSector(p2d);
 
 	assert(sector->getPos() == p2d);

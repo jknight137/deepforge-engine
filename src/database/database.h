@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -29,14 +30,14 @@ class MapDatabase : public Database
 public:
 	virtual ~MapDatabase() = default;
 
-	virtual bool saveBlock(const v3s16 &pos, std::string_view data) = 0;
-	virtual void loadBlock(const v3s16 &pos, std::string *block) = 0;
-	virtual bool deleteBlock(const v3s16 &pos) = 0;
+	virtual bool saveBlock(const v3s32 &pos, std::string_view data) = 0;
+	virtual void loadBlock(const v3s32 &pos, std::string *block) = 0;
+	virtual bool deleteBlock(const v3s32 &pos) = 0;
 
-	static s64 getBlockAsInteger(const v3s16 &pos);
-	static v3s16 getIntegerAsBlock(s64 i);
+	static s64 getBlockAsInteger(const v3s32 &pos);
+	static v3s32 getIntegerAsBlock(s64 i);
 
-	virtual void listAllLoadableBlocks(std::vector<v3s16> &dst) = 0;
+	virtual void listAllLoadableBlocks(std::vector<v3s32> &dst) = 0;
 };
 
 class PlayerSAO;

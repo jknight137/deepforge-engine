@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -118,7 +119,7 @@ luaL_Reg LuaValueNoise::methods[] = {
   LuaValueNoiseMap
 */
 
-LuaValueNoiseMap::LuaValueNoiseMap(const NoiseParams *np, s32 seed, v3s16 size)
+LuaValueNoiseMap::LuaValueNoiseMap(const NoiseParams *np, s32 seed, v3s32 size)
 {
 	try {
 		noise = new Noise(np, seed, size.X, size.Y, size.Z);
@@ -279,8 +280,8 @@ int LuaValueNoiseMap::l_get_map_slice(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 
 	LuaValueNoiseMap *o = checkObject<LuaValueNoiseMap>(L, 1);
-	v3s16 slice_offset   = read_v3s16(L, 2);
-	v3s16 slice_size     = read_v3s16(L, 3);
+	v3s32 slice_offset   = read_nodepos(L, 2);
+	v3s32 slice_size     = read_nodepos(L, 3);
 	bool use_buffer      = lua_istable(L, 4);
 
 	Noise *n = o->noise;
@@ -304,7 +305,7 @@ int LuaValueNoiseMap::create_object(lua_State *L)
 	NoiseParams np;
 	if (!read_noiseparams(L, 1, &np))
 		return 0;
-	v3s16 size = read_v3s16(L, 2);
+	v3s32 size = read_nodepos(L, 2);
 
 	LuaValueNoiseMap *o = new LuaValueNoiseMap(&np, 0, size);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;
@@ -324,7 +325,7 @@ int LuaValueNoiseMap::gc_object(lua_State *L)
 struct NoiseMapParams {
 	NoiseParams np;
 	s32 seed;
-	v3s16 size;
+	v3s32 size;
 };
 
 void *LuaValueNoiseMap::packIn(lua_State *L, int idx)
@@ -333,7 +334,7 @@ void *LuaValueNoiseMap::packIn(lua_State *L, int idx)
 	NoiseMapParams *ret = new NoiseMapParams();
 	ret->np = o->noise->np;
 	ret->seed = o->noise->seed;
-	ret->size = v3s16(o->noise->sx, o->noise->sy, o->noise->sz);
+	ret->size = v3s32(o->noise->sx, o->noise->sy, o->noise->sz);
 	return ret;
 }
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -118,7 +119,7 @@ private:
 	// Spritesheet stuff
 	// TODO move into own struct
 	v2f m_tx_size = v2f(1,1);
-	v2s16 m_tx_basepos;
+	v2s32 m_tx_basepos;
 	bool m_initial_tx_basepos_set = false;
 	bool m_tx_select_horiz_by_yawpitch = false;
 	int m_anim_frame = 0;
@@ -279,7 +280,7 @@ public:
 	/* Get light position(s).
 	 * returns number of positions written into pos[], which must have space
 	 * for at least 3 vectors. */
-	u16 getLightPosition(v3s16 *pos);
+	u16 getLightPosition(v3s32 *pos);
 
 	void updateNametag();
 

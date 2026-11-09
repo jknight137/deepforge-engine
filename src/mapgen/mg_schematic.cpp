@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014-2018 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -109,7 +110,7 @@ void Schematic::resolveNodeNames()
 }
 
 
-void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_place)
+void Schematic::blitToVManip(MMVManip *vm, v3s32 p, Rotation rot, bool force_place)
 {
 	assert(schemdata && slice_probs);
 	sanity_check(m_ndef != NULL);
@@ -118,9 +119,9 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 	int ystride = size.X;
 	int zstride = size.X * size.Y;
 
-	s16 sx = size.X;
-	s16 sy = size.Y;
-	s16 sz = size.Z;
+	s32 sx = size.X;
+	s32 sy = size.Y;
+	s32 sz = size.Z;
 
 	int i_start, i_step_x, i_step_z;
 	switch (rot) {
@@ -147,16 +148,16 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 			i_step_z = zstride;
 	}
 
-	s16 y_map = p.Y;
-	for (s16 y = 0; y != sy; y++) {
+	s32 y_map = p.Y;
+	for (s32 y = 0; y != sy; y++) {
 		if ((slice_probs[y] != MTSCHEM_PROB_ALWAYS) &&
 			(slice_probs[y] <= myrand_range(1, MTSCHEM_PROB_ALWAYS)))
 			continue;
 
-		for (s16 z = 0; z != sz; z++) {
+		for (s32 z = 0; z != sz; z++) {
 			u32 i = z * i_step_z + y * ystride + i_start;
-			for (s16 x = 0; x != sx; x++, i += i_step_x) {
-				v3s16 pos(p.X + x, y_map, p.Z + z);
+			for (s32 x = 0; x != sx; x++, i += i_step_x) {
+				v3s32 pos(p.X + x, y_map, p.Z + z);
 				if (!vm->m_area.contains(pos))
 					continue;
 
@@ -192,7 +193,7 @@ void Schematic::blitToVManip(MMVManip *vm, v3s16 p, Rotation rot, bool force_pla
 }
 
 
-bool Schematic::placeOnVManip(MMVManip *vm, v3s16 p, u32 flags,
+bool Schematic::placeOnVManip(MMVManip *vm, v3s32 p, u32 flags,
 	Rotation rot, bool force_place)
 {
 	assert(vm != NULL);
@@ -203,8 +204,8 @@ bool Schematic::placeOnVManip(MMVManip *vm, v3s16 p, u32 flags,
 	if (rot == ROTATE_RAND)
 		rot = (Rotation)myrand_range(ROTATE_0, ROTATE_270);
 
-	v3s16 s = (rot == ROTATE_90 || rot == ROTATE_270) ?
-		v3s16(size.Z, size.Y, size.X) : size;
+	v3s32 s = (rot == ROTATE_90 || rot == ROTATE_270) ?
+		v3s32(size.Z, size.Y, size.X) : size;
 
 	//// Adjust placement position if necessary
 	if (flags & DECO_PLACE_CENTER_X)
@@ -216,13 +217,13 @@ bool Schematic::placeOnVManip(MMVManip *vm, v3s16 p, u32 flags,
 
 	blitToVManip(vm, p, rot, force_place);
 
-	return vm->m_area.contains(VoxelArea(p, p + s - v3s16(1, 1, 1)));
+	return vm->m_area.contains(VoxelArea(p, p + s - v3s32(1, 1, 1)));
 }
 
-void Schematic::placeOnMap(ServerMap *map, v3s16 p, u32 flags,
+void Schematic::placeOnMap(ServerMap *map, v3s32 p, u32 flags,
 	Rotation rot, bool force_place)
 {
-	std::map<v3s16, MapBlock *> modified_blocks;
+	std::map<v3s32, MapBlock *> modified_blocks;
 
 	assert(map != NULL);
 	assert(schemdata != NULL);
@@ -232,8 +233,8 @@ void Schematic::placeOnMap(ServerMap *map, v3s16 p, u32 flags,
 	if (rot == ROTATE_RAND)
 		rot = (Rotation)myrand_range(ROTATE_0, ROTATE_270);
 
-	v3s16 s = (rot == ROTATE_90 || rot == ROTATE_270) ?
-			v3s16(size.Z, size.Y, size.X) : size;
+	v3s32 s = (rot == ROTATE_90 || rot == ROTATE_270) ?
+			v3s32(size.Z, size.Y, size.X) : size;
 
 	//// Adjust placement position if necessary
 	if (flags & DECO_PLACE_CENTER_X)
@@ -245,8 +246,8 @@ void Schematic::placeOnMap(ServerMap *map, v3s16 p, u32 flags,
 
 	//// Create VManip for affected area, emerge our area, modify area
 	//// inside VManip, then blit back.
-	v3s16 bp1 = getNodeBlockPos(p);
-	v3s16 bp2 = getNodeBlockPos(p + s - v3s16(1, 1, 1));
+	v3s32 bp1 = getNodeBlockPos(p);
+	v3s32 bp2 = getNodeBlockPos(p + s - v3s32(1, 1, 1));
 
 	MMVManip vm(map);
 	vm.initialEmerge(bp1, bp2);
@@ -289,7 +290,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 	}
 
 	//// Read size
-	size = readV3S16(ss);
+	size = v3s32::from(readV3S16(ss));
 
 	//// Read Y-slice probability values
 	delete []slice_probs;
@@ -341,7 +342,7 @@ bool Schematic::deserializeFromMts(std::istream *is)
 
 	// Fix probability values for probability range truncation introduced in v4
 	if (version < 4) {
-		for (s16 y = 0; y != size.Y; y++)
+		for (s32 y = 0; y != size.Y; y++)
 			slice_probs[y] >>= 1;
 		for (size_t i = 0; i != nodecount; i++)
 			schemdata[i].param1 >>= 1;
@@ -360,7 +361,7 @@ bool Schematic::serializeToMts(std::ostream *os) const
 
 	writeU32(ss, MTSCHEM_FILE_SIGNATURE);         // signature
 	writeU16(ss, MTSCHEM_FILE_VER_HIGHEST_WRITE); // version
-	writeV3S16(ss, size);                         // schematic size
+	writeV3S16(ss, v3s16::from(size));                         // schematic size
 
 	for (int y = 0; y != size.Y; y++)             // Y slice probabilities
 		writeU8(ss, slice_probs[y]);
@@ -530,32 +531,32 @@ bool Schematic::saveSchematicToFile(const std::string &filename,
 }
 
 
-bool Schematic::getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2)
+bool Schematic::getSchematicFromMap(Map *map, v3s32 p1, v3s32 p2)
 {
 	assert(p2 >= p1);
 	const v3s32 size_l = v3s32::from(p2) - v3s32::from(p1) + 1;
 	if (core::min_(size_l.X, size_l.Y, size_l.Z) < 0 ||
 		core::max_(size_l.X, size_l.Y, size_l.Z) > S16_MAX)
 		return false;
-	size = v3s16::from(size_l);
+	size = v3s32::from(size_l);
 
-	v3s16 bp1 = getNodeBlockPos(p1);
-	v3s16 bp2 = getNodeBlockPos(p2);
+	v3s32 bp1 = getNodeBlockPos(p1);
+	v3s32 bp2 = getNodeBlockPos(p2);
 	MMVManip *vm = new MMVManip(map);
 	vm->initialEmerge(bp1, bp2);
 
 	slice_probs = new u8[size.Y];
-	for (s16 y = 0; y != size.Y; y++)
+	for (s32 y = 0; y != size.Y; y++)
 		slice_probs[y] = MTSCHEM_PROB_ALWAYS;
 
 	// FIXME: can overflow
 	schemdata = new MapNode[size.X * size.Y * size.Z];
 
 	u32 i = 0;
-	for (s16 z = p1.Z; z <= p2.Z; z++)
-	for (s16 y = p1.Y; y <= p2.Y; y++) {
+	for (s32 z = p1.Z; z <= p2.Z; z++)
+	for (s32 y = p1.Y; y <= p2.Y; y++) {
 		u32 vi = vm->m_area.index(p1.X, y, z);
-		for (s16 x = p1.X; x <= p2.X; x++, i++, vi++) {
+		for (s32 x = p1.X; x <= p2.X; x++, i++, vi++) {
 			schemdata[i] = vm->m_data[vi];
 			schemdata[i].param1 = MTSCHEM_PROB_ALWAYS;
 		}
@@ -570,13 +571,13 @@ bool Schematic::getSchematicFromMap(Map *map, v3s16 p1, v3s16 p2)
 }
 
 
-void Schematic::applyProbabilities(v3s16 p0,
-	std::vector<std::pair<v3s16, u8> > *plist,
-	std::vector<std::pair<s16, u8> > *splist)
+void Schematic::applyProbabilities(v3s32 p0,
+	std::vector<std::pair<v3s32, u8> > *plist,
+	std::vector<std::pair<s32, u8> > *splist)
 {
 	const size_t zstride = size.Y * size.X, volume = zstride * size.Z;
 	for (size_t i = 0; i != plist->size(); i++) {
-		v3s16 p = (*plist)[i].first - p0;
+		v3s32 p = (*plist)[i].first - p0;
 		s32 index = p.Z * zstride + p.Y * size.X + p.X;
 		if (index >= 0 && static_cast<u32>(index) < volume) {
 			u8 prob = (*plist)[i].second;
@@ -589,7 +590,7 @@ void Schematic::applyProbabilities(v3s16 p0,
 	}
 
 	for (size_t i = 0; i != splist->size(); i++) {
-		s16 slice = (*splist)[i].first;
+		s32 slice = (*splist)[i].first;
 		if (slice >= 0 && slice < size.Y)
 			slice_probs[slice] = (*splist)[i].second;
 	}

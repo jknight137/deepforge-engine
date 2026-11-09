@@ -1,4 +1,4 @@
-Luanti Lua Modding API Reference
+Deepforge Lua Modding API Reference
 ================================
 
 **WARNING**: if you're looking for the `minetest` namespace (e.g. `minetest.something`),

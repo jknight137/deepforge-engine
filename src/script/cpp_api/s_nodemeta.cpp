@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -35,7 +36,7 @@ int ScriptApiNodemeta::nodemeta_inventory_AllowMove(
 		return count;
 
 	// function(pos, from_list, from_index, to_list, to_index, count, player)
-	push_v3s16(L, ma.to_inv.p);              // pos
+	push_nodepos(L, ma.to_inv.p);              // pos
 	lua_pushstring(L, ma.from_list.c_str()); // from_list
 	lua_pushinteger(L, ma.from_i + 1);       // from_index
 	lua_pushstring(L, ma.to_list.c_str());   // to_list
@@ -73,7 +74,7 @@ int ScriptApiNodemeta::nodemeta_inventory_AllowPut(
 		return stack.count;
 
 	// Call function(pos, listname, index, stack, player)
-	push_v3s16(L, ma.to_inv.p);            // pos
+	push_nodepos(L, ma.to_inv.p);            // pos
 	lua_pushstring(L, ma.to_list.c_str()); // listname
 	lua_pushinteger(L, ma.to_i + 1);       // index
 	LuaItemStack::create(L, stack);        // stack
@@ -109,7 +110,7 @@ int ScriptApiNodemeta::nodemeta_inventory_AllowTake(
 		return stack.count;
 
 	// Call function(pos, listname, index, count, player)
-	push_v3s16(L, ma.from_inv.p);            // pos
+	push_nodepos(L, ma.from_inv.p);            // pos
 	lua_pushstring(L, ma.from_list.c_str()); // listname
 	lua_pushinteger(L, ma.from_i + 1);       // index
 	LuaItemStack::create(L, stack);          // stack
@@ -145,7 +146,7 @@ void ScriptApiNodemeta::nodemeta_inventory_OnMove(
 		return;
 
 	// function(pos, from_list, from_index, to_list, to_index, count, player)
-	push_v3s16(L, ma.from_inv.p);            // pos
+	push_nodepos(L, ma.from_inv.p);            // pos
 	lua_pushstring(L, ma.from_list.c_str()); // from_list
 	lua_pushinteger(L, ma.from_i + 1);       // from_index
 	lua_pushstring(L, ma.to_list.c_str());   // to_list
@@ -178,7 +179,7 @@ void ScriptApiNodemeta::nodemeta_inventory_OnPut(
 		return;
 
 	// Call function(pos, listname, index, stack, player)
-	push_v3s16(L, ma.to_inv.p);            // pos
+	push_nodepos(L, ma.to_inv.p);            // pos
 	lua_pushstring(L, ma.to_list.c_str()); // listname
 	lua_pushinteger(L, ma.to_i + 1);       // index
 	LuaItemStack::create(L, stack);        // stack
@@ -209,7 +210,7 @@ void ScriptApiNodemeta::nodemeta_inventory_OnTake(
 		return;
 
 	// Call function(pos, listname, index, stack, player)
-	push_v3s16(L, ma.from_inv.p);            // pos
+	push_nodepos(L, ma.from_inv.p);            // pos
 	lua_pushstring(L, ma.from_list.c_str()); // listname
 	lua_pushinteger(L, ma.from_i + 1);       // index
 	LuaItemStack::create(L, stack);          // stack

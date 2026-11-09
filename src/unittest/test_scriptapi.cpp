@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2022 Luanti core developers & community
@@ -109,7 +110,7 @@ void TestScriptApi::testVectorMetatable(MyScriptApi *script)
 		return lua_toboolean(L, -1);
 	};
 
-	push_v3s16(L, {1, 2, 3});
+	push_nodepos(L, {1, 2, 3});
 	UASSERT(call_vector_check());
 
 	push_v3f(L, {1, 2, 3});
@@ -136,7 +137,7 @@ void TestScriptApi::testVectorRead(MyScriptApi *script)
 	StackUnroller unroller(L);
 
 	// both methods should parse these
-	const std::pair<const char*, v3s16> pairs1[] = {
+	const std::pair<const char*, v3s32> pairs1[] = {
 		{"return {x=1, y=-2, z=3}",    {1, -2, 3}},
 		{"return {x=1.1, y=0, z=0}",   {1, 0, 0}},
 		{"return {x=1.5, y=0, z=0}",   {2, 0, 0}},
@@ -144,12 +145,13 @@ void TestScriptApi::testVectorRead(MyScriptApi *script)
 		{"return {x=-1.5, y=0, z=0}",  {-2, 0, 0}},
 		{"return vector.new(5, 6, 7)", {5, 6, 7}},
 		{"return vector.new(32767, 0, -32768)", {S16_MAX, 0, S16_MIN}},
+		{"return vector.new(65535, -65535, 40000)", {65535, -65535, 40000}},
 	};
 	for (auto &it : pairs1) {
 		run(L, it.first, 1);
-		v3s16 v = read_v3s16(L, -1);
+		v3s32 v = read_nodepos(L, -1);
 		UASSERTEQ(auto, v, it.second);
-		v = check_v3s16(L, -1);
+		v = check_nodepos(L, -1);
 		UASSERTEQ(auto, v, it.second);
 		lua_pop(L, 1);
 	}
@@ -173,8 +175,8 @@ void TestScriptApi::testVectorReadErr(MyScriptApi *script)
 	for (auto &it : errs1) {
 		infostream << it << std::endl;
 		run(L, it, 1);
-		EXCEPTION_CHECK(LuaError, read_v3s16(L, -1));
-		EXCEPTION_CHECK(LuaError, check_v3s16(L, -1));
+		EXCEPTION_CHECK(LuaError, read_nodepos(L, -1));
+		EXCEPTION_CHECK(LuaError, check_nodepos(L, -1));
 	}
 }
 
@@ -183,8 +185,8 @@ void TestScriptApi::testVectorReadMix(MyScriptApi *script)
 	lua_State *L = script->getStack();
 	StackUnroller unroller(L);
 
-	// read_v3s16 should allow these, but check_v3s16 should not
-	const std::pair<const char*, v3s16> pairs2[] = {
+	// read_nodepos should allow these, but check_nodepos should not
+	const std::pair<const char*, v3s32> pairs2[] = {
 		{"return {x='3', y='2.9', z=3}",      {3, 3, 3}},
 		{"return {x=false, y=0, z=0}",        {0, 0, 0}},
 		{"return {x='?', y=0, z=0}",          {0, 0, 0}},
@@ -193,13 +195,13 @@ void TestScriptApi::testVectorReadMix(MyScriptApi *script)
 	for (auto &it : pairs2) {
 		infostream << it.first << std::endl;
 		run(L, it.first, 1);
-		v3s16 v = read_v3s16(L, -1);
+		v3s32 v = read_nodepos(L, -1);
 		UASSERTEQ(auto, v, it.second);
-		EXCEPTION_CHECK(LuaError, check_v3s16(L, -1));
+		EXCEPTION_CHECK(LuaError, check_nodepos(L, -1));
 		lua_pop(L, 1);
 	}
 
-	// same but even the result is undefined
+	// Integer node positions reject nonfinite values before conversion
 	const char *errs2[] = {
 		"return {x=0, y=0, z=0/0}", // nan
 		"return {x=0, y=0, z=math.huge}", // inf
@@ -207,8 +209,8 @@ void TestScriptApi::testVectorReadMix(MyScriptApi *script)
 	for (auto &it : errs2) {
 		infostream << it << std::endl;
 		run(L, it, 1);
-		(void)read_v3s16(L, -1);
-		EXCEPTION_CHECK(LuaError, check_v3s16(L, -1));
+		EXCEPTION_CHECK(LuaError, read_nodepos(L, -1));
+		EXCEPTION_CHECK(LuaError, check_nodepos(L, -1));
 		lua_pop(L, 1);
 	}
 }

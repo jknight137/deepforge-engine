@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2024 sfan5
@@ -129,7 +130,7 @@ void TestSAO::testStaticSave(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos(0, -66 * BS, 0);
-	const v3s16 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
+	const v3s32 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
 
 	auto obj = add_entity(env, testpos, "test:static");
 	UASSERT(obj);
@@ -158,7 +159,7 @@ void TestSAO::testNotSaved(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 4 * BS, 0);
-	const v3s16 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
+	const v3s32 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
 
 	// make sure matching block exists (see below)
 	auto *block = map.emergeBlock(testblockpos, true);
@@ -195,7 +196,7 @@ void TestSAO::testActivate(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 0, 100 * BS);
-	const v3s16 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
+	const v3s32 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
 
 	// this time insert the static object manually
 	StaticObject s_obj;
@@ -230,7 +231,7 @@ void TestSAO::testStaticToFalse(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos(0, 0, -22 * BS);
-	const v3s16 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
+	const v3s32 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
 
 	/*
 	 * This test represents an edge case where static_save changed from true
@@ -289,7 +290,7 @@ void TestSAO::testStaticToTrue(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos(123 * BS, 5 * BS, 0);
-	const v3s16 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
+	const v3s32 testblockpos = getNodeBlockPos(floatToInt(testpos, BS));
 
 	auto obj = add_entity(env, testpos, "test:non_static");
 	UASSERT(obj);
@@ -315,9 +316,9 @@ void TestSAO::testShutdown(ServerEnvironment *env)
 	Map &map = env->getMap();
 
 	const v3f testpos1(0, 0, 200 * BS);
-	const v3s16 testblockpos1 = getNodeBlockPos(floatToInt(testpos1, BS));
+	const v3s32 testblockpos1 = getNodeBlockPos(floatToInt(testpos1, BS));
 	const v3f testpos2(0, 0, -200 * BS);
-	const v3s16 testblockpos2 = getNodeBlockPos(floatToInt(testpos2, BS));
+	const v3s32 testblockpos2 = getNodeBlockPos(floatToInt(testpos2, BS));
 
 	auto obj1 = add_entity(env, testpos1, "test:static");
 	UASSERT(obj1);

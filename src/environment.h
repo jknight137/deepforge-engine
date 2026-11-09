@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -69,7 +70,7 @@ public:
 	 * \param p output, position of the first non-air node
 	 * the line intersects
 	 */
-	bool line_of_sight(v3f pos1, v3f pos2, v3s16 *p = nullptr);
+	bool line_of_sight(v3f pos1, v3f pos2, v3s32 *p = nullptr);
 
 	/*!
 	 * Gets the objects pointed by the shootline as

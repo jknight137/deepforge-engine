@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -147,7 +148,7 @@ bool NodeMetaRef::handleFromTable(lua_State *L, int table, IMetadata *_meta)
 }
 
 
-NodeMetaRef::NodeMetaRef(v3s16 p, ServerEnvironment *env):
+NodeMetaRef::NodeMetaRef(v3s32 p, ServerEnvironment *env):
 	m_p(p),
 	m_env(env)
 {
@@ -161,7 +162,7 @@ NodeMetaRef::NodeMetaRef(IMetadata *meta):
 
 // Creates an NodeMetaRef and leaves it on top of stack
 // Not callable from Lua; all references are created on the C side.
-void NodeMetaRef::create(lua_State *L, v3s16 p, ServerEnvironment *env)
+void NodeMetaRef::create(lua_State *L, v3s32 p, ServerEnvironment *env)
 {
 	NodeMetaRef *o = new NodeMetaRef(p, env);
 	*(void **)(lua_newuserdata(L, sizeof(void *))) = o;

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 kwolekr, Ryan Kwolek <kwolekr@minetest.net>
@@ -66,11 +67,11 @@ public:
 	void resizeHotbar();
 	void drawCrosshair();
 	void drawSelectionMesh();
-	void updateSelectionMesh(const v3s16 &camera_offset);
+	void updateSelectionMesh(const v3s32 &camera_offset);
 
 	std::vector<aabb3f> *getSelectionBoxes() { return &m_selection_boxes; }
 
-	void setSelectionPos(const v3f &pos, const v3s16 &camera_offset);
+	void setSelectionPos(const v3f &pos, const v3s32 &camera_offset);
 
 	v3f getSelectionPos() const { return m_selection_pos; }
 
@@ -96,10 +97,10 @@ public:
 
 	bool hasElementOfType(HudElementType type);
 
-	void drawLuaElements(const v3s16 &camera_offset, bool only_unhidable);
+	void drawLuaElements(const v3s32 &camera_offset, bool only_unhidable);
 
 private:
-	bool calculateScreenPos(const v3s16 &camera_offset, HudElement *e, v2s32 *pos);
+	bool calculateScreenPos(const v3s32 &camera_offset, HudElement *e, v2s32 *pos);
 	void drawStatbar(v2s32 pos, u16 corner, u16 drawdir,
 			const std::string &texture, const std::string& bgtexture,
 			s32 count, s32 maxcount, v2s32 offset, v2f size = v2f());
@@ -124,7 +125,7 @@ private:
 
 	float m_hud_scaling; // cached luanti setting
 	float m_scale_factor;
-	v3s16 m_camera_offset;
+	v3s32 m_camera_offset;
 	v2u32 m_screensize;
 	v2s32 m_displaycenter;
 	s32 m_hotbar_imagesize; // Takes hud_scaling into account, updated by resizeHotbar()

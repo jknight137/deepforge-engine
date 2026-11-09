@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2025 Luanti developers
@@ -17,10 +18,10 @@ class MtEvent;
 class NodeDugEvent : public MtEvent
 {
 public:
-	v3s16 p;
+	v3s32 p;
 	MapNode n;
 
-	NodeDugEvent(v3s16 p, MapNode n):
+	NodeDugEvent(v3s32 p, MapNode n):
 		p(p),
 		n(n)
 	{}

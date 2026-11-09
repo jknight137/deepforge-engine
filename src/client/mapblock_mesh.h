@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -36,7 +37,7 @@ struct MeshMakeData
 	VoxelManipulator m_vmanip;
 
 	// base pos of meshgen area, in blocks
-	v3s16 m_blockpos = v3s16(-1337,-1337,-1337);
+	v3s32 m_blockpos = v3s32(-1337,-1337,-1337);
 	// size of meshgen area, in nodes.
 	// vmanip will have at least an extra 1 node onion layer.
 	// area is expected to fit into mesh grid cell.
@@ -45,7 +46,7 @@ struct MeshMakeData
 	MeshGrid m_mesh_grid;
 
 	// relative to blockpos
-	v3s16 m_crack_pos_relative = v3s16(-1337,-1337,-1337);
+	v3s32 m_crack_pos_relative = v3s32(-1337,-1337,-1337);
 	float m_ao_gamma_inv = 0.0f;
 	bool m_generate_minimap = false;
 	bool m_smooth_lighting = false;
@@ -59,7 +60,7 @@ struct MeshMakeData
 	/*
 		Copy block data manually (to allow optimizations by the caller)
 	*/
-	void fillBlockDataBegin(const v3s16 &blockpos);
+	void fillBlockDataBegin(const v3s32 &blockpos);
 
 	/*
 		Prepare block data for rendering a single node located at (0,0,0).
@@ -69,7 +70,7 @@ struct MeshMakeData
 	/*
 		Set the (node) position of a crack
 	*/
-	void setCrack(int crack_level, v3s16 crack_pos);
+	void setCrack(int crack_level, v3s32 crack_pos);
 };
 
 // represents a triangle as indexes into the vertex buffer in SMeshBuffer
@@ -249,7 +250,7 @@ public:
 	 *     buffers are ordered relative to each other (with respect to their nearest
 	 *     triangle).
 	 */
-	void updateTransparentBuffers(v3f camera_pos, v3s16 block_pos, bool group_by_buffers);
+	void updateTransparentBuffers(v3f camera_pos, v3s32 block_pos, bool group_by_buffers);
 	void consolidateTransparentBuffers();
 
 	/// get the list of transparent buffers
@@ -360,8 +361,8 @@ void final_color_blend(video::SColor *result,
 // Adds MATERIAL_FLAG_CRACK if the node is cracked
 // TileSpec should be passed as reference due to the underlying TileFrame and its vector
 // TileFrame vector copy cost very much to client
-void getNodeTileN(MapNode mn, const v3s16 &p, u8 tileindex, MeshMakeData *data, TileSpec &tile);
-void getNodeTile(MapNode mn, const v3s16 &p, const v3s16 &dir, MeshMakeData *data, TileSpec &tile);
+void getNodeTileN(MapNode mn, const v3s32 &p, u8 tileindex, MeshMakeData *data, TileSpec &tile);
+void getNodeTile(MapNode mn, const v3s32 &p, const v3s32 &dir, MeshMakeData *data, TileSpec &tile);
 
 /// Return bitset of the sides of the mesh that consist of solid nodes only
 /// Bits:

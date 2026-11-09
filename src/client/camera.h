@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -91,7 +92,7 @@ public:
 	}
 
 	// Get the camera offset
-	inline v3s16 getOffset() const
+	inline v3s32 getOffset() const
 	{
 		return m_camera_offset;
 	}
@@ -209,7 +210,7 @@ private:
 	// Absolute camera direction
 	v3f m_camera_direction;
 	// Camera offset
-	v3s16 m_camera_offset;
+	v3s32 m_camera_offset;
 
 	bool m_stepheight_smooth_active = false;
 

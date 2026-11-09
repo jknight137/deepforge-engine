@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -586,9 +587,9 @@ void push_object_properties(lua_State *L, const ObjectProperties *prop)
 
 	pushnode(L, prop->node);
 	lua_setfield(L, -2, "node");
-	push_v2s16(L, prop->spritediv);
+	push_v2pos(L, prop->spritediv);
 	lua_setfield(L, -2, "spritediv");
-	push_v2s16(L, prop->initial_sprite_basepos);
+	push_v2pos(L, prop->initial_sprite_basepos);
 	lua_setfield(L, -2, "initial_sprite_basepos");
 	lua_pushboolean(L, prop->is_visible);
 	lua_setfield(L, -2, "is_visible");
@@ -2400,9 +2401,9 @@ void push_pointed_thing(lua_State *L, const PointedThing &pointed, bool csm,
 	if (pointed.type == POINTEDTHING_NODE) {
 		lua_pushstring(L, "node");
 		lua_setfield(L, -2, "type");
-		push_v3s16(L, pointed.node_undersurface);
+		push_nodepos(L, pointed.node_undersurface);
 		lua_setfield(L, -2, "under");
-		push_v3s16(L, pointed.node_abovesurface);
+		push_nodepos(L, pointed.node_abovesurface);
 		lua_setfield(L, -2, "above");
 	} else if (pointed.type == POINTEDTHING_OBJECT) {
 		lua_pushstring(L, "object");
@@ -2727,7 +2728,7 @@ void push_collision_move_result(lua_State *L, const CollisionMoveResult &res)
 		lua_setfield(L, -2, "axis");
 
 		if (c.type == COLLISION_NODE) {
-			push_v3s16(L, c.node_p);
+			push_nodepos(L, c.node_p);
 			lua_setfield(L, -2, "node_pos");
 		} else if (c.type == COLLISION_OBJECT) {
 			push_objectRef(L, c.object->getId());

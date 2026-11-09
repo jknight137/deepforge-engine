@@ -1,148 +1,74 @@
-<div align="center">
-    <img src="textures/base/pack/logo.png" width="32%">
-    <h1>Luanti (formerly Minetest)</h1>
-    <a href="https://github.com/luanti-org/luanti/actions?query=event%3Apush"><img src="https://github.com/luanti-org/luanti/workflows/linux/badge.svg" alt="Build status"></a>
-    <a href="https://hosted.weblate.org/engage/minetest/?utm_source=widget"><img src="https://hosted.weblate.org/widgets/minetest/-/svg-badge.svg" alt="Translation status"></a>
-    <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html"><img src="https://img.shields.io/badge/license-LGPLv2.1%2B-blue.svg" alt="License"></a>
-</div>
-<br>
+# Deepforge
 
-Luanti is a free open-source voxel game engine with easy modding and game creation.
+Deepforge is a voxel engine and agentic research testbed with larger continuous
+worlds, persistent scripting, durable scheduling and external actor control.
+It is a standalone project maintained in this repository.
 
-Copyright (C) 2010-2026 Perttu Ahola <celeron55@gmail.com>
-and contributors (see source file comments and the version control log)
+## Capabilities
 
-Table of Contents
-------------------
+- Signed 32-bit node and block positions with a supported envelope of +/-65535
+  nodes per axis. A node representing one metre gives roughly 131 km across.
+- Coordinate-aware SQLite storage and a matching client/server protocol.
+- Persistent world-scoped identities, controller memory and scripted state.
+- Durable scheduled events, region activation and bounded catch-up.
+- An authenticated controller service, Python SDK and Lua actor adapter.
+- Existing entity bodies can move between local behavior and external control.
 
-1. [Further Documentation](#further-documentation)
-2. [Default Controls](#default-controls)
-3. [Paths](#paths)
-4. [Configuration File](#configuration-file)
-5. [Command-line Options](#command-line-options)
-6. [Compiling](#compiling)
-7. [Docker](#docker)
-8. [Version Scheme](#version-scheme)
+The platform supports experiments involving perception, action, memory and
+controller handoff. Projects supply their policies, models, content and task
+definitions. No paid model provider, trained policy or scientific result is
+bundled. Ordinary world execution does not require a training pipeline.
 
+## Build and run
 
-Further documentation
-----------------------
-- Website: https://www.luanti.org/
-- Luanti Documentation: https://docs.luanti.org/
-- Forum: https://forum.luanti.org/
-- GitHub: https://github.com/luanti-org/luanti/
-- [Developer documentation](doc/developing/)
-- [doc/](doc/) directory of source distribution
+Standard CMake source builds are supported. See [build instructions](doc/compiling/README.md).
+The client executable is `deepforge`; the dedicated server is `deepforgeserver`.
+On Windows, use `deepforge.exe` and `deepforgeserver.exe`.
 
-Default controls
-----------------
-All controls are re-bindable using settings.
-Some can be changed in the key config dialog in the settings tab.
+For the pinned Windows SDK recipe, see [build-support](build-support/README.md).
+The shared service and controller interfaces are in [platform](platform/README.rst).
+Native correctness checks run through `--test-module` before game startup.
+Benchmarks are optional and are disabled in the supplied build configuration.
 
-| Button                        | Action                                                         |
-|-------------------------------|----------------------------------------------------------------|
-| Move mouse                    | Look around                                                    |
-| W, A, S, D                    | Move                                                           |
-| Space                         | Jump/move up                                                   |
-| Shift                         | Sneak/move down                                                |
-| Q                             | Drop itemstack                                                 |
-| Shift + Q                     | Drop single item                                               |
-| Left mouse button             | Dig/punch/use                                                  |
-| Right mouse button            | Place/use                                                      |
-| Shift + right mouse button    | Build (without using)                                          |
-| I                             | Inventory menu                                                 |
-| Mouse wheel                   | Select item                                                    |
-| 0-9                           | Select item                                                    |
-| Z                             | Zoom (needs zoom privilege)                                    |
-| T                             | Chat                                                           |
-| /                             | Command                                                        |
-| Esc                           | Pause menu/abort/exit (pauses only singleplayer game)          |
-| +                             | Increase view range                                            |
-| -                             | Decrease view range                                            |
-| K                             | Enable/disable fly mode (needs fly privilege)                  |
-| J                             | Enable/disable fast mode (needs fast privilege)                |
-| H                             | Enable/disable noclip mode (needs noclip privilege)            |
-| E                             | Aux1 (Move fast in fast mode. Games may add special features)  |
-| C                             | Cycle through camera modes                                     |
-| V                             | Cycle through minimap modes                                    |
-| Shift + V                     | Change minimap orientation                                     |
-| F1                            | Hide/show HUD                                                  |
-| F2                            | Hide/show chat                                                 |
-| F3                            | Disable/enable fog                                             |
-| F4                            | Disable/enable camera update (Mapblocks are not updated anymore when disabled, disabled in release builds)  |
-| F5                            | Cycle through debug information screens                        |
-| F6                            | Cycle through profiler info screens                            |
-| F10                           | Show/hide console                                              |
-| F12                           | Take screenshot                                                |
+## Compatibility
 
-Paths
------
-Locations:
+The wide-world build uses network protocol 32001 and mapblock format 30.
+All peers need matching builds. Original format-29 blocks remain readable;
+saving in the new format is a forward-only change. Back up existing worlds
+before upgrading. Preserve each independent world's namespace and service state.
+SQLite is the qualified wide-coordinate backend. Other database backends have
+not been qualified for the expanded coordinate range.
 
-* `bin`   - Compiled binaries
-* `share` - Distributed read-only data
-* `user`  - User-created modifiable data
+The engine preserves existing Lua APIs and configuration identifiers where
+needed for compatibility. SDK package and mod names retain the
+`dadcraft_platform` identifiers so existing integrations continue to work.
+External observations expose up to 256 loaded bodies at a time; this is a
+transport budget rather than a total world population limit. Default actor
+operations are turn, bounded movement and wait; projects register other lawful
+operations. Multiplayer capacity and large population performance are unmeasured.
 
-Where each location is on each platform:
+Public server directories, external content catalogues and automatic update
+endpoints are unconfigured by default. A consuming project may set its own.
 
-* Windows .zip / RUN_IN_PLACE source:
-    * `bin`   = `bin`
-    * `share` = `.`
-    * `user`  = `.`
-* Windows installed:
-    * `bin`   = `C:\Program Files\Minetest\bin (Depends on the install location)`
-    * `share` = `C:\Program Files\Minetest (Depends on the install location)`
-    * `user`  = `%APPDATA%\Minetest` or `%MINETEST_USER_PATH%`
-* Linux installed:
-    * `bin`   = `/usr/bin`
-    * `share` = `/usr/share/minetest`
-    * `user`  = `~/.minetest` or `$MINETEST_USER_PATH`
-* macOS:
-    * `bin`   = `Contents/MacOS`
-    * `share` = `Contents/Resources`
-    * `user`  = `Contents/User` or `~/Library/Application Support/minetest` or `$MINETEST_USER_PATH`
+## Controls
 
-Worlds can be found as separate folders in: `user/worlds/`
+W/A/S/D move, Space jumps, Shift sneaks, left click digs or punches, right click
+places or interacts, I opens inventory, T opens chat, and Esc opens the menu.
+Projects may override controls and behavior. Keyboard bindings are configurable.
 
-Configuration file
-------------------
-- Default location:
-    `user/minetest.conf`
-- This file is created by closing Luanti for the first time.
-- A specific file can be specified on the command line:
-    `--config <path-to-file>`
-- A run-in-place build will look for the configuration file in
-    `location_of_exe/../minetest.conf` and also `location_of_exe/../../minetest.conf`
+## Licensing and provenance
 
-Command-line options
---------------------
-- Use `--help`
+The engine derives from Luanti revision
+`e8f12bf1b93245cfc479ea21787beb1ec472cce9` and remains
+**LGPL-2.1-or-later**. Copyright (C) 2010-2026 Perttu Ahola and contributors.
+Upstream authorship and Git history are retained. Deepforge modifications
+are identified in changed files and version control.
 
-Compiling
----------
+See [COPYING.LESSER](COPYING.LESSER), [LICENSE.txt](LICENSE.txt) and
+[third-party notices](THIRD_PARTY_NOTICES.md). Media, fonts and dependencies
+retain their individual licenses. The separate Python platform is MIT licensed.
+The Deepforge identity artwork is original project artwork under CC0-1.0.
 
-- [Compiling - common information](doc/compiling/README.md)
-- [Compiling on GNU/Linux](doc/compiling/linux.md)
-- [Compiling on Windows](doc/compiling/windows.md)
-- [Compiling on MacOS](doc/compiling/macos.md)
-
-Docker
-------
-
-- [Developing minetestserver with Docker](doc/developing/docker.md)
-- [Running a server with Docker](doc/docker_server.md)
-
-Version scheme
---------------
-We use `major.minor.patch` since 5.0.0-dev. Prior to that we used `0.major.minor`.
-
-- Major is incremented when the release contains breaking changes, all other
-numbers are set to 0.
-- Minor is incremented when the release contains new non-breaking features,
-patch is set to 0.
-- Patch is incremented when the release only contains bugfixes and very
-minor/trivial features considered necessary.
-
-Since 5.0.0-dev and 0.4.17-dev, the dev notation refers to the next release,
-i.e.: 5.0.0-dev is the development version leading to 5.0.0.
-Prior to that we used `previous_version-dev`.
+When distributing a modified engine binary, provide the corresponding covered
+source and build/install scripts, plus the applicable licenses and notices.
+Rebranding does not replace or remove those obligations.

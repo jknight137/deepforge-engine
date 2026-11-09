@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014-2018 paramat
@@ -16,17 +17,17 @@ extern const FlagDesc flagdesc_mapgen_v5[];
 struct MapgenV5Params : public MapgenParams
 {
 	float cave_width = 0.09f;
-	s16 large_cave_depth = -256;
+	s32 large_cave_depth = -256;
 	u16 small_cave_num_min = 0;
 	u16 small_cave_num_max = 0;
 	u16 large_cave_num_min = 0;
 	u16 large_cave_num_max = 2;
 	float large_cave_flooded = 0.5f;
-	s16 cavern_limit = -256;
-	s16 cavern_taper = 256;
+	s32 cavern_limit = -256;
+	s32 cavern_taper = 256;
 	float cavern_threshold = 0.7f;
-	s16 dungeon_ymin = -31000;
-	s16 dungeon_ymax = 31000;
+	s32 dungeon_ymin = -31000;
+	s32 dungeon_ymax = 31000;
 
 	NoiseParams np_filler_depth;
 	NoiseParams np_factor;
@@ -54,7 +55,7 @@ public:
 	virtual MapgenType getType() const { return MAPGEN_V5; }
 
 	virtual void makeChunk(BlockMakeData *data);
-	int getSpawnLevelAtPoint(v2s16 p);
+	int getSpawnLevelAtPoint(v2s32 p);
 	int generateBaseTerrain();
 
 private:

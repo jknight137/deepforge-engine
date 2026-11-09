@@ -1,3 +1,5 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
+#include "constants.h"
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -28,15 +30,15 @@ private:
 	float m_trigger_interval;
 	u32 m_trigger_chance;
 	bool m_simple_catch_up;
-	s16 m_min_y;
-	s16 m_max_y;
+	s32 m_min_y;
+	s32 m_max_y;
 public:
 	LuaABM(int id,
 			const std::vector<std::string> &trigger_contents,
 			const std::vector<std::string> &required_neighbors,
 			const std::vector<std::string> &without_neighbors,
 			float trigger_interval, u32 trigger_chance, bool simple_catch_up,
-			s16 min_y, s16 max_y):
+			s32 min_y, s32 max_y):
 		m_id(id),
 		m_trigger_contents(trigger_contents),
 		m_required_neighbors(required_neighbors),
@@ -72,16 +74,16 @@ public:
 	{
 		return m_simple_catch_up;
 	}
-	virtual s16 getMinY()
+	virtual s32 getMinY()
 	{
 		return m_min_y;
 	}
-	virtual s16 getMaxY()
+	virtual s32 getMaxY()
 	{
 		return m_max_y;
 	}
 
-	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n,
+	virtual void trigger(ServerEnvironment *env, v3s32 p, MapNode n,
 			u32 active_object_count, u32 active_object_count_wider)
 	{
 		auto *script = env->getScriptIface();
@@ -105,7 +107,7 @@ public:
 	}
 
 	virtual void trigger(ServerEnvironment *env, MapBlock *block,
-		const std::unordered_set<v3s16> &positions, float dtime_s)
+		const std::unordered_set<v3s32> &positions, float dtime_s)
 	{
 		auto *script = env->getScriptIface();
 		script->triggerLBM(m_id, block, positions, dtime_s);
@@ -116,7 +118,7 @@ public:
 	ScriptApiEnv
 */
 
-void ScriptApiEnv::environment_OnGenerated(v3s16 minp, v3s16 maxp,
+void ScriptApiEnv::environment_OnGenerated(v3s32 minp, v3s32 maxp,
 	u32 blockseed)
 {
 	SCRIPTAPI_PRECHECKHEADER
@@ -125,8 +127,8 @@ void ScriptApiEnv::environment_OnGenerated(v3s16 minp, v3s16 maxp,
 	lua_getglobal(L, "core");
 	lua_getfield(L, -1, "registered_on_generateds");
 	// Call callbacks
-	push_v3s16(L, minp);
-	push_v3s16(L, maxp);
+	push_nodepos(L, minp);
+	push_nodepos(L, maxp);
 	lua_pushnumber(L, blockseed);
 	runCallbacks(3, RUN_CALLBACKS_MODE_FIRST);
 }
@@ -233,10 +235,10 @@ void ScriptApiEnv::readABMs()
 		bool simple_catch_up = true;
 		getboolfield(L, current_abm, "catch_up", simple_catch_up);
 
-		s16 min_y = INT16_MIN;
+		s32 min_y = -MAX_MAP_GENERATION_LIMIT;
 		getintfield(L, current_abm, "min_y", min_y);
 
-		s16 max_y = INT16_MAX;
+		s32 max_y = MAX_MAP_GENERATION_LIMIT;
 		getintfield(L, current_abm, "max_y", max_y);
 
 		lua_getfield(L, current_abm, "action");
@@ -299,7 +301,7 @@ void ScriptApiEnv::readLBMs()
 }
 
 void ScriptApiEnv::on_emerge_area_completion(
-	v3s16 blockpos, int action, ScriptCallbackState *state)
+	v3s32 blockpos, int action, ScriptCallbackState *state)
 {
 	Server *server = getServer();
 
@@ -318,7 +320,7 @@ void ScriptApiEnv::on_emerge_area_completion(
 	lua_rawgeti(L, LUA_REGISTRYINDEX, state->callback_ref);
 	luaL_checktype(L, -1, LUA_TFUNCTION);
 
-	push_v3s16(L, blockpos);
+	push_nodepos(L, blockpos);
 	lua_pushinteger(L, action);
 	lua_pushinteger(L, state->refcount);
 	lua_rawgeti(L, LUA_REGISTRYINDEX, state->args_ref);
@@ -340,7 +342,7 @@ void ScriptApiEnv::on_emerge_area_completion(
 	}
 }
 
-void ScriptApiEnv::check_for_falling(v3s16 p)
+void ScriptApiEnv::check_for_falling(v3s32 p)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -348,12 +350,12 @@ void ScriptApiEnv::check_for_falling(v3s16 p)
 	lua_getglobal(L, "core");
 	lua_getfield(L, -1, "check_for_falling");
 	luaL_checktype(L, -1, LUA_TFUNCTION);
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	PCALL_RES(lua_pcall(L, 1, 0, error_handler));
 }
 
 void ScriptApiEnv::on_liquid_transformed(
-	const std::vector<std::pair<v3s16, MapNode>> &list)
+	const std::vector<std::pair<v3s32, MapNode>> &list)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -373,7 +375,7 @@ void ScriptApiEnv::on_liquid_transformed(
 	lua_createtable(L, list.size(), 0);
 	for(auto &p : list) {
 		lua_pushnumber(L, index);
-		push_v3s16(L, p.first);
+		push_nodepos(L, p.first);
 		lua_rawset(L, -4);
 		lua_pushnumber(L, index++);
 		pushnode(L, p.second);
@@ -383,7 +385,7 @@ void ScriptApiEnv::on_liquid_transformed(
 	runCallbacks(2, RUN_CALLBACKS_MODE_FIRST);
 }
 
-void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set)
+void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s32> &set)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -395,7 +397,7 @@ void ScriptApiEnv::on_mapblocks_changed(const std::unordered_set<v3s16> &set)
 
 	// Convert the set to a set of position hashes
 	lua_createtable(L, 0, set.size());
-	for(const v3s16 &p : set) {
+	for(const v3s32 &p : set) {
 		lua_pushnumber(L, hash_node_position(p));
 		lua_pushboolean(L, true);
 		lua_rawset(L, -3);
@@ -416,7 +418,7 @@ bool ScriptApiEnv::has_on_mapblocks_changed()
 	return lua_objlen(L, -1) > 0;
 }
 
-void ScriptApiEnv::triggerABM(int id, v3s16 p, MapNode n,
+void ScriptApiEnv::triggerABM(int id, v3s32 p, MapNode n,
 		u32 active_object_count, u32 active_object_count_wider)
 {
 	SCRIPTAPI_PRECHECKHEADER
@@ -442,7 +444,7 @@ void ScriptApiEnv::triggerABM(int id, v3s16 p, MapNode n,
 	lua_getfield(L, -1, "action");
 	luaL_checktype(L, -1, LUA_TFUNCTION);
 	lua_remove(L, -2); // Remove registered_abms[m_id]
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, n);
 	lua_pushnumber(L, active_object_count);
 	lua_pushnumber(L, active_object_count_wider);
@@ -455,13 +457,13 @@ void ScriptApiEnv::triggerABM(int id, v3s16 p, MapNode n,
 }
 
 void ScriptApiEnv::triggerLBM(int id, MapBlock *block,
-		const std::unordered_set<v3s16> &positions, float dtime_s)
+		const std::unordered_set<v3s32> &positions, float dtime_s)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
 	int error_handler = PUSH_ERROR_HANDLER(L);
 
-	const v3s16 pos_of_block = block->getPosRelative();
+	const v3s32 pos_of_block = block->getPosRelative();
 
 	// Get core.run_lbm
 	lua_getglobal(L, "core");
@@ -474,7 +476,7 @@ void ScriptApiEnv::triggerLBM(int id, MapBlock *block,
 	lua_createtable(L, positions.size(), 0);
 	int i = 1;
 	for (auto &p : positions) {
-		push_v3s16(L, pos_of_block + p);
+		push_nodepos(L, pos_of_block + p);
 		lua_rawseti(L, -2, i++);
 	}
 	lua_pushnumber(L, dtime_s);

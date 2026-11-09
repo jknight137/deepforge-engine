@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2017-2019 vlapsley, Vaughan Lapsley <vlapsley@gmail.com>
@@ -136,17 +137,17 @@ void MapgenCarpathianParams::readParams(const Settings *settings)
 	settings->getFloatNoEx("mgcarpathian_valley_width", valley_width);
 
 	settings->getFloatNoEx("mgcarpathian_cave_width",         cave_width);
-	settings->getS16NoEx("mgcarpathian_large_cave_depth",     large_cave_depth);
+	settings->getS32NoEx("mgcarpathian_large_cave_depth",     large_cave_depth);
 	settings->getU16NoEx("mgcarpathian_small_cave_num_min",   small_cave_num_min);
 	settings->getU16NoEx("mgcarpathian_small_cave_num_max",   small_cave_num_max);
 	settings->getU16NoEx("mgcarpathian_large_cave_num_min",   large_cave_num_min);
 	settings->getU16NoEx("mgcarpathian_large_cave_num_max",   large_cave_num_max);
 	settings->getFloatNoEx("mgcarpathian_large_cave_flooded", large_cave_flooded);
-	settings->getS16NoEx("mgcarpathian_cavern_limit",         cavern_limit);
-	settings->getS16NoEx("mgcarpathian_cavern_taper",         cavern_taper);
+	settings->getS32NoEx("mgcarpathian_cavern_limit",         cavern_limit);
+	settings->getS32NoEx("mgcarpathian_cavern_taper",         cavern_taper);
 	settings->getFloatNoEx("mgcarpathian_cavern_threshold",   cavern_threshold);
-	settings->getS16NoEx("mgcarpathian_dungeon_ymin",         dungeon_ymin);
-	settings->getS16NoEx("mgcarpathian_dungeon_ymax",         dungeon_ymax);
+	settings->getS32NoEx("mgcarpathian_dungeon_ymin",         dungeon_ymin);
+	settings->getS32NoEx("mgcarpathian_dungeon_ymax",         dungeon_ymax);
 
 	settings->getNoiseParams("mgcarpathian_np_filler_depth",  np_filler_depth);
 	settings->getNoiseParams("mgcarpathian_np_height1",       np_height1);
@@ -178,17 +179,17 @@ void MapgenCarpathianParams::writeParams(Settings *settings) const
 	settings->setFloat("mgcarpathian_valley_width", valley_width);
 
 	settings->setFloat("mgcarpathian_cave_width",         cave_width);
-	settings->setS16("mgcarpathian_large_cave_depth",     large_cave_depth);
+	settings->setS32("mgcarpathian_large_cave_depth",     large_cave_depth);
 	settings->setU16("mgcarpathian_small_cave_num_min",   small_cave_num_min);
 	settings->setU16("mgcarpathian_small_cave_num_max",   small_cave_num_max);
 	settings->setU16("mgcarpathian_large_cave_num_min",   large_cave_num_min);
 	settings->setU16("mgcarpathian_large_cave_num_max",   large_cave_num_max);
 	settings->setFloat("mgcarpathian_large_cave_flooded", large_cave_flooded);
-	settings->setS16("mgcarpathian_cavern_limit",         cavern_limit);
-	settings->setS16("mgcarpathian_cavern_taper",         cavern_taper);
+	settings->setS32("mgcarpathian_cavern_limit",         cavern_limit);
+	settings->setS32("mgcarpathian_cavern_taper",         cavern_taper);
 	settings->setFloat("mgcarpathian_cavern_threshold",   cavern_threshold);
-	settings->setS16("mgcarpathian_dungeon_ymin",         dungeon_ymin);
-	settings->setS16("mgcarpathian_dungeon_ymax",         dungeon_ymax);
+	settings->setS32("mgcarpathian_dungeon_ymin",         dungeon_ymin);
+	settings->setS32("mgcarpathian_dungeon_ymax",         dungeon_ymax);
 
 	settings->setNoiseParams("mgcarpathian_np_filler_depth",  np_filler_depth);
 	settings->setNoiseParams("mgcarpathian_np_height1",       np_height1);
@@ -249,18 +250,18 @@ void MapgenCarpathian::makeChunk(BlockMakeData *data)
 	this->vm = data->vmanip;
 	this->ndef = data->nodedef;
 
-	v3s16 blockpos_min = data->blockpos_min;
-	v3s16 blockpos_max = data->blockpos_max;
+	v3s32 blockpos_min = data->blockpos_min;
+	v3s32 blockpos_max = data->blockpos_max;
 	node_min = blockpos_min * MAP_BLOCKSIZE;
-	node_max = (blockpos_max + v3s16(1, 1, 1)) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	node_max = (blockpos_max + v3s32(1, 1, 1)) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 	full_node_min = (blockpos_min - 1) * MAP_BLOCKSIZE;
-	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 
 	// Create a block-specific seed
 	blockseed = getBlockSeed2(full_node_min, seed);
 
 	// Generate terrain
-	s16 stone_surface_max_y = generateTerrain();
+	s32 stone_surface_max_y = generateTerrain();
 
 	// Create heightmap
 	updateHeightmap(node_min, node_max);
@@ -313,7 +314,7 @@ void MapgenCarpathian::makeChunk(BlockMakeData *data)
 
 	// Calculate lighting
 	if (flags & MG_LIGHT) {
-		calcLighting(node_min - v3s16(0, 1, 0), node_max + v3s16(0, 1, 0),
+		calcLighting(node_min - v3s32(0, 1, 0), node_max + v3s32(0, 1, 0),
 				full_node_min, full_node_max);
 	}
 
@@ -324,7 +325,7 @@ void MapgenCarpathian::makeChunk(BlockMakeData *data)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-int MapgenCarpathian::getSpawnLevelAtPoint(v2s16 p)
+int MapgenCarpathian::getSpawnLevelAtPoint(v2s32 p)
 {
 	// If rivers are enabled, first check if in a river channel
 	if (spflags & MGCARPATHIAN_RIVERS) {
@@ -374,7 +375,7 @@ int MapgenCarpathian::getSpawnLevelAtPoint(v2s16 p)
 	bool solid_below = false;
 	u8 cons_non_solid = 0; // consecutive non-solid nodes
 
-	for (s16 y = water_level; y <= water_level + 32; y++) {
+	for (s32 y = water_level; y <= water_level + 32; y++) {
 		float mnt_var = NoiseFractal3D(&noise_mnt_var->np, p.X, y, p.Y, seed);
 		float hill1 = getLerp(height1, height2, mnt_var);
 		float hill2 = getLerp(height3, height4, mnt_var);
@@ -445,11 +446,11 @@ int MapgenCarpathian::generateTerrain()
 
 	//// Place nodes
 	const v3s32 &em = vm->m_area.getExtent();
-	s16 stone_surface_max_y = -MAX_MAP_GENERATION_LIMIT;
+	s32 stone_surface_max_y = -MAX_MAP_GENERATION_LIMIT;
 	u32 index2d = 0;
 
-	for (s16 z = node_min.Z; z <= node_max.Z; z++)
-	for (s16 x = node_min.X; x <= node_max.X; x++, index2d++) {
+	for (s32 z = node_min.Z; z <= node_max.Z; z++)
+	for (s32 x = node_min.X; x <= node_max.X; x++, index2d++) {
 		// Hill/Mountain height (hilliness)
 		float height1 = noise_height1->result[index2d];
 		float height2 = noise_height2->result[index2d];
@@ -497,7 +498,7 @@ int MapgenCarpathian::generateTerrain()
 		u32 index3d = (z - node_min.Z) * zstride_1u1d + (x - node_min.X);
 		u32 vi = vm->m_area.index(x, node_min.Y - 1, z);
 
-		for (s16 y = node_min.Y - 1; y <= node_max.Y + 1;
+		for (s32 y = node_min.Y - 1; y <= node_max.Y + 1;
 				y++,
 				index3d += ystride,
 				VoxelArea::add_y(em, vi, 1)) {

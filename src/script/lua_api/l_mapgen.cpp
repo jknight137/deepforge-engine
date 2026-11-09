@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -214,7 +215,7 @@ bool read_schematic_def(lua_State *L, int index,
 
 	//// Get schematic size
 	lua_getfield(L, index, "size");
-	v3s16 size = check_v3s16(L, -1);
+	v3s32 size = check_nodepos(L, -1);
 	lua_pop(L, 1);
 
 	if (size.X < 0 || size.Y < 0 || size.Z < 0)
@@ -509,7 +510,7 @@ int ModApiMapgen::l_get_heat(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 
-	v3s16 pos = read_v3s16(L, 1);
+	v3s32 pos = read_nodepos(L, 1);
 
 	const BiomeGen *biomegen = getBiomeGen(L);
 	if (!biomegen || biomegen->getType() != BIOMEGEN_ORIGINAL)
@@ -529,7 +530,7 @@ int ModApiMapgen::l_get_humidity(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 
-	v3s16 pos = read_v3s16(L, 1);
+	v3s32 pos = read_nodepos(L, 1);
 
 	const BiomeGen *biomegen = getBiomeGen(L);
 	if (!biomegen || biomegen->getType() != BIOMEGEN_ORIGINAL)
@@ -549,7 +550,7 @@ int ModApiMapgen::l_get_biome_data(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 
-	v3s16 pos = read_v3s16(L, 1);
+	v3s32 pos = read_nodepos(L, 1);
 
 	const BiomeGen *biomegen = getBiomeGen(L);
 	if (!biomegen)
@@ -616,10 +617,10 @@ int ModApiMapgen::l_get_mapgen_object(lua_State *L)
 		LuaVoxelManip::create(L, vm, true);
 
 		// emerged min pos
-		push_v3s16(L, vm->m_area.MinEdge);
+		push_nodepos(L, vm->m_area.MinEdge);
 
 		// emerged max pos
-		push_v3s16(L, vm->m_area.MaxEdge);
+		push_nodepos(L, vm->m_area.MaxEdge);
 
 		return 3;
 	}
@@ -677,7 +678,7 @@ int ModApiMapgen::l_get_mapgen_object(lua_State *L)
 		return 1;
 	}
 	case MGOBJ_GENNOTIFY: {
-		std::map<std::string, std::vector<v3s16>> event_map;
+		std::map<std::string, std::vector<v3s32>> event_map;
 		mg->gennotify.getEvents(event_map);
 
 		lua_createtable(L, 0, event_map.size());
@@ -685,7 +686,7 @@ int ModApiMapgen::l_get_mapgen_object(lua_State *L)
 			lua_createtable(L, it->second.size(), 0);
 
 			for (size_t j = 0; j != it->second.size(); j++) {
-				push_v3s16(L, it->second[j]);
+				push_nodepos(L, it->second[j]);
 				lua_rawseti(L, -2, j + 1);
 			}
 
@@ -723,11 +724,11 @@ int ModApiMapgen::l_get_spawn_level(lua_State *L)
 {
 	NO_MAP_LOCK_REQUIRED;
 
-	s16 x = luaL_checkinteger(L, 1);
-	s16 z = luaL_checkinteger(L, 2);
+	s32 x = luaL_checkinteger(L, 1);
+	s32 z = luaL_checkinteger(L, 2);
 
 	EmergeManager *emerge = getServer(L)->getEmergeManager();
-	int spawn_level = emerge->getSpawnLevelAtPoint(v2s16(x, z));
+	int spawn_level = emerge->getSpawnLevelAtPoint(v2s32(x, z));
 	// Unsuitable spawn point
 	if (spawn_level == MAX_MAP_GENERATION_LIMIT)
 		return 0;
@@ -788,11 +789,11 @@ int ModApiMapgen::l_get_mapgen_params(lua_State *L)
 	lua_setfield(L, -2, "seed");
 
 	settingsmgr->getMapSetting("water_level", &value);
-	lua_pushinteger(L, stoi(value, -32768, 32767));
+	lua_pushinteger(L, stoi(value, -MAX_MAP_GENERATION_LIMIT, MAX_MAP_GENERATION_LIMIT));
 	lua_setfield(L, -2, "water_level");
 
 	settingsmgr->getMapSetting("chunksize", &value);
-	lua_pushinteger(L, stoi(value, -32768, 32767));
+	lua_pushinteger(L, stoi(value, -MAX_MAP_GENERATION_LIMIT, MAX_MAP_GENERATION_LIMIT));
 	lua_setfield(L, -2, "chunksize");
 
 	settingsmgr->getMapSetting("mg_flags", &value);
@@ -854,25 +855,25 @@ int ModApiMapgen::l_get_mapgen_edges(lua_State *L)
 	// mutable until after mod loading ends.
 	std::unique_ptr<MapgenParams> params(settingsmgr->makeMapgenParamsCopy());
 
-	s16 mapgen_limit;
+	s32 mapgen_limit;
 	if (lua_isnumber(L, 1)) {
 		mapgen_limit = lua_tointeger(L, 1);
 	} else {
 		mapgen_limit = params->mapgen_limit;
 	}
 
-	v3s16 chunksize;
+	v3s32 chunksize;
 	if (lua_isnumber(L, 2)) {
-		chunksize = v3s16(lua_tointeger(L, 2));
+		chunksize = v3s32(lua_tointeger(L, 2));
 	} else if (lua_istable(L, 2)) {
-		chunksize = check_v3s16(L, 2);
+		chunksize = check_nodepos(L, 2);
 	} else {
 		chunksize = params->chunksize;
 	}
 
 	auto edges = get_mapgen_edges(mapgen_limit, chunksize);
-	push_v3s16(L, edges.first);
-	push_v3s16(L, edges.second);
+	push_nodepos(L, edges.first);
+	push_nodepos(L, edges.second);
 	return 2;
 }
 
@@ -888,7 +889,7 @@ int ModApiMapgen::l_get_mapgen_chunksize(lua_State *L)
 	// mutable until after mod loading ends.
 	std::unique_ptr<MapgenParams> params(settingsmgr->makeMapgenParamsCopy());
 
-	push_v3s16(L, params->chunksize);
+	push_nodepos(L, params->chunksize);
 	return 1;
 }
 
@@ -1181,8 +1182,8 @@ int ModApiMapgen::l_register_decoration(lua_State *L)
 
 	deco->name           = getstringfield_default(L, index, "name", "");
 	deco->fill_ratio     = getfloatfield_default(L, index, "fill_ratio", 0.02);
-	deco->y_min          = getintfield_default(L, index, "y_min", -31000);
-	deco->y_max          = getintfield_default(L, index, "y_max", 31000);
+	deco->y_min          = getintfield_default(L, index, "y_min", -MAX_MAP_GENERATION_LIMIT);
+	deco->y_max          = getintfield_default(L, index, "y_max", MAX_MAP_GENERATION_LIMIT);
 	deco->nspawnby       = getintfield_default(L, index, "num_spawn_by", -1);
 	deco->place_offset_y = getintfield_default(L, index, "place_offset_y", 0);
 	deco->check_offset   = getintfield_default(L, index, "check_offset", -1);
@@ -1381,7 +1382,7 @@ int ModApiMapgen::l_register_ore(lua_State *L)
 			log_deprecated(L, "Field \"height_min\" on ore " + ore->name +
 					" is deprecated, use \"y_min\" instead.", 2);
 		} else {
-			ymin = -31000;
+			ymin = -MAX_MAP_GENERATION_LIMIT;
 		}
 		ore->y_min = ymin;
 	}
@@ -1393,7 +1394,7 @@ int ModApiMapgen::l_register_ore(lua_State *L)
 			log_deprecated(L, "Field \"height_max\" on ore " + ore->name +
 					" is deprecated, use \"y_max\" instead.", 2);
 		} else {
-			ymax = 31000;
+			ymax = MAX_MAP_GENERATION_LIMIT;
 		}
 		ore->y_max = ymax;
 	}
@@ -1592,10 +1593,10 @@ int ModApiMapgen::l_generate_ores(lua_State *L)
 	mg.vm   = checkObject<LuaVoxelManip>(L, 1)->vm;
 	mg.ndef = emerge->ndef;
 
-	v3s16 pmin = lua_istable(L, 2) ? check_v3s16(L, 2) :
-			mg.vm->m_area.MinEdge + v3s16(1,1,1) * MAP_BLOCKSIZE;
-	v3s16 pmax = lua_istable(L, 3) ? check_v3s16(L, 3) :
-			mg.vm->m_area.MaxEdge - v3s16(1,1,1) * MAP_BLOCKSIZE;
+	v3s32 pmin = lua_istable(L, 2) ? check_nodepos(L, 2) :
+			mg.vm->m_area.MinEdge + v3s32(1,1,1) * MAP_BLOCKSIZE;
+	v3s32 pmax = lua_istable(L, 3) ? check_nodepos(L, 3) :
+			mg.vm->m_area.MaxEdge - v3s32(1,1,1) * MAP_BLOCKSIZE;
 	sortBoxVerticies(pmin, pmax);
 
 	if (!mg.vm->m_area.contains(VoxelArea(pmin, pmax)))
@@ -1646,14 +1647,14 @@ int ModApiMapgen::l_generate_decorations(lua_State *L)
 		mg.ndef = emerge->ndef;
 	}
 
-	const v3s16 default_pmin = vm->m_area.MinEdge + MAP_BLOCKSIZE,
+	const v3s32 default_pmin = vm->m_area.MinEdge + MAP_BLOCKSIZE,
 				default_pmax = vm->m_area.MaxEdge - MAP_BLOCKSIZE;
-	v3s16 pmin = lua_istable(L, 2) ? check_v3s16(L, 2) : default_pmin;
-	v3s16 pmax = lua_istable(L, 3) ? check_v3s16(L, 3) : default_pmax;
+	v3s32 pmin = lua_istable(L, 2) ? check_nodepos(L, 2) : default_pmin;
+	v3s32 pmax = lua_istable(L, 3) ? check_nodepos(L, 3) : default_pmax;
 	sortBoxVerticies(pmin, pmax);
 	if (use_mapgen_biomes) {
 		assert(oldvm);
-		const v3s16 required_pmin = oldvm->m_area.MinEdge + MAP_BLOCKSIZE,
+		const v3s32 required_pmin = oldvm->m_area.MinEdge + MAP_BLOCKSIZE,
 			required_pmax = oldvm->m_area.MaxEdge - MAP_BLOCKSIZE;
 		if (pmin != required_pmin || pmax != required_pmax)
 			throw LuaError("use_mapgen_biomes requires extents matching chunk area");
@@ -1689,16 +1690,16 @@ int ModApiMapgen::l_create_schematic(lua_State *L)
 
 	Schematic schem;
 
-	v3s16 p1 = check_v3s16(L, 1);
-	v3s16 p2 = check_v3s16(L, 2);
+	v3s32 p1 = check_nodepos(L, 1);
+	v3s32 p2 = check_nodepos(L, 2);
 	sortBoxVerticies(p1, p2);
 
-	std::vector<std::pair<v3s16, u8> > prob_list;
+	std::vector<std::pair<v3s32, u8> > prob_list;
 	if (lua_istable(L, 3)) {
 		LuaHelper::for_ipairs(L, 3, [&]() {
 			if (lua_istable(L, -1)) {
 				lua_getfield(L, -1, "pos");
-				v3s16 pos = check_v3s16(L, -1);
+				v3s32 pos = check_nodepos(L, -1);
 				lua_pop(L, 1);
 
 				u8 prob = getintfield_default(L, -1, "prob", MTSCHEM_PROB_ALWAYS);
@@ -1707,11 +1708,11 @@ int ModApiMapgen::l_create_schematic(lua_State *L)
 		});
 	}
 
-	std::vector<std::pair<s16, u8> > slice_prob_list;
+	std::vector<std::pair<s32, u8> > slice_prob_list;
 	if (lua_istable(L, 5)) {
 		LuaHelper::for_ipairs(L, 5, [&]() {
 			if (lua_istable(L, -1)) {
-				s16 ypos = getintfield_default(L, -1, "ypos", 0);
+				s32 ypos = getintfield_default(L, -1, "ypos", 0);
 				u8 prob  = getintfield_default(L, -1, "prob", MTSCHEM_PROB_ALWAYS);
 				slice_prob_list.emplace_back(ypos, prob);
 			}
@@ -1745,7 +1746,7 @@ int ModApiMapgen::l_place_schematic(lua_State *L)
 	SchematicManager *schemmgr = getServer(L)->getEmergeManager()->schemmgr;
 
 	//// Read position
-	v3s16 p = check_v3s16(L, 1);
+	v3s32 p = check_nodepos(L, 1);
 
 	//// Read rotation
 	int rot = ROTATE_0;
@@ -1797,7 +1798,7 @@ int ModApiMapgen::l_place_schematic_on_vmanip(lua_State *L)
 	MMVManip *vm = checkObject<LuaVoxelManip>(L, 1)->vm;
 
 	//// Read position
-	v3s16 p = check_v3s16(L, 2);
+	v3s32 p = check_nodepos(L, 2);
 
 	//// Read rotation
 	int rot = ROTATE_0;
@@ -1839,7 +1840,7 @@ int ModApiMapgen::l_spawn_tree_on_vmanip(lua_State *L)
 	NO_MAP_LOCK_REQUIRED;
 
 	MMVManip *vm = checkObject<LuaVoxelManip>(L, 1)->vm;
-	v3s16 p0 = read_v3s16(L, 2);
+	v3s32 p0 = read_nodepos(L, 2);
 	treegen::TreeDef tree_def;
 	const NodeDefManager *ndef = getGameDef(L)->ndef();
 	if (!read_tree_def(L, 3, ndef, tree_def))
@@ -1937,7 +1938,7 @@ int ModApiMapgen::l_read_schematic(lua_State *L)
 	lua_createtable(L, 0, (write_yslice == "none") ? 2 : 3);
 
 	// Create the size field
-	push_v3s16(L, schem->size);
+	push_nodepos(L, schem->size);
 	lua_setfield(L, 1, "size");
 
 	// Create the yslice_prob field
@@ -1988,7 +1989,7 @@ int ModApiMapgen::l_read_schematic(lua_State *L)
 
 int ModApiMapgen::update_liquids(lua_State *L, MMVManip *vm)
 {
-	UniqueQueue<v3s16> *trans_liquid;
+	UniqueQueue<v3s32> *trans_liquid;
 	if (auto emerge = getEmergeThread(L)) {
 		trans_liquid = emerge->m_trans_liquid;
 	} else {
@@ -2008,7 +2009,7 @@ int ModApiMapgen::update_liquids(lua_State *L, MMVManip *vm)
 }
 
 int ModApiMapgen::calc_lighting(lua_State *L, MMVManip *vm,
-		v3s16 pmin, v3s16 pmax, bool propagate_shadow)
+		v3s32 pmin, v3s32 pmax, bool propagate_shadow)
 {
 	const NodeDefManager *ndef = getGameDef(L)->ndef();
 	auto emerge = getEmergeManager(L);
@@ -2026,7 +2027,7 @@ int ModApiMapgen::calc_lighting(lua_State *L, MMVManip *vm,
 }
 
 int ModApiMapgen::set_lighting(lua_State *L, MMVManip *vm,
-		v3s16 pmin, v3s16 pmax, u8 light)
+		v3s32 pmin, v3s32 pmax, u8 light)
 {
 	assert(vm->m_area.contains(VoxelArea(pmin, pmax)));
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -144,14 +145,14 @@ public:
 		m_time_from_last_punch = 0;
 		return r;
 	}
-	void noCheatDigStart(const v3s16 &p)
+	void noCheatDigStart(const v3s32 &p)
 	{
 		m_nocheat_dig_pos = p;
 		m_nocheat_dig_time = 0;
 	}
-	v3s16 getNoCheatDigPos() { return m_nocheat_dig_pos; }
+	v3s32 getNoCheatDigPos() { return m_nocheat_dig_pos; }
 	float getNoCheatDigTime() { return m_nocheat_dig_time; }
-	void noCheatDigEnd() { m_nocheat_dig_pos = v3s16(32767, 32767, 32767); }
+	void noCheatDigEnd() { m_nocheat_dig_pos = v3s32(S32_MAX, S32_MAX, S32_MAX); }
 	LagPool &getDigPool() { return m_dig_pool; }
 	void setMaxSpeedOverride(const v3f &vel);
 	// Returns true if cheated
@@ -195,7 +196,7 @@ private:
 	v3f m_last_good_position;
 	float m_time_from_last_teleport = 0.0f;
 	float m_time_from_last_punch = 0.0f;
-	v3s16 m_nocheat_dig_pos = v3s16(32767, 32767, 32767);
+	v3s32 m_nocheat_dig_pos = v3s32(S32_MAX, S32_MAX, S32_MAX);
 	float m_nocheat_dig_time = 0.0f;
 	float m_max_speed_override_time = 0.0f;
 	v3f m_max_speed_override = v3f(0.0f, 0.0f, 0.0f);
@@ -252,7 +253,7 @@ struct PlayerHPChangeReason
 	ServerActiveObject *object = nullptr;
 	// For NODE_DAMAGE and DROWNING
 	std::string node;
-	v3s16 node_pos;
+	v3s32 node_pos;
 
 	inline bool hasLuaReference() const { return lua_reference >= 0; }
 
@@ -304,5 +305,5 @@ struct PlayerHPChangeReason
 	{
 	}
 
-	PlayerHPChangeReason(Type type, std::string node, v3s16 node_pos) : type(type), node(node), node_pos(node_pos) {}
+	PlayerHPChangeReason(Type type, std::string node, v3s32 node_pos) : type(type), node(node), node_pos(node_pos) {}
 };

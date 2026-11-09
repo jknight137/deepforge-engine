@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -155,7 +156,7 @@ int ModApiClient::l_gettext(lua_State *L)
 int ModApiClient::l_get_node_or_nil(lua_State *L)
 {
 	// pos
-	v3s16 pos = read_v3s16(L, 1);
+	v3s32 pos = read_nodepos(L, 1);
 
 	// Do it
 	bool pos_ok;
@@ -187,7 +188,7 @@ int ModApiClient::l_get_language(lua_State *L)
 // get_meta(pos)
 int ModApiClient::l_get_meta(lua_State *L)
 {
-	v3s16 p = read_v3s16(L, 1);
+	v3s32 p = read_nodepos(L, 1);
 
 	// check restrictions first
 	bool pos_ok;

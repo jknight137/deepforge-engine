@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -300,7 +301,7 @@ void Camera::updateOffset()
 	v3f cp = m_camera_position / BS;
 
 	// Update offset if too far away from the center of the map
-	m_camera_offset = v3s16(
+	m_camera_offset = v3s32(
 		floorf(cp.X / CAMERA_OFFSET_STEP) * CAMERA_OFFSET_STEP,
 		floorf(cp.Y / CAMERA_OFFSET_STEP) * CAMERA_OFFSET_STEP,
 		floorf(cp.Z / CAMERA_OFFSET_STEP) * CAMERA_OFFSET_STEP

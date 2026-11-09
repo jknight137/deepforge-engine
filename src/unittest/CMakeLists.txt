@@ -1,7 +1,9 @@
+# Modified for Deepforge on 2026-11-09; original notices retained.
 file(GLOB unittest_HDRS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 set(unittest_SRCS
 	${unittest_HDRS}
+	${CMAKE_CURRENT_SOURCE_DIR}/test_wide_world.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/test.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/test_address.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/test_authdatabase.cpp

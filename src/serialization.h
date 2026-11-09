@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -53,9 +54,9 @@
 // This represents an uninitialized or invalid format
 constexpr u8 SER_FMT_VER_INVALID = 255;
 // Highest supported serialization version
-constexpr u8 SER_FMT_VER_HIGHEST_READ = 29;
+constexpr u8 SER_FMT_VER_HIGHEST_READ = 30;
 // Saved on disk version
-constexpr u8 SER_FMT_VER_HIGHEST_WRITE = 29;
+constexpr u8 SER_FMT_VER_HIGHEST_WRITE = 30;
 // Lowest supported serialization version
 constexpr u8 SER_FMT_VER_LOWEST_READ = 0;
 // Lowest serialization version for writing

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -27,12 +28,12 @@ public:
 	std::string getActor();
 	bool isActorGuess();
 	void setActor(const std::string & actor, bool is_guess);
-	std::string getSuspect(v3s16 p, float nearness_shortcut,
+	std::string getSuspect(v3s32 p, float nearness_shortcut,
 			float min_nearness);
 	void flush();
 
 	void addAction(const RollbackAction & action);
-	std::list<RollbackAction> getNodeActors(v3s16 pos, int range,
+	std::list<RollbackAction> getNodeActors(v3s32 pos, int range,
 			time_t seconds, int limit);
 	std::list<RollbackAction> getRevertActions(
 			const std::string & actor_filter, time_t seconds);
@@ -53,14 +54,14 @@ private:
 			const std::list<ActionRow> & rows);
 	const std::list<ActionRow> getRowsSince(time_t firstTime,
 			const std::string & actor);
-	const std::list<ActionRow> getRowsSince_range(time_t firstTime, v3s16 p,
+	const std::list<ActionRow> getRowsSince_range(time_t firstTime, v3s32 p,
 			int range, int limit);
-	const std::list<RollbackAction> getActionsSince_range(time_t firstTime, v3s16 p,
+	const std::list<RollbackAction> getActionsSince_range(time_t firstTime, v3s32 p,
 			int range, int limit);
 	const std::list<RollbackAction> getActionsSince(time_t firstTime,
 			const std::string & actor = "");
-	static float getSuspectNearness(bool is_guess, v3s16 suspect_p,
-		time_t suspect_t, v3s16 action_p, time_t action_t);
+	static float getSuspectNearness(bool is_guess, v3s32 suspect_p,
+		time_t suspect_t, v3s32 action_p, time_t action_t);
 
 
 	IGameDef *gamedef = nullptr;

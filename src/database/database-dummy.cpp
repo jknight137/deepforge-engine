@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -10,7 +11,7 @@ Dummy database class
 #include "remoteplayer.h"
 
 
-bool Database_Dummy::saveBlock(const v3s16 &pos, std::string_view data)
+bool Database_Dummy::saveBlock(const v3s32 &pos, std::string_view data)
 {
 	auto lock = std::lock_guard(m_mutex);
 
@@ -18,7 +19,7 @@ bool Database_Dummy::saveBlock(const v3s16 &pos, std::string_view data)
 	return true;
 }
 
-void Database_Dummy::loadBlock(const v3s16 &pos, std::string *block)
+void Database_Dummy::loadBlock(const v3s32 &pos, std::string *block)
 {
 	auto lock = std::lock_guard(m_mutex);
 
@@ -32,14 +33,14 @@ void Database_Dummy::loadBlock(const v3s16 &pos, std::string *block)
 	*block = it->second;
 }
 
-bool Database_Dummy::deleteBlock(const v3s16 &pos)
+bool Database_Dummy::deleteBlock(const v3s32 &pos)
 {
 	auto lock = std::lock_guard(m_mutex);
 
 	return m_database.erase(getBlockAsInteger(pos)) > 0;
 }
 
-void Database_Dummy::listAllLoadableBlocks(std::vector<v3s16> &dst)
+void Database_Dummy::listAllLoadableBlocks(std::vector<v3s32> &dst)
 {
 	auto lock = std::lock_guard(m_mutex);
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -153,10 +154,10 @@ private:
 	static int update_liquids(lua_State *L, MMVManip *vm);
 
 	static int calc_lighting(lua_State *L, MMVManip *vm,
-			v3s16 pmin, v3s16 pmax, bool propagate_shadow);
+			v3s32 pmin, v3s32 pmax, bool propagate_shadow);
 
 	static int set_lighting(lua_State *L, MMVManip *vm,
-			v3s16 pmin, v3s16 pmax, u8 light);
+			v3s32 pmin, v3s32 pmax, u8 light);
 
 	// Helpers
 

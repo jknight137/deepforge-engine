@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -569,7 +570,7 @@ const std::list<RollbackAction> RollbackManager::rollbackActionsFromActionRows(
 			break;
 
 		case RollbackAction::TYPE_SET_NODE:
-			action.p            = v3s16(row.x, row.y, row.z);
+			action.p            = v3s32(row.x, row.y, row.z);
 			action.n_old.name   = getNodeName(row.oldNode);
 			action.n_old.param1 = row.oldParam1;
 			action.n_old.param2 = row.oldParam2;
@@ -609,7 +610,7 @@ const std::list<ActionRow> RollbackManager::getRowsSince(time_t firstTime, const
 
 
 const std::list<ActionRow> RollbackManager::getRowsSince_range(
-		time_t start_time, v3s16 p, int range, int limit)
+		time_t start_time, v3s32 p, int range, int limit)
 {
 
 	sqlite3_bind_int64(stmt_select_range, 1, start_time);
@@ -629,7 +630,7 @@ const std::list<ActionRow> RollbackManager::getRowsSince_range(
 
 
 const std::list<RollbackAction> RollbackManager::getActionsSince_range(
-		time_t start_time, v3s16 p, int range, int limit)
+		time_t start_time, v3s32 p, int range, int limit)
 {
 	return rollbackActionsFromActionRows(getRowsSince_range(start_time, p, range, limit));
 }
@@ -644,8 +645,8 @@ const std::list<RollbackAction> RollbackManager::getActionsSince(
 
 // Get nearness factor for subject's action for this action
 // Return value: 0 = impossible, >0 = factor
-float RollbackManager::getSuspectNearness(bool is_guess, v3s16 suspect_p,
-		time_t suspect_t, v3s16 action_p, time_t action_t)
+float RollbackManager::getSuspectNearness(bool is_guess, v3s32 suspect_p,
+		time_t suspect_t, v3s32 action_p, time_t action_t)
 {
 	// Suspect cannot cause things in the past
 	if (action_t < suspect_t) {
@@ -682,7 +683,7 @@ void RollbackManager::reportAction(const RollbackAction &action_)
 	action.actor_is_guess = current_actor_is_guess;
 
 	if (action.actor.empty()) { // If actor is not known, find out suspect or cancel
-		v3s16 p;
+		v3s32 p;
 		if (!action.getPosition(&p)) {
 			return;
 		}
@@ -714,7 +715,7 @@ void RollbackManager::setActor(const std::string & actor, bool is_guess)
 	current_actor_is_guess = is_guess;
 }
 
-std::string RollbackManager::getSuspect(v3s16 p, float nearness_shortcut,
+std::string RollbackManager::getSuspect(v3s32 p, float nearness_shortcut,
 		float min_nearness)
 {
 	if (!current_actor.empty()) {
@@ -733,7 +734,7 @@ std::string RollbackManager::getSuspect(v3s16 p, float nearness_shortcut,
 			continue;
 		}
 		// Find position of suspect or continue
-		v3s16 suspect_p;
+		v3s32 suspect_p;
 		if (!i->getPosition(&suspect_p)) {
 			continue;
 		}
@@ -790,7 +791,7 @@ void RollbackManager::addAction(const RollbackAction & action)
 	}
 }
 
-std::list<RollbackAction> RollbackManager::getNodeActors(v3s16 pos, int range,
+std::list<RollbackAction> RollbackManager::getNodeActors(v3s32 pos, int range,
 		time_t seconds, int limit)
 {
 	time_t cur_time = time(0);

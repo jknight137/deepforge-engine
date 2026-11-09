@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -86,18 +87,18 @@ u64 murmur_hash_64_ua(const void *key, size_t len, unsigned int seed)
 	return h;
 }
 
-bool isBlockInSight(const v3s16 blockpos_b, v3f camera_pos, v3f camera_dir,
+bool isBlockInSight(const v3s32 blockpos_b, v3f camera_pos, v3f camera_dir,
 		const f32 camera_fov, const f32 range, f32 *distance_ptr)
 {
 	return isBlockInSightEx(blockpos_b, camera_pos, camera_dir, getFovCosSq(camera_fov), getFovAdj(camera_fov), range, distance_ptr);
 }
 
-bool isBlockInSightEx(const v3s16 blockpos_b, v3f camera_pos, v3f camera_dir,
+bool isBlockInSightEx(const v3s32 blockpos_b, v3f camera_pos, v3f camera_dir,
 		const f32 target_cos_sq, const f32 adjdist, f32 range, f32 *distance_ptr)
 {
 	// Block center position relative to camera
 	const v3f blockpos_relative =
-			intToFloat(blockpos_b * MAP_BLOCKSIZE + v3s16(MAP_BLOCKSIZE / 2), BS) -
+			intToFloat(blockpos_b * MAP_BLOCKSIZE + v3s32(MAP_BLOCKSIZE / 2), BS) -
 			camera_pos;
 
 	if (distance_ptr) {
@@ -159,7 +160,7 @@ inline float adjustDist(float dist, float zoom_fov)
 		(1.0f - std::cos(zoom_fov / 2.0f)));
 }
 
-s16 adjustDist(s16 dist, float zoom_fov)
+s32 adjustDist(s32 dist, float zoom_fov)
 {
 	return std::round(adjustDist((float)dist, zoom_fov));
 }

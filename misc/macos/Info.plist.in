@@ -9,13 +9,13 @@
 	<key>CFBundleExecutable</key>
 	<string>luanti</string>
 	<key>CFBundleIconFile</key>
-	<string>luanti-icon.icns</string>
+	<string>deepforge-icon.icns</string>
 	<key>CFBundleName</key>
 	<string>@PROJECT_NAME_CAPITALIZED@</string>
 	<key>CFBundleDisplayName</key>
 	<string>@PROJECT_NAME_CAPITALIZED@</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.luanti.luanti</string>
+	<string>io.github.jknight137.deepforge</string>
 	<key>CFBundleVersion</key>
 	<string>@VERSION_STRING@</string>
 	<key>LSApplicationCategoryType</key>

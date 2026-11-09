@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2017 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -129,9 +130,9 @@ public:
 	const std::set<std::string> &getPlayerNames() { return m_player_names; }
 	void addPlayerName(const std::string &name) { m_player_names.insert(name); }
 	void removePlayerName(const std::string &name) { m_player_names.erase(name); }
-	void updateCameraOffset(const v3s16 &camera_offset)
+	void updateCameraOffset(const v3s32 &camera_offset)
 	{ m_camera_offset = camera_offset; }
-	v3s16 getCameraOffset() const { return m_camera_offset; }
+	v3s32 getCameraOffset() const { return m_camera_offset; }
 
 	void updateFrameTime(bool is_paused);
 	u64 getFrameTime() const { return m_frame_time; }
@@ -148,7 +149,7 @@ private:
 	std::queue<ClientEnvEvent> m_client_event_queue;
 	IntervalLimiter m_active_object_light_update_interval;
 	std::set<std::string> m_player_names;
-	v3s16 m_camera_offset;
+	v3s32 m_camera_offset;
 	u64 m_frame_time = 0;
 	u64 m_frame_dtime = 0;
 	u64 m_frame_time_pause_accumulator = 0;

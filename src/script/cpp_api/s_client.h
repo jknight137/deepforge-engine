@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -35,8 +36,8 @@ public:
 	void on_hp_modification(int32_t newhp);
 	void environment_step(float dtime);
 
-	bool on_dignode(v3s16 p, MapNode node);
-	bool on_punchnode(v3s16 p, MapNode node);
+	bool on_dignode(v3s32 p, MapNode node);
+	bool on_punchnode(v3s32 p, MapNode node);
 	bool on_placenode(const PointedThing &pointed, const ItemDefinition &item);
 	bool on_item_use(const ItemStack &item, const PointedThing &pointed);
 

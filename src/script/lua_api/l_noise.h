@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -66,7 +67,7 @@ class LuaValueNoiseMap : public ModApiBase
 	static int l_get_map_slice(lua_State *L);
 
 public:
-	LuaValueNoiseMap(const NoiseParams *np, s32 seed, v3s16 size);
+	LuaValueNoiseMap(const NoiseParams *np, s32 seed, v3s32 size);
 	~LuaValueNoiseMap();
 
 	inline bool is3D() const { return noise->sz > 1; }

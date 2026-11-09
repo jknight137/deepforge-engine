@@ -1,3 +1,4 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 -- Luanti
 -- Copyright (C) 2014 sapier
 -- SPDX-License-Identifier: LGPL-2.1-or-later
@@ -153,8 +154,8 @@ local function get_formspec(tabview, name, tabdata)
 		local H = tabview.height
 
 		local hypertext = "<global valign=middle halign=center size=18>" ..
-				fgettext_ne("Luanti is a game-creation platform that allows you to play many different games.") .. "\n" ..
-				fgettext_ne("Luanti doesn't come with a game by default.") .. " " ..
+				fgettext_ne("Deepforge is a voxel engine for persistent worlds and agentic research.") .. "\n" ..
+				fgettext_ne("World content is supplied by the project using the engine.") .. " " ..
 				fgettext_ne("You need to install a game before you can create a world.")
 
 		local button_y = H * 2/3 - 0.6

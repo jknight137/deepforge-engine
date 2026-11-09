@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -20,16 +21,16 @@ public:
 	ScriptApiNode() = default;
 	virtual ~ScriptApiNode() = default;
 
-	bool node_on_punch(v3s16 p, MapNode node,
+	bool node_on_punch(v3s32 p, MapNode node,
 			ServerActiveObject *puncher, const PointedThing &pointed);
-	bool node_on_dig(v3s16 p, MapNode node,
+	bool node_on_dig(v3s32 p, MapNode node,
 			ServerActiveObject *digger);
-	void node_on_construct(v3s16 p, MapNode node);
-	void node_on_destruct(v3s16 p, MapNode node);
-	bool node_on_flood(v3s16 p, MapNode node, MapNode newnode);
-	void node_after_destruct(v3s16 p, MapNode node);
-	bool node_on_timer(v3s16 p, MapNode node, f32 elapsed, f32 timeout);
-	void node_on_receive_fields(v3s16 p,
+	void node_on_construct(v3s32 p, MapNode node);
+	void node_on_destruct(v3s32 p, MapNode node);
+	bool node_on_flood(v3s32 p, MapNode node, MapNode newnode);
+	void node_after_destruct(v3s32 p, MapNode node);
+	bool node_on_timer(v3s32 p, MapNode node, f32 elapsed, f32 timeout);
+	void node_on_receive_fields(v3s32 p,
 			const std::string &formname,
 			const StringMap &fields,
 			ServerActiveObject *sender);

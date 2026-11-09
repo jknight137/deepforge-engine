@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2017 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -43,12 +44,12 @@ public:
 	// Whether to modify chance to simulate time lost by an unattended block
 	virtual bool getSimpleCatchUp() = 0;
 	// get min Y for apply abm
-	virtual s16 getMinY() = 0;
+	virtual s32 getMinY() = 0;
 	// get max Y for apply abm
-	virtual s16 getMaxY() = 0;
+	virtual s32 getMaxY() = 0;
 	// This is called usually at interval for 1/chance of the nodes
-	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n){};
-	virtual void trigger(ServerEnvironment *env, v3s16 p, MapNode n,
+	virtual void trigger(ServerEnvironment *env, v3s32 p, MapNode n){};
+	virtual void trigger(ServerEnvironment *env, v3s32 p, MapNode n,
 		u32 active_object_count, u32 active_object_count_wider){};
 };
 
@@ -104,7 +105,7 @@ struct LoadingBlockModifierDef
 	/// @param positions set of node positions (block-relative!)
 	/// @param dtime_s game time since last deactivation
 	virtual void trigger(ServerEnvironment *env, MapBlock *block,
-		const std::unordered_set<v3s16> &positions, float dtime_s) {};
+		const std::unordered_set<v3s32> &positions, float dtime_s) {};
 };
 
 class LBMContentMapping

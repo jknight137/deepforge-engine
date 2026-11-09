@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -5,6 +6,7 @@
 #pragma once
 
 #include "irrlichttypes.h"
+#include "constants.h"
 #include "irr_v3d.h"
 #include <iostream>
 #include <cassert>
@@ -34,7 +36,7 @@ class NodeDefManager;
 extern u64 emerge_time;
 
 /*
-	This class resembles aabbox3d<s16> a lot, but has inclusive
+	This class resembles aabbox3d<s32> a lot, but has inclusive
 	edges for saner handling of integer sizes
 */
 class VoxelArea
@@ -43,14 +45,14 @@ public:
 	// Starts as zero sized
 	constexpr VoxelArea() = default;
 
-	VoxelArea(const v3s16 &min_edge, const v3s16 &max_edge):
+	VoxelArea(const v3s32 &min_edge, const v3s32 &max_edge):
 		MinEdge(min_edge),
 		MaxEdge(max_edge)
 	{
 		cacheExtent();
 	}
 
-	VoxelArea(const v3s16 &p):
+	VoxelArea(const v3s32 &p):
 		MinEdge(p),
 		MaxEdge(p)
 	{
@@ -77,7 +79,7 @@ public:
 		cacheExtent();
 	}
 
-	void addPoint(const v3s16 &p)
+	void addPoint(const v3s32 &p)
 	{
 		if(hasEmptyExtent())
 		{
@@ -96,7 +98,7 @@ public:
 	}
 
 	// Pad with d nodes
-	void pad(const v3s16 &d)
+	void pad(const v3s32 &d)
 	{
 		MinEdge -= d;
 		MaxEdge += d;
@@ -136,7 +138,7 @@ public:
 			a.MinEdge.Z >= MinEdge.Z && a.MaxEdge.Z <= MaxEdge.Z
 		);
 	}
-	bool contains(v3s16 p) const
+	bool contains(v3s32 p) const
 	{
 		return(
 			p.X >= MinEdge.X && p.X <= MaxEdge.X &&
@@ -155,12 +157,12 @@ public:
 				&& MaxEdge == other.MaxEdge);
 	}
 
-	VoxelArea operator+(const v3s16 &off) const
+	VoxelArea operator+(const v3s32 &off) const
 	{
 		return {MinEdge+off, MaxEdge+off};
 	}
 
-	VoxelArea operator-(const v3s16 &off) const
+	VoxelArea operator-(const v3s32 &off) const
 	{
 		return {MinEdge-off, MaxEdge-off};
 	}
@@ -212,7 +214,7 @@ public:
 
 		assert(contains(a));	// pre-condition
 
-		const auto &take = [&result] (v3s16 min, v3s16 max) {
+		const auto &take = [&result] (v3s32 min, v3s32 max) {
 			VoxelArea b(min, max);
 			if (!b.hasEmptyExtent())
 				result.push_back(b);
@@ -220,43 +222,43 @@ public:
 
 		// Take back area, XY inclusive
 		{
-			v3s16 min(MinEdge.X, MinEdge.Y, a.MaxEdge.Z+1);
-			v3s16 max(MaxEdge.X, MaxEdge.Y, MaxEdge.Z);
+			v3s32 min(MinEdge.X, MinEdge.Y, a.MaxEdge.Z+1);
+			v3s32 max(MaxEdge.X, MaxEdge.Y, MaxEdge.Z);
 			take(min, max);
 		}
 
 		// Take front area, XY inclusive
 		{
-			v3s16 min(MinEdge.X, MinEdge.Y, MinEdge.Z);
-			v3s16 max(MaxEdge.X, MaxEdge.Y, a.MinEdge.Z-1);
+			v3s32 min(MinEdge.X, MinEdge.Y, MinEdge.Z);
+			v3s32 max(MaxEdge.X, MaxEdge.Y, a.MinEdge.Z-1);
 			take(min, max);
 		}
 
 		// Take top area, X inclusive
 		{
-			v3s16 min(MinEdge.X, a.MaxEdge.Y+1, a.MinEdge.Z);
-			v3s16 max(MaxEdge.X, MaxEdge.Y, a.MaxEdge.Z);
+			v3s32 min(MinEdge.X, a.MaxEdge.Y+1, a.MinEdge.Z);
+			v3s32 max(MaxEdge.X, MaxEdge.Y, a.MaxEdge.Z);
 			take(min, max);
 		}
 
 		// Take bottom area, X inclusive
 		{
-			v3s16 min(MinEdge.X, MinEdge.Y, a.MinEdge.Z);
-			v3s16 max(MaxEdge.X, a.MinEdge.Y-1, a.MaxEdge.Z);
+			v3s32 min(MinEdge.X, MinEdge.Y, a.MinEdge.Z);
+			v3s32 max(MaxEdge.X, a.MinEdge.Y-1, a.MaxEdge.Z);
 			take(min, max);
 		}
 
 		// Take left area, non-inclusive
 		{
-			v3s16 min(MinEdge.X, a.MinEdge.Y, a.MinEdge.Z);
-			v3s16 max(a.MinEdge.X-1, a.MaxEdge.Y, a.MaxEdge.Z);
+			v3s32 min(MinEdge.X, a.MinEdge.Y, a.MinEdge.Z);
+			v3s32 max(a.MinEdge.X-1, a.MaxEdge.Y, a.MaxEdge.Z);
 			take(min, max);
 		}
 
 		// Take right area, non-inclusive
 		{
-			v3s16 min(a.MaxEdge.X+1, a.MinEdge.Y, a.MinEdge.Z);
-			v3s16 max(MaxEdge.X, a.MaxEdge.Y, a.MaxEdge.Z);
+			v3s32 min(a.MaxEdge.X+1, a.MinEdge.Y, a.MinEdge.Z);
+			v3s32 max(MaxEdge.X, a.MaxEdge.Y, a.MaxEdge.Z);
 			take(min, max);
 		}
 	}
@@ -264,14 +266,14 @@ public:
 	/*
 		Translates position from virtual coordinates to array index
 	*/
-	s32 index(s16 x, s16 y, s16 z) const
+	s32 index(s32 x, s32 y, s32 z) const
 	{
 		s32 i = (s32)(z - MinEdge.Z) * m_cache_extent.Y * m_cache_extent.X
 			+ (y - MinEdge.Y) * m_cache_extent.X
 			+ (x - MinEdge.X);
 		return i;
 	}
-	s32 index(v3s16 p) const
+	s32 index(v3s32 p) const
 	{
 		return index(p.X, p.Y, p.Z);
 	}
@@ -279,7 +281,7 @@ public:
 	/**
 	 * Translate index in the X coordinate
 	 */
-	static void add_x(const v3s32 &extent, u32 &i, s16 a)
+	static void add_x(const v3s32 &extent, u32 &i, s32 a)
 	{
 		(void)extent;
 		i += a;
@@ -288,7 +290,7 @@ public:
 	/**
 	 * Translate index in the Y coordinate
 	 */
-	static void add_y(const v3s32 &extent, u32 &i, s16 a)
+	static void add_y(const v3s32 &extent, u32 &i, s32 a)
 	{
 		i += a * extent.X;
 	}
@@ -296,7 +298,7 @@ public:
 	/**
 	 * Translate index in the Z coordinate
 	 */
-	static void add_z(const v3s32 &extent, u32 &i, s16 a)
+	static void add_z(const v3s32 &extent, u32 &i, s32 a)
 	{
 		i += a * extent.X * extent.Y;
 	}
@@ -304,7 +306,7 @@ public:
 	/**
 	 * Translate index in space
 	 */
-	static void add_p(const v3s32 &extent, u32 &i, v3s16 a)
+	static void add_p(const v3s32 &extent, u32 &i, v3s32 a)
 	{
 		i += a.Z * extent.X * extent.Y + a.Y * extent.X + a.X;
 	}
@@ -321,27 +323,24 @@ public:
 
 	/// Minimum edge of the area (inclusive)
 	/// @warning read-only!
-	v3s16 MinEdge = v3s16(1,1,1);
+	v3s32 MinEdge = v3s32(1,1,1);
 	/// Maximum edge of the area (inclusive)
 	/// @warning read-only!
-	v3s16 MaxEdge;
+	v3s32 MaxEdge;
 
 private:
 	void cacheExtent()
 	{
-		m_cache_extent = {
-			MaxEdge.X - MinEdge.X + 1,
-			MaxEdge.Y - MinEdge.Y + 1,
-			MaxEdge.Z - MinEdge.Z + 1
-		};
-		// If positions were sorted correctly this must always hold.
-		// Note that this still permits empty areas (where MinEdge = MaxEdge + 1).
-		assert(m_cache_extent.X >= 0 && m_cache_extent.X <= MAX_EXTENT);
-		assert(m_cache_extent.Y >= 0 && m_cache_extent.Y <= MAX_EXTENT);
-		assert(m_cache_extent.Z >= 0 && m_cache_extent.Z <= MAX_EXTENT);
-	}
+        const s64 x = (s64)MaxEdge.X - MinEdge.X + 1;
+        const s64 y = (s64)MaxEdge.Y - MinEdge.Y + 1;
+        const s64 z = (s64)MaxEdge.Z - MinEdge.Z + 1;
+        if (x < 0 || y < 0 || z < 0 || x > MAX_EXTENT || y > MAX_EXTENT || z > MAX_EXTENT)
+            throw InvalidPositionException("Voxel area extent exceeds supported coordinate domain");
+        m_cache_extent = v3s32(x, y, z);
+    }
 
-	static constexpr s32 MAX_EXTENT = S16_MAX - S16_MIN + 1;
+    // Includes mapblock padding. Allocation remains governed by MAX_WORKING_VOLUME.
+    static constexpr s32 MAX_EXTENT = 2 * MAX_MAP_GENERATION_LIMIT + 3 * MAP_BLOCKSIZE;
 	v3s32 m_cache_extent;
 };
 
@@ -371,7 +370,7 @@ public:
 		These are a bit slow and shouldn't be used internally.
 		Use m_data[m_area.index(p)] instead.
 	*/
-	MapNode getNode(const v3s16 &p)
+	MapNode getNode(const v3s32 &p)
 	{
 		VoxelArea voxel_area(p);
 		addArea(voxel_area);
@@ -385,7 +384,7 @@ public:
 
 		return m_data[index];
 	}
-	MapNode getNodeNoEx(const v3s16 &p)
+	MapNode getNodeNoEx(const v3s32 &p)
 	{
 		VoxelArea voxel_area(p);
 		addArea(voxel_area);
@@ -398,7 +397,7 @@ public:
 
 		return m_data[index];
 	}
-	MapNode getNodeNoExNoEmerge(const v3s16 &p) const
+	MapNode getNodeNoExNoEmerge(const v3s32 &p) const
 	{
 		if (!m_area.contains(p))
 			return {CONTENT_IGNORE};
@@ -409,12 +408,12 @@ public:
 	}
 	// Stuff explodes if non-emerged area is touched with this.
 	// Emerge first, and check VOXELFLAG_NO_DATA if appropriate.
-	MapNode & getNodeRefUnsafe(const v3s16 &p)
+	MapNode & getNodeRefUnsafe(const v3s32 &p)
 	{
 		return m_data[m_area.index(p)];
 	}
 
-	const MapNode & getNodeRefUnsafeCheckFlags(const v3s16 &p) const
+	const MapNode & getNodeRefUnsafeCheckFlags(const v3s32 &p) const
 	{
 		s32 index = m_area.index(p);
 
@@ -424,18 +423,18 @@ public:
 		return m_data[index];
 	}
 
-	u8 & getFlagsRefUnsafe(const v3s16 &p)
+	u8 & getFlagsRefUnsafe(const v3s32 &p)
 	{
 		return m_flags[m_area.index(p)];
 	}
 
-	bool exists(const v3s16 &p)
+	bool exists(const v3s32 &p)
 	{
 		return m_area.contains(p) &&
 			!(getFlagsRefUnsafe(p) & VOXELFLAG_NO_DATA);
 	}
 
-	void setNode(const v3s16 &p, const MapNode &n)
+	void setNode(const v3s32 &p, const MapNode &n)
 	{
 		VoxelArea voxel_area(p);
 		addArea(voxel_area);
@@ -452,7 +451,7 @@ public:
 		This is convenient but slower than playing around directly
 		with the m_data table with indices.
 	*/
-	bool setNodeNoEmerge(const v3s16 &p, MapNode n)
+	bool setNodeNoEmerge(const v3s32 &p, MapNode n)
 	{
 		if(!m_area.contains(p))
 			return false;
@@ -481,11 +480,11 @@ public:
 		dst_area.getExtent() <= src_area.getExtent()
 	*/
 	void copyFrom(MapNode *src, bool is_mono_block, const VoxelArea& src_area,
-			v3s16 from_pos, v3s16 to_pos, const v3s16 &size);
+			v3s32 from_pos, v3s32 to_pos, const v3s32 &size);
 
 	// Copy data
 	void copyTo(MapNode *dst, const VoxelArea& dst_area,
-			v3s16 dst_pos, v3s16 from_pos, const v3s16 &size) const;
+			v3s32 dst_pos, v3s32 from_pos, const v3s32 &size) const;
 
 	/*
 		Member variables

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Deepforge
+GenericName=Voxel engine
+Comment=Persistent voxel worlds and agentic research
+Exec=deepforge
+Icon=deepforge
+Terminal=false
+Type=Application
+Categories=Game;Simulation;Science;
+StartupNotify=false
+StartupWMClass=deepforge
+Keywords=voxel;world;agents;research;multiplayer;

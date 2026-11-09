@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -233,7 +234,7 @@ struct alignas(u32) MapNode
 
 	u8 getFaceDir(const NodeDefManager *nodemgr, bool allow_wallmounted = false) const;
 	u8 getWallMounted(const NodeDefManager *nodemgr) const;
-	v3s16 getWallMountedDir(const NodeDefManager *nodemgr) const;
+	v3s32 getWallMountedDir(const NodeDefManager *nodemgr) const;
 
 	/// @returns Rotation in range 0–239 (in 1.5° steps)
 	u8 getDegRotate(const NodeDefManager *nodemgr) const;
@@ -245,7 +246,7 @@ struct alignas(u32) MapNode
 	 *
 	 * \param p coordinates of the node
 	 */
-	u8 getNeighbors(v3s16 p, Map *map) const;
+	u8 getNeighbors(v3s32 p, Map *map) const;
 
 	/*
 		Gets list of node boxes (used for rendering (NDT_NODEBOX))

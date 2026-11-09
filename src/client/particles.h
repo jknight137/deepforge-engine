@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -220,10 +221,10 @@ public:
 	void handleParticleEvent(ClientEvent *event, Client *client,
 			LocalPlayer *player);
 
-	void addDiggingParticles(LocalPlayer *player, v3s16 pos,
+	void addDiggingParticles(LocalPlayer *player, v3s32 pos,
 		const MapNode &n);
 
-	void addNodeParticle(LocalPlayer *player, v3s16 pos,
+	void addNodeParticle(LocalPlayer *player, v3s32 pos,
 		const MapNode &n);
 
 	void reserveParticleSpace(size_t max_estimate);

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2017 Loic Blot <loic.blot@unix-experience.fr>
@@ -38,7 +39,7 @@ int LuaMinimap::l_get_pos(lua_State *L)
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
-	push_v3s16(L, m->getPos());
+	push_nodepos(L, m->getPos());
 	return 1;
 }
 
@@ -47,7 +48,7 @@ int LuaMinimap::l_set_pos(lua_State *L)
 	LuaMinimap *ref = checkObject<LuaMinimap>(L, 1);
 	Minimap *m = getobject(ref);
 
-	m->setPos(read_v3s16(L, 2));
+	m->setPos(read_nodepos(L, 2));
 	return 1;
 }
 

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -51,7 +52,7 @@
 // I really don't want to make every algorithm to check if it's going near
 // the limit or not, so this is lower.
 // This is the maximum value the setting map_generation_limit can be
-#define MAX_MAP_GENERATION_LIMIT (31007)
+#define MAX_MAP_GENERATION_LIMIT (65535)
 
 // Size of node in floating-point units
 // The original idea behind this is to disallow plain casts between

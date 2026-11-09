@@ -3,11 +3,11 @@ version: 1
 AppDir:
   path: AppDir
   app_info:
-    id: org.luanti.luanti
-    name: Luanti
-    icon: luanti
+    id: io.github.jknight137.deepforge
+    name: Deepforge
+    icon: deepforge
     version: !ENV ${VERSION}
-    exec: usr/bin/luanti
+    exec: usr/bin/deepforge
     exec_args: $@
   files:
     include: []

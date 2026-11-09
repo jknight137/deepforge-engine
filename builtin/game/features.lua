@@ -1,4 +1,6 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 core.features = {
+	large_world_coordinates = true,
 	glasslike_framed = true,
 	nodebox_as_selectionbox = true,
 	get_all_craft_recipes_works = true,

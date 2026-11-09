@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -60,7 +61,7 @@ float Environment::getTimeOfDayF()
 	return m_time_of_day_f;
 }
 
-bool Environment::line_of_sight(v3f pos1, v3f pos2, v3s16 *p)
+bool Environment::line_of_sight(v3f pos1, v3f pos2, v3s32 *p)
 {
 	// Iterate through nodes on the line
 	voxalgo::VoxelLineIterator iterator(pos1 / BS, (pos2 - pos1) / BS);
@@ -110,7 +111,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 				state->m_found.push(std::move(pointed));
 		}
 		// Set search range
-		core::aabbox3d<s16> maximal_exceed = nodedef->getSelectionBoxIntUnion();
+		core::aabbox3d<s32> maximal_exceed = nodedef->getSelectionBoxIntUnion();
 		state->m_search_range.MinEdge = -maximal_exceed.MaxEdge;
 		state->m_search_range.MaxEdge = -maximal_exceed.MinEdge;
 		// Setting is done
@@ -119,7 +120,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 
 	// The index of the first pointed thing that was not returned
 	// before. The last index which needs to be tested.
-	s16 lastIndex = state->m_iterator.m_last_index;
+	s32 lastIndex = state->m_iterator.m_last_index;
 	if (!state->m_found.empty()) {
 		lastIndex = state->m_iterator.getIndex(
 			floatToInt(state->m_found.top().intersection_point, BS));
@@ -129,12 +130,12 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 	std::vector<aabb3f> boxes;
 	while (state->m_iterator.m_current_index <= lastIndex) {
 		// Test the nodes around the current node in search_range.
-		core::aabbox3d<s16> new_nodes = state->m_search_range;
+		core::aabbox3d<s32> new_nodes = state->m_search_range;
 		new_nodes.MinEdge += state->m_iterator.m_current_node_pos;
 		new_nodes.MaxEdge += state->m_iterator.m_current_node_pos;
 
 		// Only check new nodes
-		v3s16 delta = state->m_iterator.m_current_node_pos
+		v3s32 delta = state->m_iterator.m_current_node_pos
 			- state->m_previous_node;
 		if (delta.X > 0) {
 			new_nodes.MinEdge.X = new_nodes.MaxEdge.X;
@@ -150,18 +151,18 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			new_nodes.MaxEdge.Z = new_nodes.MinEdge.Z;
 		}
 
-		if (new_nodes.MaxEdge.X == S16_MAX ||
-			new_nodes.MaxEdge.Y == S16_MAX ||
-			new_nodes.MaxEdge.Z == S16_MAX) {
+		if (new_nodes.MaxEdge.X == S32_MAX ||
+			new_nodes.MaxEdge.Y == S32_MAX ||
+			new_nodes.MaxEdge.Z == S32_MAX) {
 			break; // About to go out of bounds
 		}
 
 		// For each untested node
-		for (s16 z = new_nodes.MinEdge.Z; z <= new_nodes.MaxEdge.Z; z++)
-		for (s16 y = new_nodes.MinEdge.Y; y <= new_nodes.MaxEdge.Y; y++)
-		for (s16 x = new_nodes.MinEdge.X; x <= new_nodes.MaxEdge.X; x++) {
+		for (s32 z = new_nodes.MinEdge.Z; z <= new_nodes.MaxEdge.Z; z++)
+		for (s32 y = new_nodes.MinEdge.Y; y <= new_nodes.MaxEdge.Y; y++)
+		for (s32 x = new_nodes.MinEdge.X; x <= new_nodes.MaxEdge.X; x++) {
 			MapNode n;
-			v3s16 np(x, y, z);
+			v3s32 np(x, y, z);
 			bool is_valid_position;
 
 			n = map.getNode(np, &is_valid_position);
@@ -190,6 +191,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			// If a node is found, this is the center of the
 			// first nodebox the shootline meets.
 			v3f found_boxcenter(0, 0, 0);
+			v3f found_local_intersection;
 
 			// Do calculations relative to the node center
 			// to translate the ray rather than the boxes
@@ -205,13 +207,12 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 					continue;
 				}
 
-				intersection_point += npf; // translate back to world coords
-				f32 distanceSq = (intersection_point
-					- state->m_shootline.start).getLengthSQ();
+				f32 distanceSq = (intersection_point - rel_start).getLengthSQ();
 				// If this is the nearest collision, save it
 				if (min_distance_sq > distanceSq) {
 					min_distance_sq = distanceSq;
-					result.intersection_point = intersection_point;
+					result.intersection_point = intersection_point + npf;
+					found_local_intersection = intersection_point;
 					result.intersection_normal = intersection_normal;
 					result.box_id = id;
 					found_boxcenter = box.getCenter();
@@ -229,8 +230,8 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			result.distanceSq = min_distance_sq;
 			// Set undersurface and abovesurface nodes
 			const f32 d = 0.002 * BS;
-			v3f fake_intersection = result.intersection_point;
-			found_boxcenter += npf; // translate back to world coords
+			v3f fake_intersection = found_local_intersection;
+			// Keep the inset node-relative: 0.002*BS is smaller than far-world float spacing.
 			// Move intersection towards its source block.
 			if (fake_intersection.X < found_boxcenter.X) {
 				fake_intersection.X += d;
@@ -247,7 +248,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			} else {
 				fake_intersection.Z -= d;
 			}
-			result.node_real_undersurface = floatToInt(
+			result.node_real_undersurface = np + floatToInt(
 				fake_intersection, BS);
 			result.node_abovesurface = result.node_real_undersurface
 				+ floatToInt(result.intersection_normal, 1.0f);
@@ -256,7 +257,7 @@ void Environment::continueRaycast(RaycastState *state, PointedThing *result_p)
 			state->m_found.push(std::move(result));
 			// If this is nearer than the old nearest object,
 			// the search can be shorter
-			s16 newIndex = state->m_iterator.getIndex(
+			s32 newIndex = state->m_iterator.getIndex(
 				result.node_real_undersurface);
 			if (newIndex < lastIndex) {
 				lastIndex = newIndex;

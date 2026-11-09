@@ -1,23 +1,8 @@
+-- Modified for Deepforge on 2026-11-09; original notices retained.
 -- Luanti
 -- Copyright (C) 2013 sapier
 -- SPDX-License-Identifier: LGPL-2.1-or-later
 
-
-local function prepare_credits(dest, source)
-	local string = table.concat(source, "\n") .. "\n"
-
-	string = core.hypertext_escape(string)
-	string = string:gsub("%[.-%]", "<gray>%1</gray>")
-
-	table.insert(dest, string)
-end
-
-local function get_credits()
-	local f = assert(io.open(core.get_mainmenu_path() .. "/credits.json"))
-	local json = core.parse_json(f:read("*all"))
-	f:close()
-	return json
-end
 
 local function get_renderer_info()
 	local ret = {}
@@ -53,34 +38,19 @@ return {
 			"<tag name=gray color=#aaa>",
 		}
 
-		local credits = get_credits()
+		table.insert_all(hypertext, {
+			"<heading>Deepforge</heading>\n",
+			"Voxel engine and agentic research testbed.\n\n",
+			"<heading>Capabilities</heading>\n",
+			"Larger continuous worlds, persistent scripting, durable scheduling, " ..
+			"and authenticated external actor control.\n\n",
+			"<heading>Licensing and attribution</heading>\n",
+			"Derived from Luanti. Copyright (C) 2010-2026 Perttu Ahola and contributors.\n",
+			"Engine: LGPL-2.1-or-later. See COPYING.LESSER and LICENSE.txt.\n",
+			"SDK: MIT. Original and dependency notices are retained in the distribution.\n",
+		})
 
-		table.insert_all(hypertext, {
-			"<heading>", fgettext_ne("Core Developers"), "</heading>\n",
-		})
-		prepare_credits(hypertext, credits.core_developers)
-		table.insert_all(hypertext, {
-			"\n",
-			"<heading>", fgettext_ne("Core Team"), "</heading>\n",
-		})
-		prepare_credits(hypertext, credits.core_team)
-		table.insert_all(hypertext, {
-			"\n",
-			"<heading>", fgettext_ne("Active Contributors"), "</heading>\n",
-		})
-		prepare_credits(hypertext, credits.contributors)
-		table.insert_all(hypertext, {
-			"\n",
-			"<heading>", fgettext_ne("Previous Core Developers"), "</heading>\n",
-		})
-		prepare_credits(hypertext, credits.previous_core_developers)
-		table.insert_all(hypertext, {
-			"\n",
-			"<heading>", fgettext_ne("Previous Contributors"), "</heading>\n",
-		})
-		prepare_credits(hypertext, credits.previous_contributors)
-
-		hypertext = table.concat(hypertext):sub(1, -2)
+		hypertext = table.concat(hypertext)
 
 		local fs = {
 			"image[1,0.5;3.4,3.4;", core.formspec_escape(logofile), "]",
@@ -88,7 +58,7 @@ return {
 			"label[0.1,4;5.4,0.6;",
 			core.formspec_escape(version.project .. " " .. version.string), "]",
 			"style_type[button_url;border=false;textcolor=#4cd9f9]",
-			"button_url[1.5,4.6;2.5,0.5;homepage;luanti.org;https://www.luanti.org/]"
+			"button_url[1.5,4.6;2.5,0.5;homepage;Source and documentation;https://github.com/jknight137/deepforge-engine]"
 		}
 
 		if PLATFORM == "Android" then

@@ -1,0 +1,35 @@
+.TH DEEPFORGESERVER 6 "2026-11-09" "Deepforge"
+.SH NAME
+deepforgeserver \- voxel engine and agentic research testbed
+.SH SYNOPSIS
+.B deepforgeserver
+.RI [ options ]
+.SH DESCRIPTION
+Deepforge provides persistent voxel worlds, larger coordinates and matching
+client/server networking. The optional platform adds scripting, scheduling,
+controller memory and authenticated external actor control.
+.SH OPTIONS
+.TP
+.B \-help
+Show command-line options.
+.TP
+.B \-version
+Show the engine version.
+.TP
+.BI \-world " directory"
+Select a world directory.
+.TP
+.BI \-config " file"
+Read an explicit configuration file.
+.TP
+.BI \-test-module " name"
+Run one compiled correctness module and exit before world startup.
+.SH COMPATIBILITY
+The expanded coordinate envelope requires protocol-32001 peers. New mapblocks
+use format 30. Preserve an offline backup before upgrading a saved world.
+.SH DOCUMENTATION
+https://github.com/jknight137/deepforge-engine
+.SH LICENSE
+The engine is LGPL-2.1-or-later. Original author and dependency notices remain
+in LICENSE.txt, COPYING.LESSER and THIRD_PARTY_NOTICES.md. Platform and media
+components retain their separately stated licenses.

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2024 cx384
@@ -31,8 +32,8 @@ void drawItemStack(
 		const core::rect<s32> *clip,
 		Client *client,
 		ItemRotationKind rotation_kind,
-		const v3s16 &angle,
-		const v3s16 &rotation_speed)
+		const v3s32 &angle,
+		const v3s32 &rotation_speed)
 {
 	static MeshTimeInfo rotation_time_infos[IT_ROT_NONE];
 
@@ -314,5 +315,5 @@ void drawItemStack(
 		ItemRotationKind rotation_kind)
 {
 	drawItemStack(driver, font, item, rect, clip, client, rotation_kind,
-		v3s16(0, 0, 0), v3s16(0, 100, 0));
+		v3s32(0, 0, 0), v3s32(0, 100, 0));
 }

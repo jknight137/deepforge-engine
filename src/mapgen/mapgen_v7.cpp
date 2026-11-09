@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2014-2020 paramat
@@ -156,26 +157,26 @@ MapgenV7Params::MapgenV7Params():
 void MapgenV7Params::readParams(const Settings *settings)
 {
 	settings->getFlagStrNoEx("mgv7_spflags", spflags, flagdesc_mapgen_v7);
-	settings->getS16NoEx("mgv7_mount_zero_level",       mount_zero_level);
-	settings->getS16NoEx("mgv7_floatland_ymin",         floatland_ymin);
-	settings->getS16NoEx("mgv7_floatland_ymax",         floatland_ymax);
-	settings->getS16NoEx("mgv7_floatland_taper",        floatland_taper);
+	settings->getS32NoEx("mgv7_mount_zero_level",       mount_zero_level);
+	settings->getS32NoEx("mgv7_floatland_ymin",         floatland_ymin);
+	settings->getS32NoEx("mgv7_floatland_ymax",         floatland_ymax);
+	settings->getS32NoEx("mgv7_floatland_taper",        floatland_taper);
 	settings->getFloatNoEx("mgv7_float_taper_exp",      float_taper_exp);
 	settings->getFloatNoEx("mgv7_floatland_density",    floatland_density);
-	settings->getS16NoEx("mgv7_floatland_ywater",       floatland_ywater);
+	settings->getS32NoEx("mgv7_floatland_ywater",       floatland_ywater);
 
 	settings->getFloatNoEx("mgv7_cave_width",           cave_width);
-	settings->getS16NoEx("mgv7_large_cave_depth",       large_cave_depth);
+	settings->getS32NoEx("mgv7_large_cave_depth",       large_cave_depth);
 	settings->getU16NoEx("mgv7_small_cave_num_min",     small_cave_num_min);
 	settings->getU16NoEx("mgv7_small_cave_num_max",     small_cave_num_max);
 	settings->getU16NoEx("mgv7_large_cave_num_min",     large_cave_num_min);
 	settings->getU16NoEx("mgv7_large_cave_num_max",     large_cave_num_max);
 	settings->getFloatNoEx("mgv7_large_cave_flooded",   large_cave_flooded);
-	settings->getS16NoEx("mgv7_cavern_limit",           cavern_limit);
-	settings->getS16NoEx("mgv7_cavern_taper",           cavern_taper);
+	settings->getS32NoEx("mgv7_cavern_limit",           cavern_limit);
+	settings->getS32NoEx("mgv7_cavern_taper",           cavern_taper);
 	settings->getFloatNoEx("mgv7_cavern_threshold",     cavern_threshold);
-	settings->getS16NoEx("mgv7_dungeon_ymin",           dungeon_ymin);
-	settings->getS16NoEx("mgv7_dungeon_ymax",           dungeon_ymax);
+	settings->getS32NoEx("mgv7_dungeon_ymin",           dungeon_ymin);
+	settings->getS32NoEx("mgv7_dungeon_ymax",           dungeon_ymax);
 
 	settings->getNoiseParams("mgv7_np_terrain_base",    np_terrain_base);
 	settings->getNoiseParams("mgv7_np_terrain_alt",     np_terrain_alt);
@@ -197,26 +198,26 @@ void MapgenV7Params::readParams(const Settings *settings)
 void MapgenV7Params::writeParams(Settings *settings) const
 {
 	settings->setFlagStr("mgv7_spflags", spflags, flagdesc_mapgen_v7);
-	settings->setS16("mgv7_mount_zero_level",           mount_zero_level);
-	settings->setS16("mgv7_floatland_ymin",             floatland_ymin);
-	settings->setS16("mgv7_floatland_ymax",             floatland_ymax);
-	settings->setS16("mgv7_floatland_taper",            floatland_taper);
+	settings->setS32("mgv7_mount_zero_level",           mount_zero_level);
+	settings->setS32("mgv7_floatland_ymin",             floatland_ymin);
+	settings->setS32("mgv7_floatland_ymax",             floatland_ymax);
+	settings->setS32("mgv7_floatland_taper",            floatland_taper);
 	settings->setFloat("mgv7_float_taper_exp",          float_taper_exp);
 	settings->setFloat("mgv7_floatland_density",        floatland_density);
-	settings->setS16("mgv7_floatland_ywater",           floatland_ywater);
+	settings->setS32("mgv7_floatland_ywater",           floatland_ywater);
 
 	settings->setFloat("mgv7_cave_width",               cave_width);
-	settings->setS16("mgv7_large_cave_depth",           large_cave_depth);
+	settings->setS32("mgv7_large_cave_depth",           large_cave_depth);
 	settings->setU16("mgv7_small_cave_num_min",         small_cave_num_min);
 	settings->setU16("mgv7_small_cave_num_max",         small_cave_num_max);
 	settings->setU16("mgv7_large_cave_num_min",         large_cave_num_min);
 	settings->setU16("mgv7_large_cave_num_max",         large_cave_num_max);
 	settings->setFloat("mgv7_large_cave_flooded",       large_cave_flooded);
-	settings->setS16("mgv7_cavern_limit",               cavern_limit);
-	settings->setS16("mgv7_cavern_taper",               cavern_taper);
+	settings->setS32("mgv7_cavern_limit",               cavern_limit);
+	settings->setS32("mgv7_cavern_taper",               cavern_taper);
 	settings->setFloat("mgv7_cavern_threshold",         cavern_threshold);
-	settings->setS16("mgv7_dungeon_ymin",               dungeon_ymin);
-	settings->setS16("mgv7_dungeon_ymax",               dungeon_ymax);
+	settings->setS32("mgv7_dungeon_ymin",               dungeon_ymin);
+	settings->setS32("mgv7_dungeon_ymax",               dungeon_ymax);
 
 	settings->setNoiseParams("mgv7_np_terrain_base",    np_terrain_base);
 	settings->setNoiseParams("mgv7_np_terrain_alt",     np_terrain_alt);
@@ -245,7 +246,7 @@ void MapgenV7Params::setDefaultSettings(Settings *settings)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-int MapgenV7::getSpawnLevelAtPoint(v2s16 p)
+int MapgenV7::getSpawnLevelAtPoint(v2s32 p)
 {
 	// If rivers are enabled, first check if in a river
 	if (spflags & MGV7_RIDGES) {
@@ -261,11 +262,11 @@ int MapgenV7::getSpawnLevelAtPoint(v2s16 p)
 	// 'offset's.
 	// Raising the maximum spawn level above 'water_level + 16' is necessary
 	// for when terrain 'offset's are set much higher than water_level.
-	s16 max_spawn_y = std::fmax(std::fmax(noise_terrain_alt->np.offset,
+	s32 max_spawn_y = std::fmax(std::fmax(noise_terrain_alt->np.offset,
 			noise_terrain_base->np.offset),
 			water_level + 16);
 	// Base terrain calculation
-	s16 y = baseTerrainLevelAtPoint(p.X, p.Y);
+	s32 y = baseTerrainLevelAtPoint(p.X, p.Y);
 
 	// If mountains are disabled, terrain level is base terrain level.
 	// Avoids mid-air spawn where mountain terrain would have been.
@@ -308,17 +309,17 @@ void MapgenV7::makeChunk(BlockMakeData *data)
 	this->vm = data->vmanip;
 	this->ndef = data->nodedef;
 
-	v3s16 blockpos_min = data->blockpos_min;
-	v3s16 blockpos_max = data->blockpos_max;
+	v3s32 blockpos_min = data->blockpos_min;
+	v3s32 blockpos_max = data->blockpos_max;
 	node_min = blockpos_min * MAP_BLOCKSIZE;
-	node_max = (blockpos_max + v3s16(1, 1, 1)) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	node_max = (blockpos_max + v3s32(1, 1, 1)) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 	full_node_min = (blockpos_min - 1) * MAP_BLOCKSIZE;
-	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s16(1, 1, 1);
+	full_node_max = (blockpos_max + 2) * MAP_BLOCKSIZE - v3s32(1, 1, 1);
 
 	blockseed = getBlockSeed2(full_node_min, seed);
 
 	// Generate base and mountain terrain
-	s16 stone_surface_max_y = generateTerrain();
+	s32 stone_surface_max_y = generateTerrain();
 
 	// Create heightmap
 	updateHeightmap(node_min, node_max);
@@ -375,7 +376,7 @@ void MapgenV7::makeChunk(BlockMakeData *data)
 		node_max.Y >= floatland_ymin - csize.Y * 2 && node_min.Y <= floatland_ymax);
 
 	if (flags & MG_LIGHT)
-		calcLighting(node_min - v3s16(0, 1, 0), node_max + v3s16(0, 1, 0),
+		calcLighting(node_min - v3s32(0, 1, 0), node_max + v3s32(0, 1, 0),
 			full_node_min, full_node_max, propagate_shadow);
 
 	this->generating = false;
@@ -387,7 +388,7 @@ void MapgenV7::makeChunk(BlockMakeData *data)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-float MapgenV7::baseTerrainLevelAtPoint(s16 x, s16 z)
+float MapgenV7::baseTerrainLevelAtPoint(s32 x, s32 z)
 {
 	float hselect = NoiseFractal2D(&noise_height_select->np, x, z, seed);
 	hselect = rangelim(hselect, 0.0f, 1.0f);
@@ -420,7 +421,7 @@ float MapgenV7::baseTerrainLevelFromMap(int index)
 }
 
 
-bool MapgenV7::getMountainTerrainAtPoint(s16 x, s16 y, s16 z)
+bool MapgenV7::getMountainTerrainAtPoint(s32 x, s32 y, s32 z)
 {
 	float mnt_h_n =
 		std::fmax(NoiseFractal2D(&noise_mount_height->np, x, z, seed), 1.0f);
@@ -431,7 +432,7 @@ bool MapgenV7::getMountainTerrainAtPoint(s16 x, s16 y, s16 z)
 }
 
 
-bool MapgenV7::getMountainTerrainFromMap(int idx_xyz, int idx_xz, s16 y)
+bool MapgenV7::getMountainTerrainFromMap(int idx_xyz, int idx_xz, s32 y)
 {
 	float mounthn = std::fmax(noise_mount_height->result[idx_xz], 1.0f);
 	float density_gradient = -((float)(y - mount_zero_level) / mounthn);
@@ -441,7 +442,7 @@ bool MapgenV7::getMountainTerrainFromMap(int idx_xyz, int idx_xz, s16 y)
 }
 
 
-bool MapgenV7::getRiverChannelFromMap(int idx_xyz, int idx_xz, s16 y)
+bool MapgenV7::getRiverChannelFromMap(int idx_xyz, int idx_xz, s32 y)
 {
 	// Maximum width of river channel. Creates the vertical canyon walls
 	float width = 0.2f;
@@ -489,8 +490,8 @@ int MapgenV7::generateTerrain()
 	bool gen_floatlands = false;
 	u8 cache_index = 0;
 	// Y values where floatland tapering starts
-	s16 float_taper_ymax = floatland_ymax - floatland_taper;
-	s16 float_taper_ymin = floatland_ymin + floatland_taper;
+	s32 float_taper_ymax = floatland_ymax - floatland_taper;
+	s32 float_taper_ymin = floatland_ymin + floatland_taper;
 
 	if ((spflags & MGV7_FLOATLANDS) &&
 			node_max.Y >= floatland_ymin && node_min.Y <= floatland_ymax) {
@@ -499,7 +500,7 @@ int MapgenV7::generateTerrain()
 		noise_floatland->noiseMap3D(node_min.X, node_min.Y - 1, node_min.Z);
 
 		// Cache floatland noise offset values, for floatland tapering
-		for (s16 y = node_min.Y - 1; y <= node_max.Y + 1; y++, cache_index++) {
+		for (s32 y = node_min.Y - 1; y <= node_max.Y + 1; y++, cache_index++) {
 			float float_offset = 0.0f;
 			if (y > float_taper_ymax) {
 				float_offset = std::pow((y - float_taper_ymax) / (float)floatland_taper,
@@ -523,12 +524,12 @@ int MapgenV7::generateTerrain()
 
 	//// Place nodes
 	const v3s32 &em = vm->m_area.getExtent();
-	s16 stone_surface_max_y = -MAX_MAP_GENERATION_LIMIT;
+	s32 stone_surface_max_y = -MAX_MAP_GENERATION_LIMIT;
 	u32 index2d = 0;
 
-	for (s16 z = node_min.Z; z <= node_max.Z; z++)
-	for (s16 x = node_min.X; x <= node_max.X; x++, index2d++) {
-		s16 surface_y = baseTerrainLevelFromMap(index2d);
+	for (s32 z = node_min.Z; z <= node_max.Z; z++)
+	for (s32 x = node_min.X; x <= node_max.X; x++, index2d++) {
+		s32 surface_y = baseTerrainLevelFromMap(index2d);
 		if (surface_y > stone_surface_max_y)
 			stone_surface_max_y = surface_y;
 
@@ -536,7 +537,7 @@ int MapgenV7::generateTerrain()
 		u32 vi = vm->m_area.index(x, node_min.Y - 1, z);
 		u32 index3d = (z - node_min.Z) * zstride_1u1d + (x - node_min.X);
 
-		for (s16 y = node_min.Y - 1; y <= node_max.Y + 1;
+		for (s32 y = node_min.Y - 1; y <= node_max.Y + 1;
 				y++,
 				index3d += ystride,
 				VoxelArea::add_y(em, vi, 1),

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2019 EvicenceBKidscode / Pierre-Yves Rollo <dev@pyrollo.com>
@@ -93,8 +94,8 @@ public:
 
 		// img & item specific attributes
 		std::string name;
-		v3s16 angle{0, 0, 0};
-		v3s16 rotation{0, 0, 0};
+		v3s32 angle{0, 0, 0};
+		v3s32 rotation{0, 0, 0};
 
 		s32 margin = 10;
 

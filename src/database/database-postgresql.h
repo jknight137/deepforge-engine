@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -40,9 +41,9 @@ protected:
 		return (float) atof(PQgetvalue(res, row, col));
 	}
 
-	inline v3s16 pg_to_v3s16(PGresult *res, int row, int col)
+	inline v3s32 pg_to_v3s16(PGresult *res, int row, int col)
 	{
-		return v3s16(
+		return v3s32(
 			pg_to_int(res, row, col),
 			pg_to_int(res, row, col + 1),
 			pg_to_int(res, row, col + 2)
@@ -109,10 +110,10 @@ public:
 	MapDatabasePostgreSQL(const std::string &connect_string);
 	virtual ~MapDatabasePostgreSQL() = default;
 
-	bool saveBlock(const v3s16 &pos, std::string_view data);
-	void loadBlock(const v3s16 &pos, std::string *block);
-	bool deleteBlock(const v3s16 &pos);
-	void listAllLoadableBlocks(std::vector<v3s16> &dst);
+	bool saveBlock(const v3s32 &pos, std::string_view data);
+	void loadBlock(const v3s32 &pos, std::string *block);
+	bool deleteBlock(const v3s32 &pos);
+	void listAllLoadableBlocks(std::vector<v3s32> &dst);
 
 	PARENT_CLASS_FUNCS
 

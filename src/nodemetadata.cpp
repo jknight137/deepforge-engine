@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -101,28 +102,30 @@ void NodeMetadataList::serialize(std::ostream &os, u8 blockver, bool disk,
 		Version 0 is a placeholder for "nothing to see here; go away."
 	*/
 
-	u16 count = include_empty ? m_data.size() : countNonEmpty();
+	size_t count = include_empty ? m_data.size() : countNonEmpty();
+	if (count > U16_MAX)
+		throw SerializationError("Node metadata update exceeds format entry limit");
 	if (count == 0) {
 		writeU8(os, 0); // version
 		return;
 	}
 
-	u8 version = (blockver > 27) ? 2 : 1;
+	u8 version = absolute_pos ? 3 : ((blockver > 27) ? 2 : 1);
 	writeU8(os, version);
 	writeU16(os, count);
 
 	for (NodeMetadataMap::const_iterator
 			i = m_data.begin();
 			i != m_data.end(); ++i) {
-		v3s16 p = i->first;
+		v3s32 p = i->first;
 		NodeMetadata *data = i->second;
 		if (!include_empty && data->empty())
 			continue;
 
 		if (absolute_pos) {
-			writeS16(os, p.X);
-			writeS16(os, p.Y);
-			writeS16(os, p.Z);
+			writeS32(os, p.X);
+			writeS32(os, p.Y);
+			writeS32(os, p.Z);
 		} else {
 			// Serialize positions within a mapblock
 			static_assert(MAP_BLOCKSIZE * MAP_BLOCKSIZE * MAP_BLOCKSIZE <= U16_MAX,
@@ -146,7 +149,7 @@ void NodeMetadataList::deSerialize(std::istream &is,
 		return;
 	}
 
-	if (version > 2) {
+	if (version > 3 || (version == 3 && !absolute_pos)) {
 		std::string err_str = std::string(FUNCTION_NAME)
 			+ ": version " + itos(version) + " not supported";
 		infostream << err_str << std::endl;
@@ -156,11 +159,11 @@ void NodeMetadataList::deSerialize(std::istream &is,
 	u16 count = readU16(is);
 
 	for (u16 i = 0; i < count; i++) {
-		v3s16 p;
+		v3s32 p;
 		if (absolute_pos) {
-			p.X = readS16(is);
-			p.Y = readS16(is);
-			p.Z = readS16(is);
+			p.X = version == 3 ? readS32(is) : readS16(is);
+			p.Y = version == 3 ? readS32(is) : readS16(is);
+			p.Z = version == 3 ? readS32(is) : readS16(is);
 		} else {
 			u16 p16 = readU16(is);
 			p.X = p16 & (MAP_BLOCKSIZE - 1);
@@ -187,9 +190,9 @@ NodeMetadataList::~NodeMetadataList()
 	clear();
 }
 
-std::vector<v3s16> NodeMetadataList::getAllKeys() const
+std::vector<v3s32> NodeMetadataList::getAllKeys() const
 {
-	std::vector<v3s16> keys;
+	std::vector<v3s32> keys;
 	keys.reserve(m_data.size());
 	for (const auto &it : m_data)
 		keys.push_back(it.first);
@@ -197,7 +200,7 @@ std::vector<v3s16> NodeMetadataList::getAllKeys() const
 	return keys;
 }
 
-NodeMetadata *NodeMetadataList::get(v3s16 p) const
+NodeMetadata *NodeMetadataList::get(v3s32 p) const
 {
 	auto n = m_data.find(p);
 	if (n == m_data.end())
@@ -205,7 +208,7 @@ NodeMetadata *NodeMetadataList::get(v3s16 p) const
 	return n->second;
 }
 
-std::unique_ptr<NodeMetadata> NodeMetadataList::remove(v3s16 p)
+std::unique_ptr<NodeMetadata> NodeMetadataList::remove(v3s32 p)
 {
 	std::unique_ptr<NodeMetadata> ret;
 	NodeMetadata *olddata = get(p);
@@ -222,7 +225,7 @@ std::unique_ptr<NodeMetadata> NodeMetadataList::remove(v3s16 p)
 	return ret;
 }
 
-std::unique_ptr<NodeMetadata> NodeMetadataList::set(v3s16 p, NodeMetadata *d)
+std::unique_ptr<NodeMetadata> NodeMetadataList::set(v3s32 p, NodeMetadata *d)
 {
 	auto ret = remove(p);
 	m_data[p] = d;

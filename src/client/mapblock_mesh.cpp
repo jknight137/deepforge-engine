@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -37,16 +38,16 @@ MeshMakeData::MeshMakeData(const NodeDefManager *ndef,
 	assert(m_side_length > 0);
 }
 
-void MeshMakeData::fillBlockDataBegin(const v3s16 &blockpos)
+void MeshMakeData::fillBlockDataBegin(const v3s32 &blockpos)
 {
 	m_blockpos = blockpos;
 
-	v3s16 blockpos_nodes = m_blockpos*MAP_BLOCKSIZE;
+	v3s32 blockpos_nodes = m_blockpos*MAP_BLOCKSIZE;
 
 	m_vmanip.clear();
 	// extra 1 block thick layer around the mesh
-	VoxelArea voxel_area(blockpos_nodes - v3s16(1,1,1) * MAP_BLOCKSIZE,
-			blockpos_nodes + v3s16(1,1,1) * (m_side_length + MAP_BLOCKSIZE) - v3s16(1,1,1));
+	VoxelArea voxel_area(blockpos_nodes - v3s32(1,1,1) * MAP_BLOCKSIZE,
+			blockpos_nodes + v3s32(1,1,1) * (m_side_length + MAP_BLOCKSIZE) - v3s32(1,1,1));
 	m_vmanip.addArea(voxel_area);
 }
 
@@ -57,7 +58,7 @@ void MeshMakeData::fillSingleNode(MapNode data, MapNode padding)
 	m_vmanip.clear();
 	// area around 0,0,0 so that this positon has neighbors
 	const s16 sz = 3;
-	m_vmanip.addArea({v3s16(-sz), v3s16(sz)});
+	m_vmanip.addArea({v3s32(-sz), v3s32(sz)});
 
 	u32 count = m_vmanip.m_area.getVolume();
 	for (u32 i = 0; i < count; i++) {
@@ -68,7 +69,7 @@ void MeshMakeData::fillSingleNode(MapNode data, MapNode padding)
 	m_vmanip.setNodeNoEmerge({0, 0, 0}, data);
 }
 
-void MeshMakeData::setCrack(int crack_level, v3s16 crack_pos)
+void MeshMakeData::setCrack(int crack_level, v3s32 crack_pos)
 {
 	if (crack_level >= 0)
 		m_crack_pos_relative = crack_pos - m_blockpos*MAP_BLOCKSIZE;
@@ -153,7 +154,7 @@ void final_color_blend(video::SColor *result,
 /*
 	Gets nth node tile (0 <= n <= 5).
 */
-void getNodeTileN(MapNode mn, const v3s16 &p, u8 tileindex, MeshMakeData *data, TileSpec &tile)
+void getNodeTileN(MapNode mn, const v3s32 &p, u8 tileindex, MeshMakeData *data, TileSpec &tile)
 {
 	const NodeDefManager *ndef = data->m_nodedef;
 	const ContentFeatures &f = ndef->get(mn);
@@ -173,7 +174,7 @@ void getNodeTileN(MapNode mn, const v3s16 &p, u8 tileindex, MeshMakeData *data, 
 /*
 	Gets node tile given a face direction.
 */
-void getNodeTile(MapNode mn, const v3s16 &p, const v3s16 &dir, MeshMakeData *data, TileSpec &tile)
+void getNodeTile(MapNode mn, const v3s32 &p, const v3s32 &dir, MeshMakeData *data, TileSpec &tile)
 {
 	const NodeDefManager *ndef = data->m_nodedef;
 
@@ -464,19 +465,19 @@ MapBlockMesh::MapBlockMesh(Client *client, MeshMakeData *data):
 		m = make_irr<scene::SMesh>();
 
 	auto mesh_grid = data->m_mesh_grid;
-	v3s16 bp = data->m_blockpos;
+	v3s32 bp = data->m_blockpos;
 	// Only generate minimap mapblocks at grid aligned coordinates.
 	// FIXME: ^ doesn't really make sense. and in practice, bp is always aligned
 	if (mesh_grid.isMeshPos(bp) && data->m_generate_minimap) {
 		// meshgen area always fits into a grid cell
 		m_minimap_mapblocks.resize(mesh_grid.getCellVolume(), nullptr);
-		v3s16 ofs;
+		v3s32 ofs;
 
 		// See also client.cpp for the code that reads the array of minimap blocks.
 		for (ofs.Z = 0; ofs.Z < mesh_grid.cell_size; ofs.Z++)
 		for (ofs.Y = 0; ofs.Y < mesh_grid.cell_size; ofs.Y++)
 		for (ofs.X = 0; ofs.X < mesh_grid.cell_size; ofs.X++) {
-			v3s16 p = (bp + ofs) * MAP_BLOCKSIZE;
+			v3s32 p = (bp + ofs) * MAP_BLOCKSIZE;
 			if (data->m_vmanip.getNodeNoExNoEmerge(p).getContent() != CONTENT_IGNORE) {
 				MinimapMapblock *block = new MinimapMapblock;
 				m_minimap_mapblocks[mesh_grid.getOffsetIndex(ofs)] = block;
@@ -629,7 +630,7 @@ bool MapBlockMesh::animate(bool faraway, float time, int crack,
 	return true;
 }
 
-void MapBlockMesh::updateTransparentBuffers(v3f camera_pos, v3s16 block_pos,
+void MapBlockMesh::updateTransparentBuffers(v3f camera_pos, v3s32 block_pos,
 		bool group_by_buffers)
 {
 	// nothing to do if the entire block is opaque
@@ -762,22 +763,22 @@ video::SColor encode_light(u16 light, u8 emissive_light)
 
 u8 get_solid_sides(MeshMakeData *data)
 {
-	v3s16 blockpos_nodes = data->m_blockpos * MAP_BLOCKSIZE;
+	v3s32 blockpos_nodes = data->m_blockpos * MAP_BLOCKSIZE;
 	const NodeDefManager *ndef = data->m_nodedef;
 
 	const u16 side = data->m_side_length;
-	assert(data->m_vmanip.m_area.contains(blockpos_nodes + v3s16(side - 1)));
+	assert(data->m_vmanip.m_area.contains(blockpos_nodes + v3s32(side - 1)));
 
 	u8 result = 0x3F; // all sides solid
 	for (s16 i = 0; i < side && result != 0; i++)
 	for (s16 j = 0; j < side && result != 0; j++) {
-		v3s16 positions[6] = {
-			v3s16(0, i, j),
-			v3s16(side - 1, i, j),
-			v3s16(i, 0, j),
-			v3s16(i, side - 1, j),
-			v3s16(i, j, 0),
-			v3s16(i, j, side - 1)
+		v3s32 positions[6] = {
+			v3s32(0, i, j),
+			v3s32(side - 1, i, j),
+			v3s32(i, 0, j),
+			v3s32(i, side - 1, j),
+			v3s32(i, j, 0),
+			v3s32(i, j, side - 1)
 		};
 
 		for (u8 k = 0; k < 6; k++) {

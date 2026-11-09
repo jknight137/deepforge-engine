@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -320,7 +321,7 @@ bool Hud::hasElementOfType(HudElementType type)
 }
 
 // Calculates screen position of waypoint. Returns true if waypoint is visible (in front of the player), else false.
-bool Hud::calculateScreenPos(const v3s16 &camera_offset, HudElement *e, v2s32 *pos)
+bool Hud::calculateScreenPos(const v3s32 &camera_offset, HudElement *e, v2s32 *pos)
 {
 	v3f w_pos = e->world_pos * BS;
 	scene::ICameraSceneNode* camera =
@@ -339,7 +340,7 @@ bool Hud::calculateScreenPos(const v3s16 &camera_offset, HudElement *e, v2s32 *p
 	return true;
 }
 
-void Hud::drawLuaElements(const v3s16 &camera_offset, bool only_unhidable)
+void Hud::drawLuaElements(const v3s32 &camera_offset, bool only_unhidable)
 {
 	const u32 text_height = g_fontengine->getTextHeight();
 	gui::IGUIFont *const font = g_fontengine->getFont();
@@ -874,7 +875,7 @@ void Hud::drawCrosshair()
 	}
 }
 
-void Hud::setSelectionPos(const v3f &pos, const v3s16 &camera_offset)
+void Hud::setSelectionPos(const v3f &pos, const v3s32 &camera_offset)
 {
 	m_camera_offset = camera_offset;
 	m_selection_pos = pos;
@@ -948,7 +949,7 @@ void Hud::drawBlockBounds()
 
 	u16 mesh_chunk_size = std::max<u16>(1, g_settings->getU16("client_mesh_chunk"));
 
-	v3s16 block_pos = getContainerPos(player->getStandingNodePos(), MAP_BLOCKSIZE);
+	v3s32 block_pos = getContainerPos(player->getStandingNodePos(), MAP_BLOCKSIZE);
 
 	v3f cam_offset = intToFloat(client->getCamera()->getOffset(), BS);
 
@@ -958,8 +959,8 @@ void Hud::drawBlockBounds()
 	s16 radius = m_block_bounds_mode == BLOCK_BOUNDS_NEAR ?
 			rangelim(g_settings->getU16("show_block_bounds_radius_near"), 0, 1000) : 0;
 
-	for (s16 x = -radius; x <= radius + 1; x++)
-	for (s16 y = -radius; y <= radius + 1; y++) {
+	for (s32 x = -radius; x <= radius + 1; x++)
+	for (s32 y = -radius; y <= radius + 1; y++) {
 		// Red for mesh chunk edges, yellow for other block edges.
 		auto choose_color = [&](s16 x_base, s16 y_base) {
 			// See also MeshGrid::isMeshPos().
@@ -993,7 +994,7 @@ void Hud::drawBlockBounds()
 	}
 }
 
-void Hud::updateSelectionMesh(const v3s16 &camera_offset)
+void Hud::updateSelectionMesh(const v3s32 &camera_offset)
 {
 	m_camera_offset = camera_offset;
 	if (m_mode != HIGHLIGHT_HALO)

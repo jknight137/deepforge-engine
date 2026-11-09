@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -80,8 +81,12 @@ int Database_SQLite3::busyHandler(void *data, int count)
 
 	prev_time = cur_time;
 
-	// Make sqlite transaction fail if delay exceeds BUSY_FATAL_TRESHOLD
-	return total_diff < BUSY_FATAL_TRESHOLD;
+	// Wait instead of spinning while another connection owns the lock.
+	if (total_diff >= BUSY_FATAL_TRESHOLD)
+		return 0;
+	const int remaining = BUSY_FATAL_TRESHOLD - total_diff;
+	sqlite3_sleep(std::min(remaining, 1 + std::min(count, 24)));
+	return porting::getTimeMs() - first_time < BUSY_FATAL_TRESHOLD;
 }
 
 
@@ -268,7 +273,7 @@ void MapDatabaseSQLite3::initStatements()
 	}
 }
 
-inline int MapDatabaseSQLite3::bindPos(sqlite3_stmt *stmt, v3s16 pos, int index)
+inline int MapDatabaseSQLite3::bindPos(sqlite3_stmt *stmt, v3s32 pos, int index)
 {
 	if (m_new_format) {
 		int_to_sqlite(stmt, index, pos.X);
@@ -281,7 +286,7 @@ inline int MapDatabaseSQLite3::bindPos(sqlite3_stmt *stmt, v3s16 pos, int index)
 	}
 }
 
-bool MapDatabaseSQLite3::deleteBlock(const v3s16 &pos)
+bool MapDatabaseSQLite3::deleteBlock(const v3s32 &pos)
 {
 	verifyDatabase();
 
@@ -297,7 +302,7 @@ bool MapDatabaseSQLite3::deleteBlock(const v3s16 &pos)
 	return good;
 }
 
-bool MapDatabaseSQLite3::saveBlock(const v3s16 &pos, std::string_view data)
+bool MapDatabaseSQLite3::saveBlock(const v3s32 &pos, std::string_view data)
 {
 	verifyDatabase();
 
@@ -310,7 +315,7 @@ bool MapDatabaseSQLite3::saveBlock(const v3s16 &pos, std::string_view data)
 	return true;
 }
 
-void MapDatabaseSQLite3::loadBlock(const v3s16 &pos, std::string *block)
+void MapDatabaseSQLite3::loadBlock(const v3s32 &pos, std::string *block)
 {
 	verifyDatabase();
 
@@ -328,11 +333,11 @@ void MapDatabaseSQLite3::loadBlock(const v3s16 &pos, std::string *block)
 	sqlite3_reset(m_stmt_read);
 }
 
-void MapDatabaseSQLite3::listAllLoadableBlocks(std::vector<v3s16> &dst)
+void MapDatabaseSQLite3::listAllLoadableBlocks(std::vector<v3s32> &dst)
 {
 	verifyDatabase();
 
-	v3s16 p;
+	v3s32 p;
 	while (SQLSTEP(m_stmt_list, "Failed to list blocks")) {
 		if (m_new_format) {
 			p.X = sqlite_to_int(m_stmt_list, 0);

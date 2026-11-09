@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2015-2020 paramat
@@ -29,11 +30,11 @@ class CavesNoiseIntersection
 {
 public:
 	CavesNoiseIntersection(const NodeDefManager *nodedef,
-		BiomeManager *biomemgr, BiomeGen *biomegen, v3s16 chunksize, NoiseParams *np_cave1,
+		BiomeManager *biomemgr, BiomeGen *biomegen, v3s32 chunksize, NoiseParams *np_cave1,
 		NoiseParams *np_cave2, s32 seed, float cave_width);
 	~CavesNoiseIntersection();
 
-	void generateCaves(MMVManip *vm, v3s16 nmin, v3s16 nmax, biome_t *biomemap);
+	void generateCaves(MMVManip *vm, v3s32 nmin, v3s32 nmax, biome_t *biomemap);
 
 private:
 	const NodeDefManager *m_ndef;
@@ -42,7 +43,7 @@ private:
 	BiomeGen *m_bmgn;
 
 	// configurable parameters
-	v3s16 m_csize;
+	v3s32 m_csize;
 	float m_cave_width;
 
 	// intermediate state variables
@@ -59,18 +60,18 @@ private:
 class CavernsNoise
 {
 public:
-	CavernsNoise(const NodeDefManager *nodedef, v3s16 chunksize,
+	CavernsNoise(const NodeDefManager *nodedef, v3s32 chunksize,
 		NoiseParams *np_cavern, s32 seed, float cavern_limit,
 		float cavern_taper, float cavern_threshold);
 	~CavernsNoise();
 
-	bool generateCaverns(MMVManip *vm, v3s16 nmin, v3s16 nmax);
+	bool generateCaverns(MMVManip *vm, v3s32 nmin, v3s32 nmax);
 
 private:
 	const NodeDefManager *m_ndef;
 
 	// configurable parameters
-	v3s16 m_csize;
+	v3s32 m_csize;
 	float m_cavern_limit;
 	float m_cavern_taper;
 	float m_cavern_threshold;
@@ -104,7 +105,7 @@ public:
 	MMVManip *vm;
 	const NodeDefManager *ndef;
 	GenerateNotifier *gennotify;
-	s16 *heightmap;
+	s32 *heightmap;
 	BiomeGen *bmgn;
 
 	s32 seed;
@@ -116,8 +117,8 @@ public:
 
 	u16 ystride;
 
-	s16 min_tunnel_diameter;
-	s16 max_tunnel_diameter;
+	s32 min_tunnel_diameter;
+	s32 max_tunnel_diameter;
 	u16 tunnel_routepoints;
 	int part_max_length_rs;
 
@@ -126,17 +127,17 @@ public:
 	bool flooded;
 	bool use_biome_liquid;
 
-	v3s16 node_min;
-	v3s16 node_max;
+	v3s32 node_min;
+	v3s32 node_max;
 
 	v3f orp;  // starting point, relative to caved space
-	v3s16 of; // absolute coordinates of caved space
-	v3s16 ar; // allowed route area
-	s16 rs;   // tunnel radius size
+	v3s32 of; // absolute coordinates of caved space
+	v3s32 ar; // allowed route area
+	s32 rs;   // tunnel radius size
 	v3f main_direction;
 
-	s16 route_y_min;
-	s16 route_y_max;
+	s32 route_y_min;
+	s32 route_y_max;
 
 	PseudoRandom *ps;
 
@@ -155,14 +156,14 @@ public:
 	// vm and ps are mandatory parameters.
 	// If heightmap is NULL, the surface level at all points is assumed to
 	// be water_level.
-	void makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax, PseudoRandom *ps,
-			bool is_large_cave, int max_stone_height, s16 *heightmap);
+	void makeCave(MMVManip *vm, v3s32 nmin, v3s32 nmax, PseudoRandom *ps,
+			bool is_large_cave, int max_stone_height, s32 *heightmap);
 
 private:
 	void makeTunnel(bool dirswitch);
 	void carveRoute(v3f vec, float f, bool randomize_xz);
 
-	inline bool isPosAboveSurface(v3s16 p);
+	inline bool isPosAboveSurface(v3s32 p);
 };
 
 /*
@@ -188,7 +189,7 @@ public:
 	PseudoRandom *ps2;
 
 	// configurable parameters
-	s16 *heightmap;
+	s32 *heightmap;
 	content_t c_water_source;
 	content_t c_lava_source;
 	int water_level;
@@ -196,25 +197,25 @@ public:
 	// intermediate state variables
 	u16 ystride;
 
-	s16 min_tunnel_diameter;
-	s16 max_tunnel_diameter;
+	s32 min_tunnel_diameter;
+	s32 max_tunnel_diameter;
 	u16 tunnel_routepoints;
 	int part_max_length_rs;
 
 	bool large_cave;
 	bool large_cave_is_flat;
 
-	v3s16 node_min;
-	v3s16 node_max;
+	v3s32 node_min;
+	v3s32 node_max;
 
 	v3f orp;  // starting point, relative to caved space
-	v3s16 of; // absolute coordinates of caved space
-	v3s16 ar; // allowed route area
-	s16 rs;   // tunnel radius size
+	v3s32 of; // absolute coordinates of caved space
+	v3s32 ar; // allowed route area
+	s32 rs;   // tunnel radius size
 	v3f main_direction;
 
-	s16 route_y_min;
-	s16 route_y_max;
+	s32 route_y_min;
+	s32 route_y_max;
 
 	// ndef is a mandatory parameter.
 	// If gennotify is NULL, generation events are not logged.
@@ -225,13 +226,13 @@ public:
 	// vm, ps, and ps2 are mandatory parameters.
 	// If heightmap is NULL, the surface level at all points is assumed to
 	// be water_level.
-	void makeCave(MMVManip *vm, v3s16 nmin, v3s16 nmax, PseudoRandom *ps,
+	void makeCave(MMVManip *vm, v3s32 nmin, v3s32 nmax, PseudoRandom *ps,
 			PseudoRandom *ps2, bool is_large_cave, int max_stone_height,
-			s16 *heightmap = NULL);
+			s32 *heightmap = NULL);
 
 private:
 	void makeTunnel(bool dirswitch);
 	void carveRoute(v3f vec, float f, bool randomize_xz, bool tunnel_above_ground);
 
-	inline s16 getSurfaceFromHeightmap(v3s16 p);
+	inline s32 getSurfaceFromHeightmap(v3s32 p);
 };

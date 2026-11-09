@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -92,7 +93,7 @@ struct EnumString ScriptApiNode::es_TextureAlphaMode[] =
 		{0, NULL},
 	};
 
-bool ScriptApiNode::node_on_punch(v3s16 p, MapNode node,
+bool ScriptApiNode::node_on_punch(v3s32 p, MapNode node,
 		ServerActiveObject *puncher, const PointedThing &pointed)
 {
 	SCRIPTAPI_PRECHECKHEADER
@@ -106,7 +107,7 @@ bool ScriptApiNode::node_on_punch(v3s16 p, MapNode node,
 		return false;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 	objectrefGetOrCreate(L, puncher);
 	pushPointedThing(pointed);
@@ -115,7 +116,7 @@ bool ScriptApiNode::node_on_punch(v3s16 p, MapNode node,
 	return true;
 }
 
-bool ScriptApiNode::node_on_dig(v3s16 p, MapNode node,
+bool ScriptApiNode::node_on_dig(v3s32 p, MapNode node,
 		ServerActiveObject *digger)
 {
 	SCRIPTAPI_PRECHECKHEADER
@@ -129,7 +130,7 @@ bool ScriptApiNode::node_on_dig(v3s16 p, MapNode node,
 		return false;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 	objectrefGetOrCreate(L, digger);
 	PCALL_RES(lua_pcall(L, 3, 1, error_handler));
@@ -142,7 +143,7 @@ bool ScriptApiNode::node_on_dig(v3s16 p, MapNode node,
 	return result;
 }
 
-void ScriptApiNode::node_on_construct(v3s16 p, MapNode node)
+void ScriptApiNode::node_on_construct(v3s32 p, MapNode node)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -155,12 +156,12 @@ void ScriptApiNode::node_on_construct(v3s16 p, MapNode node)
 		return;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	PCALL_RES(lua_pcall(L, 1, 0, error_handler));
 	lua_pop(L, 1);  // Pop error handler
 }
 
-void ScriptApiNode::node_on_destruct(v3s16 p, MapNode node)
+void ScriptApiNode::node_on_destruct(v3s32 p, MapNode node)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -173,12 +174,12 @@ void ScriptApiNode::node_on_destruct(v3s16 p, MapNode node)
 		return;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	PCALL_RES(lua_pcall(L, 1, 0, error_handler));
 	lua_pop(L, 1);  // Pop error handler
 }
 
-bool ScriptApiNode::node_on_flood(v3s16 p, MapNode node, MapNode newnode)
+bool ScriptApiNode::node_on_flood(v3s32 p, MapNode node, MapNode newnode)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -191,7 +192,7 @@ bool ScriptApiNode::node_on_flood(v3s16 p, MapNode node, MapNode newnode)
 		return false;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 	pushnode(L, newnode);
 	PCALL_RES(lua_pcall(L, 3, 1, error_handler));
@@ -199,7 +200,7 @@ bool ScriptApiNode::node_on_flood(v3s16 p, MapNode node, MapNode newnode)
 	return readParam<bool>(L, -1, false);
 }
 
-void ScriptApiNode::node_after_destruct(v3s16 p, MapNode node)
+void ScriptApiNode::node_after_destruct(v3s32 p, MapNode node)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -212,13 +213,13 @@ void ScriptApiNode::node_after_destruct(v3s16 p, MapNode node)
 		return;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	pushnode(L, node);
 	PCALL_RES(lua_pcall(L, 2, 0, error_handler));
 	lua_pop(L, 1);  // Pop error handler
 }
 
-bool ScriptApiNode::node_on_timer(v3s16 p, MapNode node, f32 elapsed, f32 timeout)
+bool ScriptApiNode::node_on_timer(v3s32 p, MapNode node, f32 elapsed, f32 timeout)
 {
 	SCRIPTAPI_PRECHECKHEADER
 
@@ -231,7 +232,7 @@ bool ScriptApiNode::node_on_timer(v3s16 p, MapNode node, f32 elapsed, f32 timeou
 		return false;
 
 	// Call function
-	push_v3s16(L, p);
+	push_nodepos(L, p);
 	lua_pushnumber(L, elapsed);
 	pushnode(L, node);
 	lua_pushnumber(L, timeout);
@@ -242,7 +243,7 @@ bool ScriptApiNode::node_on_timer(v3s16 p, MapNode node, f32 elapsed, f32 timeou
 	return ret;
 }
 
-void ScriptApiNode::node_on_receive_fields(v3s16 p,
+void ScriptApiNode::node_on_receive_fields(v3s32 p,
 		const std::string &formname,
 		const StringMap &fields,
 		ServerActiveObject *sender)
@@ -263,7 +264,7 @@ void ScriptApiNode::node_on_receive_fields(v3s16 p,
 		return;
 
 	// Call function
-	push_v3s16(L, p);                    // pos
+	push_nodepos(L, p);                    // pos
 	lua_pushstring(L, formname.c_str()); // formname
 	lua_newtable(L);                     // fields
 	StringMap::const_iterator it;

@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 sapier, sapier at gmx dot net
@@ -40,9 +41,9 @@ typedef enum {
 /******************************************************************************/
 
 /** c wrapper function to use from scriptapi */
-std::vector<v3s16> get_path(Map *map, const NodeDefManager *ndef,
-		v3s16 source,
-		v3s16 destination,
+std::vector<v3s32> get_path(Map *map, const NodeDefManager *ndef,
+		v3s32 source,
+		v3s32 destination,
 		unsigned int searchdistance,
 		unsigned int max_jump,
 		unsigned int max_drop,

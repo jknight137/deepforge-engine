@@ -1,0 +1,62 @@
+[
+  {
+    "source": "toolchain/llvm-mingw-20260616-ucrt-x86_64/x86_64-w64-mingw32/bin/libc++.dll",
+    "sha256": "952b41b1370ddb5e7299cc9fcefce2ad8c2021409948b057ec4d903c03760b6c"
+  },
+  {
+    "source": "libs/curl/bin/libcurl.dll",
+    "sha256": "adb1f00b332d8b4fdd97c72611f97fd6726cc84c4de0f6f2d5e8bc2c9d3ae31c"
+  },
+  {
+    "source": "libs/freetype/bin/libfreetype.dll",
+    "sha256": "0a01ec88279cbd17b4a271b0650c370cefa317560c1b7ff9bb64385b166a7965"
+  },
+  {
+    "source": "libs/libjpeg/bin/libjpeg-62.dll",
+    "sha256": "3c88a130393987312eca5d3f39a869a3002df7b83698d074ad2a2cfc7c246957"
+  },
+  {
+    "source": "libs/libpng/bin/libpng16.dll",
+    "sha256": "b45976849d6d80d295c97b0c4ce45c11021b60f0f3463f7e1b1575cf16074479"
+  },
+  {
+    "source": "libs/sqlite3/bin/libsqlite3-0.dll",
+    "sha256": "527bade6f7ac915958270f4fcf1c677a49f4915f1c2662f31d315f3433194be1"
+  },
+  {
+    "source": "toolchain/llvm-mingw-20260616-ucrt-x86_64/x86_64-w64-mingw32/bin/libunwind.dll",
+    "sha256": "8d9f60801f50c0a6cb7beb7fd2e121f98bf39ebe40e6c7e07a8a39fccb817c03"
+  },
+  {
+    "source": "libs/libvorbis/bin/libvorbis.dll",
+    "sha256": "8254f7a40857a2a07ee0ffbbf6714dbc38e0b60c34b1eaf4bed0f2533f681ccc"
+  },
+  {
+    "source": "libs/libvorbis/bin/libvorbisfile.dll",
+    "sha256": "24b43af046373bae17bf42e4e7ebd63c6c4f07d6161874a09687c5400f72e83d"
+  },
+  {
+    "source": "libs/libzip/bin/libzip.dll",
+    "sha256": "031f9a7a906eae5fdbab037a300da59c2bcde6dc68e0512e7dba9b11e198343d"
+  },
+  {
+    "source": "libs/zstd/bin/libzstd.dll",
+    "sha256": "3368c79f2499ebc78e5bfb46fd4e08fd317db502f184d7979412e4c58fde7afd"
+  },
+  {
+    "source": "libs/libogg/bin/ogg.dll",
+    "sha256": "1e4f9ee88f5ac26b70e431080c6b1fc602583c1462759e179b81f442c6860c0d"
+  },
+  {
+    "source": "libs/openal-soft/bin/OpenAL32.dll",
+    "sha256": "db2446d98b5d59068b4ca74cca3c0acea935f17cb29206843afc97c16bd7952b"
+  },
+  {
+    "source": "libs/sdl2/bin/SDL2.dll",
+    "sha256": "47a1dad28eab7b5f2efad4bb6220e8eb7c52b062eae6593ea2991cb7690763f0"
+  },
+  {
+    "source": "libs/zlib/bin/zlib1.dll",
+    "sha256": "951d57b19cad3f38b3fc4630c2a644265e3cb96f934c43a99b39fb5b497ecf7f"
+  }
+]

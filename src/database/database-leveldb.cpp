@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -39,7 +40,7 @@ Database_LevelDB::Database_LevelDB(const std::string &savedir)
 	m_database.reset(db);
 }
 
-bool Database_LevelDB::saveBlock(const v3s16 &pos, std::string_view data)
+bool Database_LevelDB::saveBlock(const v3s32 &pos, std::string_view data)
 {
 	leveldb::Slice data_s(data.data(), data.size());
 	leveldb::Status status = m_database->Put(leveldb::WriteOptions(),
@@ -53,7 +54,7 @@ bool Database_LevelDB::saveBlock(const v3s16 &pos, std::string_view data)
 	return true;
 }
 
-void Database_LevelDB::loadBlock(const v3s16 &pos, std::string *block)
+void Database_LevelDB::loadBlock(const v3s32 &pos, std::string *block)
 {
 	leveldb::Status status = m_database->Get(leveldb::ReadOptions(),
 		i64tos(getBlockAsInteger(pos)), block);
@@ -65,7 +66,7 @@ void Database_LevelDB::loadBlock(const v3s16 &pos, std::string *block)
 	}
 }
 
-bool Database_LevelDB::deleteBlock(const v3s16 &pos)
+bool Database_LevelDB::deleteBlock(const v3s32 &pos)
 {
 	leveldb::Status status = m_database->Delete(leveldb::WriteOptions(),
 			i64tos(getBlockAsInteger(pos)));
@@ -78,7 +79,7 @@ bool Database_LevelDB::deleteBlock(const v3s16 &pos)
 	return true;
 }
 
-void Database_LevelDB::listAllLoadableBlocks(std::vector<v3s16> &dst)
+void Database_LevelDB::listAllLoadableBlocks(std::vector<v3s32> &dst)
 {
 	std::unique_ptr<leveldb::Iterator> it(m_database->NewIterator(leveldb::ReadOptions()));
 	for (it->SeekToFirst(); it->Valid(); it->Next()) {

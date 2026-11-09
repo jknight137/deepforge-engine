@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -740,7 +741,7 @@ int ObjectRef::l_send_mapblock(lua_State *L)
 	if (player == nullptr)
 		return 0;
 
-	v3s16 pos = read_v3s16(L, 2);
+	v3s32 pos = read_nodepos(L, 2);
 
 	session_t peer_id = player->getPeerId();
 	bool r = getServer(L)->SendBlock(peer_id, pos);
@@ -1406,7 +1407,7 @@ int ObjectRef::l_set_sprite(lua_State *L)
 	if (entitysao == nullptr)
 		return 0;
 
-	v2s16 start_frame = readParam<v2s16>(L, 2, v2s16(0,0));
+	v2s32 start_frame = readParam<v2s32>(L, 2, v2s32(0,0));
 	int num_frames    = readParam<int>(L, 3, 1);
 	float framelength = readParam<float>(L, 4, 0.2f);
 	bool select_x_by_camera = readParam<bool>(L, 5, false);

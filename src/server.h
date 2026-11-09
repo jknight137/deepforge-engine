@@ -1,3 +1,4 @@
+// Modified for Deepforge on 2026-11-09; original notices retained.
 // Luanti
 // SPDX-License-Identifier: LGPL-2.1-or-later
 // Copyright (C) 2010-2013 celeron55, Perttu Ahola <celeron55@gmail.com>
@@ -439,7 +440,7 @@ public:
 	ModChannel *getModChannel(const std::string &channel) override;
 
 	// Send block to specific player only
-	bool SendBlock(session_t peer_id, const v3s16 &blockpos);
+	bool SendBlock(session_t peer_id, const v3s32 &blockpos);
 
 	// Get or load translations for a language
 	// Note: don't store returned pointer.
@@ -524,12 +525,12 @@ private:
 
 	// The standard library does not implement std::hash for pairs so we have this:
 	struct SBCHash {
-		size_t operator() (const std::pair<v3s16, u16> &p) const {
-			return std::hash<v3s16>()(p.first) ^ p.second;
+		size_t operator() (const std::pair<v3s32, u16> &p) const {
+			return std::hash<v3s32>()(p.first) ^ p.second;
 		}
 	};
 
-	typedef std::unordered_map<std::pair<v3s16, u16>, std::string, SBCHash> SerializedBlockCache;
+	typedef std::unordered_map<std::pair<v3s32, u16>, std::string, SBCHash> SerializedBlockCache;
 
 	void init();
 
@@ -576,15 +577,15 @@ private:
 		far_d_nodes are ignored and their peer_ids are added to far_players
 	*/
 	// Envlock and conlock should be locked when calling these
-	void sendRemoveNode(v3s16 p, std::unordered_set<u16> *far_players = nullptr,
+	void sendRemoveNode(v3s32 p, std::unordered_set<u16> *far_players = nullptr,
 			float far_d_nodes = 100);
-	void sendAddNode(v3s16 p, MapNode n,
+	void sendAddNode(v3s32 p, MapNode n,
 			std::unordered_set<u16> *far_players = nullptr,
 			float far_d_nodes = 100, bool remove_metadata = true);
-	void sendNodeChangePkt(NetworkPacket &pkt, v3s16 block_pos,
+	void sendNodeChangePkt(NetworkPacket &pkt, v3s32 block_pos,
 			v3f p, float far_d_nodes, std::unordered_set<u16> *far_players);
 
-	void sendMetadataChanged(const std::unordered_set<v3s16> &positions,
+	void sendMetadataChanged(const std::unordered_set<v3s32> &positions,
 			float far_d_nodes = 100);
 
 	// Environment and Connection must be locked when called
